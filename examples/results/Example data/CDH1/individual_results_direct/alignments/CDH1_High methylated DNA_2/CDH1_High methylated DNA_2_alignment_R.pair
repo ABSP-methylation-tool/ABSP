@@ -1,0 +1,57 @@
+########################################
+# Program: Biostrings (version 2.62.0), a Bioconductor package
+# Rundate: Tue May 03 14:30:17 2022
+########################################
+#=======================================
+#
+# Aligned_sequences: 2
+# 1: P1
+# 2: S1
+# Matrix: NA
+# Gap_penalty: 14.0
+# Extend_penalty: 4.0
+#
+# Length: 146
+# Identity:     146/146 (100.0%)
+# Similarity:    NA/146 (NA%)
+# Gaps:           0/146 (0.0%)
+# Score: 289.336
+#
+#
+#=======================================
+
+P1                36 ACCGCCCCCCGTACCGCTAA     55
+                     ||||||||||||||||||||
+S1               128 ACCGCCCCCCGTACCGCTAA    147
+
+P1                56 TTAACTAAAAATTCACCTAC     75
+                     ||||||||||||||||||||
+S1               148 TTAACTAAAAATTCACCTAC    167
+
+P1                76 CGACCACAACCAATCAACAA     95
+                     ||||||||||||||||||||
+S1               168 CGACCACAACCAATCAACAA    187
+
+P1                96 CGCGAACCCCTCCCCAAAAC    115
+                     ||||||||||||||||||||
+S1               188 CGCGAACCCCTCCCCAAAAC    207
+
+P1               116 GAAACTAACGACCCGCCCAC    135
+                     ||||||||||||||||||||
+S1               208 GAAACTAACGACCCGCCCAC    227
+
+P1               136 CCGACCTCGCATAAACGCGA    155
+                     ||||||||||||||||||||
+S1               228 CCGACCTCGCATAAACGCGA    247
+
+P1               156 TAACCCTCTAACCTAAAATT    175
+                     ||||||||||||||||||||
+S1               248 TAACCCTCTAACCTAAAATT    267
+
+P1               176 ACTAAA    181
+                     ||||||
+S1               268 ACTAAA    273
+
+
+#---------------------------------------
+#---------------------------------------
