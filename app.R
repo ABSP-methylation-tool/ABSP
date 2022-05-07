@@ -45,7 +45,7 @@ ui <- fluidPage(
     
     # Theme
     theme = shinytheme("flatly"),
-    includeCSS("www/custom2.css"),
+    includeCSS("www/custom_app.css"),
     
     
     titlePanel(windowTitle = "ABSP",
@@ -138,7 +138,7 @@ ui <- fluidPage(
                                    
                                    br(),
                                    
-                                   p("Find the ABSP tool on github at", tags$a(href="https://github.com/", "https://github.com/.../ABSP",target="_blank")),
+                                   p("Find the ABSP tool on github at", tags$a(href="https://github.com/ABSP-methylation-tool/ABSP", "https://github.com/ABSP-methylation-tool/ABSP",target="_blank")),
                                    p("Find the user guide in the ", em("documents")," folder of your ABSP folder"),
                                    
                                    br(),
