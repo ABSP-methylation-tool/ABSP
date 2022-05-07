@@ -1,0 +1,2752 @@
+---
+title: "![](./logo.svg){height=40} \n Individual analysis results"
+output:
+  html_document: 
+    fig_caption: yes
+    theme: flatly
+    css: custom.css
+params:
+  foldername:
+    label: "Enter folder name"
+    value: folder-name
+    input: text
+  seqname:
+    label: "Enter sequence name"
+    value: sequence-name
+    input: text
+  collection:
+    label: "Enter collection name (distinct groups, not to compare)"
+    value: collection
+    input: text
+  group:
+    label: "Enter condition / group name (to compare) (examples: control, treated...)"
+    value: group1
+    input: text
+  replicate:
+    label: "Enter replicate number"
+    value: 1
+    input: numeric
+  clone:
+    label: "Enter clone number (for direct sequencing, please leave empty or enter 0)"
+    value: 0
+    input: numeric
+  DNA_seq:
+    label: "Select .fasta file of reference DNA sequence from plus strand with header containing coordinates and strand (plus or minus) used for primer design"
+    value: "DNA_seq.fasta"
+    input: file
+  genome:
+    label: "Select genome"
+    value: BSgenome.Hsapiens.UCSC.hg19
+    input: select
+    choices: !r installed.genomes()
+    selected: BSgenome.Hsapiens.UCSC.hg19
+  date_s1:
+    label: "Select date of sequencing #1"
+    value: !r Sys.Date()
+    input: date
+  date_s2:
+    label: "Select date of sequencing #2"
+    value: !r Sys.Date()
+    input: date
+  ab1_s1:
+    label: "Select .ab1 file of sequencing result from one direction #1"
+    value: "seq_s1.ab1"
+    input: file
+  ab1_s2:
+    label: "Select .ab1 file of sequencing result from the other direction #2"
+    value: "seq_s2.ab1"
+    input: file
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo=FALSE)
+knitr::opts_knit$set(root.dir = gsub("/scripts","",getwd()))
+options(knitr.table.format = "html")
+options(ucscChromosomeNames=FALSE)
+Sys.setlocale(category = "LC_ALL", locale = "en_SE.utf8")
+```
+
+```{r Library sync, include=F}
+# Restore package versions from the renv.lock file : synchronize library with lockfile
+renv::restore()
+```
+
+```{r TEST SCRIPT files and params, eval=F}
+## TEST SCRIPT WITHOUT KNITTING
+
+# Parameters variables
+folder_name <- "Test"
+seq_name = "CDH1v2"
+seq_coll = "" ; seq_coll = ifelse(seq_coll==0,"",seq_coll)
+seq_group = "0"
+seq_rep = "1"  ; seq_rep = ifelse(seq_rep==0,"",seq_rep)
+seq_clone = "0" ; seq_clone = ifelse(seq_clone=="0"|seq_clone==""|seq_clone==" ","",paste0("clone",str_pad(seq_clone, 2, "0", side="left")))
+clone_nb = 0
+seq_date_s1 = "2022-03-04"
+seq_date_s2 = "2022-03-04"
+selected_genome = "BSgenome.Hsapiens.UCSC.hg19"
+
+# Get files paths using choose.files function (Windows only)
+DNA_seq_path = choose.files(default = "", caption = "Select .fasta file corresponding to DNA sequence",
+                                multi = FALSE, filters=Filters, index=nrow(Filters))
+sangerseq_s1_path = choose.files(default = "", caption = "Select .ab1 file corresponding to the result of sequencing in one direction #1",
+                                multi = FALSE, filters=Filters, index=nrow(Filters))
+sangerseq_s2_path = choose.files(default = "", caption = "Select .ab1 file corresponding to the result of sequencing in the other direction #2",
+                                multi = FALSE, filters=Filters, index=nrow(Filters))
+
+useSeqs1 <- T
+useSeqs2 <- T
+```
+
+```{r read input params, include=F}
+## SCRIPT TO USE PARAMS FOR KNITING : DO NOT RUN IF TESTING THE SCRIPT WITHOUT KNITTING
+
+# Parameters variables
+folder_name <- params$foldername
+seq_name <- params$seqname
+seq_coll <- params$collection ; seq_coll <- ifelse(seq_coll==0 | is.na(seq_coll),"",seq_coll)
+seq_group <- params$group
+if (params$replicate==0 | is.na(params$replicate)) {seq_rep <- ""} else {seq_rep <- params$replicate}
+if (params$clone==0 | is.na(params$clone)) {seq_clone <- ""} else {seq_clone <- paste0("clone",str_pad(params$clone, 2, "0", side="left"))}
+if (params$clone==0 | is.na(params$clone)) {clone_nb <- NA} else {clone_nb <- params$clone}
+
+# Date 
+if(length(params$date_s1)==0) {seq_date_s1 <- ""
+} else if (is.null(params$date_s1) | is.na(params$date_s1)) { seq_date_s1 <- ""
+} else {seq_date_s1 <- params$date_s1}
+
+if(length(params$date_s2)==0) {seq_date_s2 <- ""
+} else if (is.null(params$date_s2) | is.na(params$date_s2)) { seq_date_s2 <- ""
+} else {seq_date_s2 <- params$date_s2}
+
+# Date format
+seq_date_s1 <- as.character(seq_date_s1)
+seq_date_s2 <- as.character(seq_date_s2)
+
+selected_genome <- params$genome
+
+# Files
+
+if(length(params$ab1_s1)==0) { useSeqs1 <- F
+} else if (params$ab1_s1=="seq_s1.ab1" | is.na(params$ab1_s1) | is.null(params$ab1_s1) | params$ab1_s1=="") { useSeqs1 <- F
+} else  { useSeqs1 <- T }
+
+if(length(params$ab1_s2)==0) { useSeqs2 <- F
+} else if (params$ab1_s2=="seq_s2.ab1" | is.na(params$ab1_s2) | is.null(params$ab1_s2) | params$ab1_s2=="") { useSeqs2 <- F
+} else  { useSeqs2 <- T }
+
+DNA_seq_path <- params$DNA_seq
+sangerseq_s1_path <- params$ab1_s1
+sangerseq_s2_path <- params$ab1_s2
+
+```
+
+```{r read files and extract coordinates, include=F, warning=T}
+# SEQUENCE FASTA FILE
+
+# Check fasta format
+if (grepl("*.fasta$",DNA_seq_path)==F) { stop("sequence file must be in .fasta format") }
+
+# Read fasta file as DNA String set
+DNA_seq_stringset <- readDNAStringSet(DNA_seq_path,format="fasta")
+
+# Set ref DNA sequence as a character variable
+DNA_seq <- base::as.character(DNA_seq_stringset, use.names=F)
+
+# Extract fasta header
+DNA_seq_header <- DNA_seq_stringset@ranges@NAMES
+
+```
+
+```{r get information, include=F, warning=T}
+# Extractcoordinates : chromosome
+seq_chr <- stringr::str_extract(DNA_seq_header,"(?<=chr)(.{1,5})(?=:\\d{1,20}-\\d{1,20})")
+seq_chr <- paste0("chr",seq_chr)
+# Extract coordinates : start
+seq_start <- as.numeric(stringr::str_extract(DNA_seq_header, "(?<=chr.{1,20}:)(\\d*)(?=-\\d{1,20})"))
+# Extract coordinates : end
+seq_end <- as.numeric(stringr::str_extract(DNA_seq_header, "(?<=chr.{1,20}:\\d{1,20}-)(\\d*)"))
+
+# Extract chosen strand for primer design
+if (grepl("primers",DNA_seq_header)==T) {
+  # if 'primers' feature is indicated strand plus or minus is retrieved
+  seq_strand <- stringr::str_extract(DNA_seq_header,"(?<=primers=)(plus|minus)")
+  # if 'primers' feature doesn't indicate strand plus or minus : warning
+  if (is.na(seq_strand)) { 
+    seq_strand <- "plus"
+    p("Warning: In fasta header 'primers' feature indicates neither plus or minus strand. Strand used for primers design is the plus strand by default.",
+      style="color:#d37217 ; font-weight: bold ;")
+  }
+} else {
+  # By default : plus strand
+  seq_strand <- "plus"
+  p("Warning: In fasta header no 'primers' feature is indicates. Strand used for primers design is the plus strand by default.", 
+    style="color:#d37217 ; font-weight: bold ;")
+}
+
+
+# Load genome database for genomic plots
+if (!(selected_genome %in% installed.packages()[,"Package"])) {
+  BiocManager::install(selected_genome, ask = FALSE)
+  suppressMessages(lapply(selected_genome, library, character.only = TRUE, quietly = TRUE))
+}
+genome <- getBSgenome(selected_genome)
+```
+
+
+```{r functions script,include=F}
+# Functions script
+source(file = "./scripts/ABSP_functions.R")
+```
+
+
+```{r output folders and file prefix}
+# Create variable for common prefix of output files 
+fileprefix <- paste(seq_name,seq_coll,seq_group,seq_rep,seq_clone,sep="_")
+fileprefix <- gsub("__","_",fileprefix)
+fileprefix <- gsub("*_$","",fileprefix)
+
+ir_type_name <- paste0("individual_results_", ifelse(seq_clone!="","cloning","direct"))
+
+# Create the results folder if not already created
+if (! dir.exists(file.path(getwd(),"results"))) {suppressWarnings(dir.create(file.path(getwd(),"results")))}
+
+
+# Path to main folder to seperate different experiment or user
+indivDir <- list(
+  main = file.path(getwd(),"results",folder_name))
+
+# Path to sequence folder for the same sequence analyzed (same primers)
+indivDir <- c(indivDir, list(
+  name = file.path(indivDir$main,seq_name)))
+
+# Paths to output folders
+indivDir <- c(indivDir, list(
+  indiv = file.path(indivDir$name,ir_type_name)))
+indivDir <- c(indivDir, list(
+  alg = file.path(indivDir$indiv,"alignments"),
+  chrom = file.path(indivDir$indiv,"chromatograms"),
+  data = file.path(indivDir$indiv,"data"),
+  plot = file.path(indivDir$indiv,"plots"),
+  seq = file.path(indivDir$indiv,"sequences"),
+  tab = file.path(indivDir$indiv,"tables")
+))
+# Create directories
+for (i in indivDir) {if (! dir.exists(i)){suppressWarnings(dir.create(i))}}
+
+
+
+# Paths to output subfolders
+indivDir$alg <- file.path(indivDir$alg,fileprefix)
+indivDir$chrom <- file.path(indivDir$chrom,fileprefix)
+indivDir$tab <- file.path(indivDir$tab,fileprefix)
+# Create directories
+for (i in indivDir) {if (! dir.exists(i)){suppressWarnings(dir.create(i))}}
+
+```
+
+```{r Diagram of output folders, inculde=F}
+# create diagram of output folder with DiagrammeR
+# settings
+diagramset_indiv <- "
+digraph graph2 { 
+
+graph [layout = dot]
+
+# node definitions with substituted label text
+node [shape = folder, width = 1.5, fontname='Arial',fontsize=14, fillcolor='#374e64', style=filled, fontcolor='white',color=none, height=0.5]
+a [label = 'ABSP']
+b [label = 'results']
+c [label = '@@1']
+d [label = '@@2']
+e [label = '@@3']
+f [label = 'alignments']
+g [label = 'chromatograms']
+h [label = 'data']
+i [label = 'plots']
+j [label = 'sequences']
+k [label = 'tables']
+l [label = '.pair', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+m [label = '.fasta', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+n [label = '.pdf', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+o [label = '.csv', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+p [label = '.png', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+q [label = '.fasta', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+r [label = '.csv', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+s [label = '.png', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+t [label = '.xlsx', shape= rectangle, style=rounded, width = 1,  fillcolor='white', fontcolor='#374e64',color='#374e64']
+
+nodesep=0.2
+ranksep=0.2
+splines=polyline
+
+a -> b [penwidth=0.5, arrowsize=0.5, arrowhead=none]
+b -> c [penwidth=0.5, arrowsize=0.5, arrowhead=none]
+c -> d [penwidth=0.5, arrowsize=0.5, arrowhead=none]
+d -> e [penwidth=0.5, arrowsize=0.5, arrowhead=none]
+e -> {f g h i j k} [penwidth=0.5, arrowhead=none]
+f -> l [penwidth=0, arrowhead=none]
+l -> m [penwidth=0, arrowhead=none]
+g -> n [penwidth=0, arrowhead=none]
+h -> o [penwidth=0, arrowhead=none]
+i -> p [penwidth=0, arrowhead=none]
+j -> q [penwidth=0, arrowhead=none]
+k -> r [penwidth=0, arrowhead=none]
+r -> s [penwidth=0, arrowhead=none]
+s -> t [penwidth=0, arrowhead=none]
+
+}
+[1]:  paste0(folder_name)
+[2]:  paste0(seq_name)
+[3]:  paste0(ir_type_name)
+"
+# diagram
+diagram_indiv <- DiagrammeR::grViz(diagramset_indiv)
+```
+
+
+```{r List the output files function, include=F}
+list_output_indiv <- function(fileprefix) {
+  files <- list(
+    alg = list.files(path=indivDir$alg, full.names = T, include.dirs = F, recursive=T, pattern=fileprefix),
+    chrom = list.files(path=indivDir$chrom, full.names = T, include.dirs = F, recursive=T, pattern=fileprefix),
+    data = list.files(path=indivDir$data, full.names = T, include.dirs = F, recursive=T, pattern=fileprefix),
+    plot = c(list.files(path=indivDir$plot, full.names = T, include.dirs = F, recursive=T, pattern=fileprefix),
+             list.files(path=indivDir$plot, full.names = T, include.dirs = F, recursive=T, pattern="legend")),
+    seq = list.files(path=indivDir$seq, full.names = T, include.dirs = F, recursive=T),
+    tab = list.files(path=indivDir$tab, full.names = T, include.dirs = F, recursive=T, pattern=fileprefix))
+  
+  cat("  \n")
+  if (length(files$alg)!=0) {
+    cat("#### **alignments**","  \n")
+    tags_alg <- tagList()
+    for (i in files$alg) {tags_alg[[i]] <- htmltools::p(htmltools::a(href = i,basename(i),target="_blank"))}
+    cat(paste0(tags_alg))
+    cat("  \n")}
+  
+  if (length(files$chrom)!=0) {
+    cat("#### **chromatograms**","  \n")
+    tags_chrom <- tagList()
+    for (i in files$chrom) {tags_chrom[[i]] <- htmltools::p(htmltools::a(href = i,basename(i),target="_blank"))}
+    cat(paste0(tags_chrom))
+    cat("  \n")}
+  
+  if (length(files$data)!=0) {
+    cat("#### **data**","  \n")
+    tags_data <- tagList()
+    for (i in files$data) {tags_data[[i]] <- htmltools::p(htmltools::a(href = i,basename(i),target="_blank"))}
+    cat(paste0(tags_data))
+    cat("  \n")}
+  
+  if (length(files$plot)!=0) {
+    cat("#### **plots**","  \n")
+    tags_plot <- tagList()
+    for (i in files$plot) {tags_plot[[i]] <- htmltools::p(htmltools::a(href = i,basename(i),target="_blank"))}
+    cat(paste0(tags_plot))
+    cat("  \n")}
+  
+  if (length(files$seq)!=0) {
+    cat("#### **sequences**","  \n")
+    tags_seq <- tagList()
+    for (i in files$seq) {tags_seq[[i]] <- htmltools::p(htmltools::a(href = i,basename(i),target="_blank"))}
+    cat(paste0(tags_seq))
+    cat("  \n")}
+  
+  if (length(files$tab)!=0) {
+    cat("#### **tables**","  \n")
+    tags_tab <- tagList()
+    for (i in files$tab) {tags_tab[[i]] <- htmltools::p(htmltools::a(href = i,basename(i),target="_blank"))}
+    cat(paste0(tags_tab))
+    cat("  \n")}
+}
+```
+
+
+
+```{r colors, include=F}
+# Colors of sequence track for genomic plots
+bases_colors <- c(A="#43CD80", T="#D7191C", G="#FDC661", C="#2C7BB6", N="#7F7F7F")
+colors_tables <- c(correct="#00be7d",incorrect="#bf3232",warning="#d37217",correct_pale="#91e2c4",incorrect_pale="#e29191",warning_pale="#e2b891")
+```
+
+
+
+
+
+# {.tabset}
+
+```{r display expermient parameters header, results='asis'}
+# First column of table
+parameters <- c(
+  "Folder name :",
+  "Sequence name :",
+  "Collection :",
+  "Group :",
+  "Experiment type :",
+  "Replicate number  :",
+  "Clone number  :",
+  "Date of sequencing #1 :",
+  "Date of sequencing #2 :",
+  "Date of analysis  :",
+  "Prefix of output files  :"
+  )
+# Second column of table
+values <- c(
+  folder_name,
+  seq_name,
+  seq_coll,
+  seq_group,
+  "Type",
+  seq_rep,
+  seq_clone,
+  seq_date_s1,
+  seq_date_s2,
+  format(Sys.time(), "%Y-%m-%d %H:%M"),
+  fileprefix
+)
+# Specify the experiment type 
+if(seq_rep!="") values[5] <- "Direct-BSP"
+if(seq_clone!="") values[5] <- "Cloning-BSP"
+# Create data frame
+paramTable <- data.frame("Parameters" = parameters, "Input values" = values)
+# Remove empty unecessary rows
+paramTable <- paramTable[which(paramTable[,2]!=""),]
+rownames(paramTable) <- NULL # reset row names, as row numbers are displayed if rows are missing
+# print table as formattable
+formattable(paramTable, align=rep("l", 2))
+```
+
+
+  
+
+## Reference DNA {.tabset .tabset-pills}
+
+### Reference DNA sequence {.tabset .tabset-pills}   
+
+```{r choice of base DNA sequence from amplified strand, include=F}
+# Get DNA sequences depending on strand chosen for primer design : 
+  # base sequence is the sequence from the strand chosen for primer design as only this strand will be amplified by PCR following the bisulfite conversion
+  # RC sequence is the reverse complement of base sequence, equivalent to the opposite strand, necessary to find CG coordinates on the reverse sequence (for CG position query on reverse sequencing results)
+DNA_seq <- DNAString(DNA_seq)
+if (seq_strand=="minus"){DNA_seq = reverseComplement(DNA_seq)}
+seq <- list("seq" = DNA_seq, "seq_RC" = reverseComplement(DNA_seq))
+```
+
+
+| Reference DNA sequence information | Input values |
+|:--------------------------|:--------------------------|
+| Name                            | `r seq_name`                                    |
+| Strand used for primer design   | `r stringr::str_to_sentence(seq_strand)` strand |
+| Length                          | `r nchar(seq$seq)` pb                           |
+| Coordinates on reference genome | `r paste0(seq_chr,":",seq_start,"-",seq_end) `  |
+
+
+
+
+```{r check if incorrect genomic coordinates}
+# Verify correct genomic coordinates
+if ( (seq_end - seq_start) - length(DNA_seq) != -1 ) {genocoord <-T} else {genocoord <-F}
+```
+  
+```{r output if incorrect genomic coordinates, results='asis', eval=genocoord}
+# Output tab and Directories tab
+cat("## Output data {.tabset .tabset-pills}","### Directories", sep="  \n")
+```
+
+```{r diagram if incorrect genomic coordinates, eval=genocoord}
+# Diagram of directories
+diagram_indiv
+```
+
+```{r stop knit if incorrect genomic coordinates, results='asis', eval=genocoord}
+# Files tab with list of output files
+cat("### Files","  \n")
+list_output_indiv(fileprefix = fileprefix)
+# Abort analysis and error message
+cat("## Analysis aborted","  \n")
+p("Error: Length of reference DNA sequence does not match with the provided genomic coordinates. Please verify concordance between the reference DNA sequence and genomic coordinates.", style="color:#bf3232 ; font-weight: bold ;")
+shiny::setProgress(1) 
+knit_exit()
+```
+
+
+
+
+
+#### `r if(seq_strand=="plus"){"Genomic DNA Sequence from plus strand (template strand):"} else {"Genomic DNA Sequence from plus strand (not used):"} `
+```{r display ref DNA sequence plus}
+if(seq_strand=="plus") {
+  cat(as.character(seq$seq))
+  write.fasta(as.vector(seq$seq),
+              names=paste(seq_name,"genomic DNA sequence from plus strand",paste0(seq_chr,":",seq_start,"-",seq_end),sep=" "),
+              file.out=file.path(indivDir$seq,paste0(seq_name,"_plus.fasta")))} 
+if(seq_strand=="minus") {
+  cat(as.character(seq$seq_RC))
+  write.fasta(as.vector(seq$seq_RC),
+              names=paste(seq_name,"genomic DNA sequence from plus strand",paste0(seq_chr,":",seq_start,"-",seq_end),sep=" "),
+              file.out=file.path(indivDir$seq,paste0(seq_name,"_plus.fasta")))}
+```
+
+#### `r if(seq_strand=="plus"){"Genomic DNA Sequence from minus strand (not used):"} else {"Genomic DNA Sequence from minus strand (template strand):"}`
+```{r display ref DNA sequence minus}
+if(seq_strand=="plus") {
+  cat(as.character(seq$seq_RC))
+  write.fasta(as.vector(seq$seq_RC),
+              names=paste(seq_name,"genomic DNA sequence from minus strand",paste0(seq_chr,":",seq_start,"-",seq_end),sep=" "),
+              file.out=file.path(indivDir$seq,paste0(seq_name,"_minus.fasta")))}
+if(seq_strand=="minus") {
+  cat(as.character(seq$seq))
+  write.fasta(as.vector(seq$seq),
+              names=paste(seq_name,"genomic DNA sequence from minus strand",paste0(seq_chr,":",seq_start,"-",seq_end),sep=" "),
+              file.out=file.path(indivDir$seq,paste0(seq_name,"_minus.fasta")))}
+```
+
+
+
+### Localization of CG dinucleotides {.tabset .tabset-pills} 
+
+```{r find CG localization, include=FALSE}
+# Find CG coordinates from DNA ref coordinates
+# To compute the coordinates, addition or removal of 1 is needed as the first nucleotide is corresponding to position 1 and not 0
+CG_pos <- findCGcoordinates(sequence = seq$seq, 
+                            sequence_reverse = seq$seq_RC, 
+                            chr=seq_chr, coord_start = seq_start, coord_end = seq_end, 
+                            seq_strand = seq_strand)
+```
+
+
+#### CG positions on plus strand
+
+```{r display CG positions plus}
+# Plus
+if (seq_strand=="plus"){
+  CG_pos_FT <- CG_pos$CG_pos
+  colnames(CG_pos_FT) <- c("CG number","chr","start","end","C position","G position")
+  formattable(CG_pos_FT, align=rep("c",ncol(CG_pos_FT)))
+} 
+if (seq_strand=="minus") {
+  CG_pos_RC_FT <- CG_pos$CG_pos_RC
+  colnames(CG_pos_RC_FT) <- c("CG number","chr","start","end","C position","G position")
+  formattable(CG_pos_RC_FT, align=rep("c",ncol(CG_pos_RC_FT)))
+}
+```
+
+
+
+#### CG positions on minus strand
+
+```{r display CG positions minus}
+# Minus
+if (seq_strand=="plus") {
+  CG_pos_RC_FT <- CG_pos$CG_pos_RC
+  colnames(CG_pos_RC_FT) <- c("CG number","chr","start","end","C position","G position")
+  formattable(CG_pos_RC_FT, align=rep("c",ncol(CG_pos_RC_FT)))
+} 
+if (seq_strand=="minus") {
+  CG_pos_FT <- CG_pos$CG_pos
+  colnames(CG_pos_FT) <- c("CG number","chr","start","end","C position","G position")
+  formattable(CG_pos_FT, align=rep("c",ncol(CG_pos_FT)))
+}
+```
+
+
+
+### Bisulfite converted sequences {.tabset .tabset-pills} 
+
+<!--  The `r seq_strand` strand is used to perform bisulfite conversion as it is the strand used for primer design, only this strand is amplified during PCR.  
+However, PCR regenerates the opposite strand of the bisulfite converted DNA sequence delimited by primers, which corresponds to its reverse complement but does not match with the bisulfite converted `r ifelse(seq_strand=="plus","minus","plus")` strand. -->
+  
+
+```{r bisulfite conversion}
+# Bisulfite conversion is only performed on the chosen strand for primer design, as only this strand will be amplified by PCR following the bisulfite conversion
+seq_BS <- bisulfiteConversion(seq$seq)
+```
+
+#### Converted sequence sense (template strand)  
+Bisulfite converted sequence of the `r seq_strand` strand as indicated as the template strand.
+```{r display DNA BS}
+# Print and save the DNA sequence
+cat(as.character(seq_BS$seq_BS))
+fasta_name <- paste(seq_name, 
+                    "bisulfite converted DNA sequence sense (from", seq_strand,"strand)", 
+                    paste0(seq_chr, ":", seq_start, "-", seq_end), 
+                    sep=" ")
+write.fasta(as.vector(seq_BS$seq_BS), names=fasta_name, file.out=file.path(indivDir$seq,paste0(seq_name,"_BS_sense.fasta")))
+rm(fasta_name)
+```
+
+#### Converted sequence antisense (reverse complement) 
+Reverse complement of the bisulfite converted sequence from the `r seq_strand` strand.
+```{r display DNA BS RC}
+# Print and save the DNA sequence
+cat(as.character(seq_BS$seq_BS_RC))
+fasta_name <- paste(seq_name, 
+                    "bisulfite converted DNA sequence antisense (from", seq_strand,"strand)", 
+                    paste0(seq_chr, ":", seq_start, "-", seq_end), 
+                    sep=" ")
+write.fasta(as.vector(seq_BS$seq_BS_RC), names=fasta_name, file.out=file.path(indivDir$seq,paste0(seq_name,"_BS_antisense.fasta")))
+rm(fasta_name)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Sequencing trimming {.tabset .tabset-pills}
+
+```{r Thresholds, include=F}
+
+# Thresholds 
+
+# Maximum base-calling error probability (value per position):
+th_quality_error <- 0.001 
+# Minimum Phred quality score, logarithmically linked to error probability (value per position):
+th_quality_phred <- (-10*log(th_quality_error,10))
+
+# Minimum ratio of primary peak, corresponding to the primary peak value over the total of peak value, to consider a position as non-mixed (value per position):
+th_mixed_position <- 0.75
+# Minimum percentage of non-mixed positions in the trimmed sequence to be considered non-mixed (value for the total trimmed sequence):
+th_mixed_perc <- 75 # %
+
+# Minimum length of trimmed sequences
+th_min_trim <- 30 # bp
+
+# Minimum length of the aligned sequences
+th_min_alg <- 30 # bp
+```
+
+```{r read seq files, include=F}
+
+shiny::setProgress(0.1) # For progression bar displayed
+
+# SANGER SEQ FILES
+if(useSeqs1==T) {
+  sangerRead_s1 <- SangerRead(
+    printLevel = "SangerRead",
+    inputSource = "ABIF",
+    readFeature = "Forward Read",
+    readFileName = sangerseq_s1_path,
+    geneticCode = GENETIC_CODE,
+    TrimmingMethod = "M1",
+    M1TrimmingCutoff = th_quality_error,
+    M2CutoffQualityScore = NULL,
+    M2SlidingWindowSize = NULL,
+    baseNumPerRow = 2,
+    heightPerRow = 200,
+    signalRatioCutoff = (1-(th_mixed_perc/100)),
+    showTrimmed = TRUE)
+  
+  if (sangerRead_s1@objectResults@creationResult==F) {useSeqs1 <- F}
+}
+
+if(useSeqs2==T) {
+  sangerRead_s2 <- SangerRead(
+    printLevel = "SangerRead",
+    inputSource = "ABIF",
+    readFeature = "Forward Read",
+    readFileName = sangerseq_s2_path,
+    geneticCode = GENETIC_CODE,
+    TrimmingMethod = "M1",
+    M1TrimmingCutoff = th_quality_error,
+    M2CutoffQualityScore = NULL,
+    M2SlidingWindowSize = NULL,
+    baseNumPerRow = 2,
+    heightPerRow = 200,
+    signalRatioCutoff = (1-(th_mixed_perc/100)),
+    showTrimmed = TRUE)
+  
+  if (sangerRead_s2@objectResults@creationResult==F) {useSeqs2 <- F}
+}
+
+shiny::setProgress(0.2) 
+```
+
+```{r create seq table s1, include=F, eval=useSeqs1}
+# Create table
+seqtable_s1 <- seqtable(sangerRead_s1)
+```
+
+```{r create seq table s2, include=F, eval=useSeqs2}
+# Create table
+seqtable_s2 <- seqtable(sangerRead_s2)
+```
+
+
+```{r mixed report s1, include=F, eval=useSeqs1}
+# Find the trimmed sequence
+ratios_s1 <- c()
+for (i in 3:15) { # i consecutive non-mixed positions required at the start and end of the trimmed sequence
+  MixedReport_s1 <- MixedReport(seqtable_s1,consecutive_threshold = i, th_mixed_position=th_mixed_position) 
+  ratios_s1[i] <- MixedReport_s1$trimmedPercNonMixedPos
+}
+# select the minimum of consecutive positions requirement (to have the longer sequence) only above the ratio threshold (ratio of non-mixed over mixed position in the trimmed sequence)
+th_mixed_consecutive_s1 <- ifelse(length(which(ratios_s1*100>=th_mixed_perc))>0 , min(which(ratios_s1*100>=th_mixed_perc)), NA)
+if (!is.na(th_mixed_consecutive_s1)) {
+  # Generate MixedReport for selected consecutive position threshold
+  MixedReport_s1 <- MixedReport(seqtable_s1,consecutive_threshold = th_mixed_consecutive_s1, th_mixed_position=th_mixed_position)
+  MixedReport_s1[["ConsecutiveNonMixedPosExtremities"]] <- th_mixed_consecutive_s1
+} else {
+  MixedReport_s1 <- MixedReport(seqtable_s1,consecutive_threshold = th_mixed_consecutive_s1, th_mixed_position=th_mixed_position)
+  MixedReport_s1[["ConsecutiveNonMixedPosExtremities"]] <- th_mixed_consecutive_s1
+}
+```
+
+```{r mixed report s2, include=F, eval=useSeqs2}
+# Find the trimmed sequence
+ratios_s2 <- c()
+for (i in 3:15) { # i consecutive non-mixed positions required at the start and end of the trimmed sequence
+  MixedReport_s2 <- MixedReport(seqtable_s2,consecutive_threshold = i, th_mixed_position=th_mixed_position) 
+  ratios_s2[i] <- MixedReport_s2$trimmedPercNonMixedPos
+}
+# select the minimum of consecutive positions requirement (to have the longer sequence) only above the ratio threshold (ratio of non-mixed over mixed position in the trimmed sequence)
+th_mixed_consecutive_s2 <- ifelse(length(which(ratios_s2*100>=th_mixed_perc))>0 , min(which(ratios_s2*100>=th_mixed_perc)), NA)
+if (!is.na(th_mixed_consecutive_s2)) {
+  # Generate MixedReport for selected consecutive position threshold
+  MixedReport_s2 <- MixedReport(seqtable_s2,consecutive_threshold = th_mixed_consecutive_s2, th_mixed_position=th_mixed_position)
+  MixedReport_s2[["ConsecutiveNonMixedPosExtremities"]] <- th_mixed_consecutive_s2
+} else {
+  MixedReport_s2 <- MixedReport(seqtable_s2,consecutive_threshold = th_mixed_consecutive_s2, th_mixed_position=th_mixed_position)
+  MixedReport_s2[["ConsecutiveNonMixedPosExtremities"]] <- th_mixed_consecutive_s2
+}
+```
+
+
+
+```{r trimmed sequence s1, results='asis', eval=useSeqs1}
+
+# Trim sequencing result
+Trimmed_s1 <- trimSeq(sangerRead_s1, MixedReport_s1)
+
+if(Trimmed_s1$SeqLength < th_min_trim | is.na(Trimmed_s1$SeqLength)) {
+  TrimOKs1 <- F
+} else if (Trimmed_s1$MeanQualityScore < th_quality_phred | Trimmed_s1$PercNonMixedPos < th_mixed_perc ) { 
+  TrimOKs1 <- F
+} else {
+  TrimOKs1 <- T
+}
+```
+
+```{r trimmed sequence s2, results='asis', eval=useSeqs2}
+
+# Trim sequencing result
+Trimmed_s2 <- trimSeq(sangerRead_s2, MixedReport_s2)
+
+if(Trimmed_s2$SeqLength <= th_min_trim | is.na(Trimmed_s2$SeqLength) ) {
+  TrimOKs2 <- F
+} else if (Trimmed_s2$MeanQualityScore < th_quality_phred | Trimmed_s2$PercNonMixedPos < th_mixed_perc ) { 
+  TrimOKs2 <- F
+} else {
+  TrimOKs2 <- T
+}
+```
+
+
+
+```{r final trimmed create table summary s1, eval=useSeqs1} 
+# Create row dor sequencing 1
+Trim_final_table_s1 <- data.frame(
+  check.names = FALSE,
+  "Sequencing" = "#1",
+  "Length" = Trimmed_s1$SeqLength,
+  "Start position" = Trimmed_s1$StartPos,
+  "End position" = Trimmed_s1$FinishPo,
+  "Mean of Phred quality scores" = Trimmed_s1$MeanQualityScore,
+  "Mean of primary peak ratio" = Trimmed_s1$MeanPrimaryRatio,
+  "Percentage of non-mixed positions" = Trimmed_s1$PercNonMixedPos,
+  "Trimmed sequence quality" = TrimOKs1)
+```
+
+```{r final trimmed create table summary s2, eval=useSeqs2} 
+# Create row dor sequencing 2
+Trim_final_table_s2 <- data.frame(
+  check.names = FALSE,
+  "Sequencing" = "#2",
+  "Length" = Trimmed_s2$SeqLength,
+  "Start position" = Trimmed_s2$StartPos,
+  "End position" = Trimmed_s2$FinishPo,
+  "Mean of Phred quality scores" = Trimmed_s2$MeanQualityScore,
+  "Mean of primary peak ratio" = Trimmed_s2$MeanPrimaryRatio,
+  "Percentage of non-mixed positions" = Trimmed_s2$PercNonMixedPos,
+  "Trimmed sequence quality" = TrimOKs2)
+```
+
+```{r final trimmed table summary}
+# Merge tables 
+if (useSeqs1==T & useSeqs2==T) {Trim_final_table <- rbind(Trim_final_table_s1, Trim_final_table_s2 )}
+if (useSeqs1==T & useSeqs2==F) {Trim_final_table <- Trim_final_table_s1}
+if (useSeqs1==F & useSeqs2==T) {Trim_final_table <- Trim_final_table_s2}
+```
+
+
+
+
+### Summary
+
+| Thresholds                                  | Values                   |
+|:-------------|:--------------------------|
+| Minimum length of the trimmed sequence :        | **`r th_min_trim` bp**    |
+| Minimum Phred quality score :  | **`r th_quality_phred`**    | 
+| Minimum ratio of primary peak :  | **`r th_mixed_position`**    | 
+| Minimum percentage of non-mixed positions :  | **`r th_mixed_perc` %**    | 
+
+
+```{r final trimmed dispaly table summary, results='asis'}
+# Export table data as csv and xlsx
+write.table(Trim_final_table, file = file.path(indivDir$tab,paste0(fileprefix,"_trimmedseq_table.csv")), row.names = T, col.names = T)
+write.xlsx(Trim_final_table, file = file.path(indivDir$tab,paste0(fileprefix,"_trimmedseq_table.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display Quality table
+Trim_final_FT <- formattable(
+  Trim_final_table, 
+  align = rep("c",ncol(Trim_final_table)),
+  list("Sequencing" = formatter("span", style = ~ formattable::style(font.weight = "bold")),
+       "Length" = color_condi(">=", th_min_trim, colors_tables["correct_pale"], colors_tables["incorrect_pale"]),
+       "Mean of Phred quality scores" =  color_condi(">=", th_quality_phred, colors_tables["correct_pale"], colors_tables["warning_pale"]),
+       "Mean of primary peak ratio" =  color_condi(">=", th_mixed_position, colors_tables["correct_pale"], colors_tables["warning_pale"]),
+       "Percentage of non-mixed positions" =  color_condi(">=", th_mixed_perc, colors_tables["correct_pale"], colors_tables["warning_pale"]),
+       "Trimmed sequence quality" = formatter("span", x ~ icontext(ifelse(x==T, "ok", "remove"), ifelse(x==T, "Correct", "Incorrect")), 
+                                    style = x ~ formattable::style(color = ifelse(x==T, colors_tables["correct"], colors_tables["incorrect"])))))
+
+Trim_final_FT
+```
+
+```{r Trim summary export table, include=F}
+export_formattable(Trim_final_FT,file=file.path(indivDir$tab,paste0(fileprefix,"_trimmedseq.png")))
+```
+
+
+### Sequencing result #1 {.tabset .tabset-pills}
+
+#### Raw sequence {.tabset .tabset-pills}
+
+##### Sequence
+
+```{r raw seq s1, results='asis', eval=useSeqs1}
+p("Sequence of primary peaks:", style="font-weight: bold ;")
+p("Length: ",nchar(primarySeq(sangerRead_s1,string = TRUE))," bp")
+```
+
+```{r display primary peaks seq s1, eval=useSeqs1}
+cat(primarySeq(sangerRead_s1,string = TRUE))
+```
+
+##### Chromatogram
+```{r chromatogram s1, include=F, eval=useSeqs1}
+# Save chromatogram
+chroma_s1_path <- file.path(indivDir$chrom,paste0(fileprefix,"_chromatogram_1.pdf"))
+chromatogram(sangerRead_s1, width = 20, height = 2, showcalls = "both", filename = chroma_s1_path)
+```
+
+```{r display chromatogram s1, out.width = "100%", fig.align = "center", eval=useSeqs1}
+htmltools::p("Open ",htmltools::a(href = file.path(chroma_s1_path),"chromatogram file",target="_blank")," in a new tab")
+htmltools::tags$iframe(src=file.path(chroma_s1_path), style="width:100%; height:1000px;", frameborder="0")
+```
+
+##### Table
+```{r seq table s1, include=F, eval=useSeqs1}
+# Export table data as csv and xlsx
+write.table(seqtable_s1, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_1.csv")), row.names = T, col.names = T)
+write.xlsx(seqtable_s1, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_1.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display table
+seqtable_s1_FT <- seqtable_s1
+colnames(seqtable_s1_FT) <- c("Position","A peak","T peak","G peak","C peak","Total","A ratio","T ratio","G ratio","C ratio","Primary base","Quality score","Primary ratio")
+seqtable_s1_FT <- formattable(
+  seqtable_s1_FT, 
+  align = rep("c",ncol(seqtable_s1_FT)),
+  list("Position" = formatter("span", style = ~ formattable::style(font.weight = "bold")), 
+       "A peak"= color_format("white",bases_colors["A"]),
+       "T peak"= color_format("white",bases_colors["T"]),
+       "G peak"= color_format("white",bases_colors["G"]),
+       "C peak"= color_format("white",bases_colors["C"]),
+       "Total"= color_condi(">=", 100, colorT = "lightgrey", colorF = colors_tables["incorrect_pale"],block="block"),
+       "A ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["A"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "T ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["T"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "G ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["G"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "C ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["C"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "Primary base"= color_base("white", bases_colors=bases_colors),
+       "Quality score" = color_condi(">=", th_quality_phred,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block"),
+       "Primary ratio" = color_condi(">=", th_mixed_position,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block")
+  ))
+```
+
+```{r display seq table s1, eval=useSeqs1}
+seqtable_s1_FT
+```
+
+
+#### Quality report
+
+
+**Trimming thresholds :**  
+
+* Trimming Method : **`r ifelse(useSeqs1==T,sangerRead_s1@QualityReport@TrimmingMethod,"")`**  
+* Minimum base error probability : **`r ifelse(useSeqs1==T,th_quality_error,"")` %**  
+* Minimum Phred quality score : **`r ifelse(useSeqs1==T,th_quality_phred,"")`**  
+
+
+| Raw sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Raw sequence length : | **`r ifelse(useSeqs1==T,sangerRead_s1@QualityReport@rawSeqLength,"")` bp** |
+| Mean of raw sequence Phred quality scores : | **`r ifelse(useSeqs1==T,round(sangerRead_s1@QualityReport@rawMeanQualityScore,2),"")`** |
+
+
+| Quality report - Trimmed sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Trimmed sequence length : | **`r ifelse(useSeqs1==T,sangerRead_s1@QualityReport@trimmedSeqLength,"")` bp** |
+| Trimmed sequence start position : | **`r ifelse(useSeqs1==T,sangerRead_s1@QualityReport@trimmedStartPos,"")`** |
+| Trimmed sequence end position : | **`r ifelse(useSeqs1==T,sangerRead_s1@QualityReport@trimmedFinishPos,"")`** |
+| Mean of trimmed sequence Phred quality scores : | **`r ifelse(useSeqs1==T,round(sangerRead_s1@QualityReport@trimmedMeanQualityScore,2),"")`** |
+ 
+
+#### Mixed base peak report
+
+ 
+**Trimming thresholds :**  
+
+* Minimum primary peak ratio for a position to be considered non-mixed : **`r ifelse(useSeqs1==T,th_mixed_position,"")`**  
+* Minimum of non-mixed positions percentage in the trimmed sequence to be considered non-mixed : **`r ifelse(useSeqs1==T,th_mixed_perc,"")` %**  
+* Minimum number of consecutive non-mixed positions at extremities to get a non-mixed positions percentage above threshold for the trimmed sequence (computed) : **`r ifelse(useSeqs1==T,MixedReport_s1$ConsecutiveNonMixedPosExtremities,"")` bp**  
+
+
+| Raw sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Raw sequence length : | **`r ifelse(useSeqs1==T,MixedReport_s1$rawSeqLength,"")` bp** |
+| Mean of raw sequence primary peak ratios : | **`r ifelse(useSeqs1==T, MixedReport_s1$rawMeanPrimaryRatio,"")`** |
+| Percentage of non-mixed positions on raw sequence : | **`r ifelse(useSeqs1==T,MixedReport_s1$rawPercNonMixedPos,"")` %** |
+
+
+| Mixed peak report - Trimmed sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Trimmed sequence length : | **`r ifelse(useSeqs1==T,MixedReport_s1$trimmedSeqLength,"")` bp** |
+| Trimmed sequence start position : | **`r ifelse(useSeqs1==T,MixedReport_s1$trimmedStartPos,"")`** |
+| Trimmed sequence end position : | **`r ifelse(useSeqs1==T,MixedReport_s1$trimmedFinishPos,"")`** |
+| Mean of trimmed sequence primary peak ratios : | **`r ifelse(useSeqs1==T,MixedReport_s1$trimmedMeanPrimaryRatio,"")`** |
+| Percentage of non-mixed positions on trimmed sequence : | **`r ifelse(useSeqs1==T,MixedReport_s1$trimmedPercNonMixedPos,"")` %** |
+
+
+#### Trimming plot 
+
+```{r trim plot s1, include=F, eval=useSeqs1}
+Trim_plot_s1 <- suppressWarnings(trimming_plot(sangerRead = sangerRead_s1, 
+                                               seqtable = seqtable_s1, 
+                                               MixedReport = MixedReport_s1, 
+                                               Trimmed_seq = Trimmed_s1,
+                                               th_quality_phred = th_quality_phred, 
+                                               th_mixed_position = th_mixed_position,
+                                               downloadname = paste0(fileprefix,"_trimming_plot_s1.png"),
+                                               colors_tables = colors_tables))
+```
+
+```{r display trim plot s1, out.width="100%", eval=useSeqs1}
+suppressWarnings(Trim_plot_s1)
+```
+
+
+
+
+#### Final trimmed sequence {.tabset .tabset-pills}
+
+##### Sequence
+
+```{r trimmed ok s1, results='asis', eval=useSeqs1 & !TrimOKs1}
+p("Warning: Trimmed sequence from the sequencing result #1 was found with insufficient length or insufficient quality and will not be used.",
+  style="color:#d37217 ; font-weight: bold ;")
+```
+
+
+| Final trimmed sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Length : | **`r ifelse(useSeqs1==T,Trimmed_s1$SeqLength,"")` bp** |
+| Start position : | **`r ifelse(useSeqs1==T,Trimmed_s1$StartPos,"")`** |
+| End position : | **`r ifelse(useSeqs1==T,Trimmed_s1$FinishPos,"")`** |
+| Mean of Phred quality scores : | **`r ifelse(useSeqs1==T,Trimmed_s1$MeanQualityScore,"")`** |
+| Mean of primary peak ratio : | **`r ifelse(useSeqs1==T,Trimmed_s1$MeanPrimaryRatio,"")`** |
+| Percentage of non-mixed positions : | **`r ifelse(useSeqs1==T,Trimmed_s1$PercNonMixedPos,"")` %** |
+  
+  
+```{r trimmed seq s1, results='asis', eval=useSeqs1 & TrimOKs1}
+p("Sequence of primary peaks:", style="font-weight: bold ;")
+```
+
+```{r display trimmed seq s1, eval=useSeqs1 & TrimOKs1}
+cat(as.character(Trimmed_s1$PrimarySeq))
+```
+
+
+##### Chromatogram
+
+```{r chromatogram trimmed s1, include=F, eval=useSeqs1 & TrimOKs1}
+# Save chromatogram
+chroma_s1_path <- file.path(indivDir$chrom,paste0(fileprefix,"_chromatogram_trimmed_1.pdf"))
+chromatogram(sangerRead_s1, trim5 = Trimmed_s1$StartPos, trim3 = (sangerRead_s1@QualityReport@rawSeqLength - Trimmed_s1$FinishPos), width = 20, height = 2, showcalls = "both", filename = chroma_s1_path)
+```
+
+```{r display trimmed chromatogram s1, out.width = "100%", fig.align = "center", eval=useSeqs1 & TrimOKs1}
+
+htmltools::p("Open ",htmltools::a(href = file.path(chroma_s1_path),"chromatogram file",target="_blank")," in a new tab")
+htmltools::tags$iframe(src=file.path(chroma_s1_path), style="width:100%; height:1000px;", frameborder="0") 
+```
+
+
+
+##### Table
+
+```{r trimmed seq table s1,include=F, eval=useSeqs1 & TrimOKs1}
+
+# Create table
+seqtable_trim_s1 <- seqtable_s1[Trimmed_s1$StartPos:Trimmed_s1$FinishPos,]
+
+# Export table data as csv and xlsx
+write.table(seqtable_trim_s1, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_trimmed_1.csv")), row.names = T, col.names = T)
+write.xlsx(seqtable_trim_s1, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_trimmed_1.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display table
+seqtable_trim_s1_FT <- seqtable_trim_s1
+colnames(seqtable_trim_s1_FT) <- c("Position","A peak","T peak","G peak","C peak","Total","A ratio","T ratio","G ratio","C ratio","Primary base","Quality score","Primary ratio")
+seqtable_trim_s1_FT <- formattable(
+  seqtable_trim_s1_FT, 
+  align = rep("c",ncol(seqtable_trim_s1_FT)),
+  list("Position" = formatter("span", style = ~ formattable::style(font.weight = "bold")), 
+       "A peak"= color_format("white",bases_colors["A"]),
+       "T peak"= color_format("white",bases_colors["T"]),
+       "G peak"= color_format("white",bases_colors["G"]),
+       "C peak"= color_format("white",bases_colors["C"]),
+       "Total"= color_condi(">=", 100, colorT = "lightgrey", colorF = colors_tables["incorrect_pale"],block="block"),
+       "A ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["A"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "T ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["T"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "G ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["G"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "C ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["C"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "Primary base"= color_base("white", bases_colors=bases_colors),
+       "Quality score" = color_condi(">=", th_quality_phred,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block"),
+       "Primary ratio" = color_condi(">=", th_mixed_position,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block")
+  ))
+```
+
+```{r display trimmed seq table s1, eval=useSeqs1 & TrimOKs1}
+seqtable_trim_s1_FT
+
+shiny::setProgress(0.3) 
+```
+
+
+
+
+
+
+
+
+
+
+### Sequencing result #2 {.tabset .tabset-pills}
+
+#### Raw sequence {.tabset .tabset-pills}
+
+##### Sequence
+
+```{r raw seq s2, results='asis', eval=useSeqs2}
+p("Sequence of primary peaks:", style="font-weight: bold ;")
+p("Length: ",nchar(primarySeq(sangerRead_s2,string = TRUE))," bp")
+```
+
+```{r display primary peaks seq s2, eval=useSeqs2}
+cat(primarySeq(sangerRead_s2,string = TRUE))
+```
+
+##### Chromatogram
+```{r chromatogram s2, include=F, eval=useSeqs2}
+# Save chromatogram
+chroma_s2_path <- file.path(indivDir$chrom,paste0(fileprefix,"_chromatogram_2.pdf"))
+chromatogram(sangerRead_s2, width = 20, height = 2, showcalls = "both", filename = chroma_s2_path)
+```
+
+```{r display chromatogram s2, out.width = "100%", fig.align = "center", eval=useSeqs2}
+htmltools::p("Open ",htmltools::a(href = file.path(chroma_s2_path),"chromatogram file",target="_blank")," in a new tab")
+htmltools::tags$iframe(src=file.path(chroma_s2_path), style="width:100%; height:1000px;", frameborder="0")
+```
+
+##### Table
+```{r seq table s2, include=F, eval=useSeqs2}
+# Export table data as csv and xlsx
+write.table(seqtable_s2, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_2.csv")), row.names = T, col.names = T)
+write.xlsx(seqtable_s2, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_2.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display table
+seqtable_s2_FT <- seqtable_s2
+colnames(seqtable_s2_FT) <- c("Position","A peak","T peak","G peak","C peak","Total","A ratio","T ratio","G ratio","C ratio","Primary base","Quality score","Primary ratio")
+seqtable_s2_FT <- formattable(
+  seqtable_s2_FT, 
+  align = rep("c",ncol(seqtable_s2_FT)),
+  list("Position" = formatter("span", style = ~ formattable::style(font.weight = "bold")), 
+       "A peak"= color_format("white",bases_colors["A"]),
+       "T peak"= color_format("white",bases_colors["T"]),
+       "G peak"= color_format("white",bases_colors["G"]),
+       "C peak"= color_format("white",bases_colors["C"]),
+       "Total"= color_condi(">=", 100, colorT = "lightgrey", colorF = colors_tables["incorrect_pale"],block="block"),
+       "A ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["A"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "T ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["T"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "G ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["G"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "C ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["C"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "Primary base"= color_base("white", bases_colors=bases_colors),
+       "Quality score" = color_condi(">=", th_quality_phred,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block"),
+       "Primary ratio" = color_condi(">=", th_mixed_position,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block")
+  ))
+```
+
+```{r display seq table s2, eval=useSeqs2}
+seqtable_s2_FT
+```
+
+
+#### Quality report
+
+
+**Trimming thresholds :**  
+
+* Trimming Method : **`r ifelse(useSeqs2==T,sangerRead_s2@QualityReport@TrimmingMethod,"")`**  
+* Minimum base error probability : **`r ifelse(useSeqs2==T,th_quality_error,"")` %**  
+* Minimum Phred quality score : **`r ifelse(useSeqs2==T,th_quality_phred,"")`**  
+
+
+| Raw sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Raw sequence length : | **`r ifelse(useSeqs2==T,sangerRead_s2@QualityReport@rawSeqLength,"")` bp** |
+| Mean of raw sequence Phred quality scores : | **`r ifelse(useSeqs2==T,round(sangerRead_s2@QualityReport@rawMeanQualityScore,2),"")`** |
+
+
+| Quality report - Trimmed sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Trimmed sequence length : | **`r ifelse(useSeqs2==T,sangerRead_s2@QualityReport@trimmedSeqLength,"")` bp** |
+| Trimmed sequence start position : | **`r ifelse(useSeqs2==T,sangerRead_s2@QualityReport@trimmedStartPos,"")`** |
+| Trimmed sequence end position : | **`r ifelse(useSeqs2==T,sangerRead_s2@QualityReport@trimmedFinishPos,"")`** |
+| Mean of trimmed sequence Phred quality scores : | **`r ifelse(useSeqs2==T,round(sangerRead_s2@QualityReport@trimmedMeanQualityScore,2),"")`** |
+ 
+
+
+#### Mixed base peak report
+
+
+**Trimming thresholds :**  
+
+* Minimum primary peak ratio for a position to be considered non-mixed : **`r ifelse(useSeqs2==T,th_mixed_position,"")`**  
+* Minimum of non-mixed positions percentage in the trimmed sequence to be considered non-mixed : **`r ifelse(useSeqs2==T,th_mixed_perc,"")` %**  
+* Minimum number of consecutive non-mixed positions at extremities to get a non-mixed positions percentage above threshold for the trimmed sequence (computed) : **`r ifelse(useSeqs2==T,MixedReport_s2$ConsecutiveNonMixedPosExtremities,"")` bp**  
+
+
+| Raw sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Raw sequence length : | **`r ifelse(useSeqs2==T,MixedReport_s2$rawSeqLength,"")` bp** |
+| Mean of raw sequence primary peak ratios : | **`r ifelse(useSeqs2==T, MixedReport_s2$rawMeanPrimaryRatio,"")`** |
+| Percentage of non-mixed positions on raw sequence : | **`r ifelse(useSeqs2==T,MixedReport_s2$rawPercNonMixedPos,"")` %** |
+
+
+| Mixed peak report - Trimmed sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Trimmed sequence length : | **`r ifelse(useSeqs2==T,MixedReport_s2$trimmedSeqLength,"")` bp** |
+| Trimmed sequence start position : | **`r ifelse(useSeqs2==T,MixedReport_s2$trimmedStartPos,"")`** |
+| Trimmed sequence end position : | **`r ifelse(useSeqs2==T,MixedReport_s2$trimmedFinishPos,"")`** |
+| Mean of trimmed sequence primary peak ratios : | **`r ifelse(useSeqs2==T,MixedReport_s2$trimmedMeanPrimaryRatio,"")`** |
+| Percentage of non-mixed positions on trimmed sequence : | **`r ifelse(useSeqs2==T,MixedReport_s2$trimmedPercNonMixedPos,"")` %** |
+
+
+
+#### Trimming plot 
+
+```{r trim plot s2, include=F, eval=useSeqs2}
+Trim_plot_s2 <- suppressWarnings(trimming_plot(sangerRead = sangerRead_s2, 
+                                               seqtable = seqtable_s2, 
+                                               MixedReport = MixedReport_s2, 
+                                               Trimmed_seq = Trimmed_s2,
+                                               th_quality_phred = th_quality_phred, 
+                                               th_mixed_position = th_mixed_position,
+                                               downloadname = paste0(fileprefix,"_trimming_plot_s2.png"),
+                                               colors_tables = colors_tables))
+```
+
+```{r display trim plot s2, out.width="100%", eval=useSeqs2}
+suppressWarnings(Trim_plot_s2)
+```
+
+
+
+
+#### Final trimmed sequence {.tabset .tabset-pills}
+
+##### Sequence
+
+```{r trimmed ok s2, results='asis', eval=useSeqs2 & !TrimOKs2}
+p("Warning: Trimmed sequence from the sequencing result #2 was found with insufficient length or insufficient quality and will not be used.",
+  style="color:#d37217 ; font-weight: bold ;")
+```
+
+
+
+| Final trimmed sequence information | Values |
+|:----------------------------------------------------|:-----------------------|
+| Length : | **`r ifelse(useSeqs2==T,Trimmed_s2$SeqLength,"")` bp** |
+| Start position : | **`r ifelse(useSeqs2==T,Trimmed_s2$StartPos,"")`** |
+| End position : | **`r ifelse(useSeqs2==T,Trimmed_s2$FinishPos,"")`** |
+| Mean of Phred quality scores : | **`r ifelse(useSeqs2==T,Trimmed_s2$MeanQualityScore,"")`** |
+| Mean of primary peak ratio : | **`r ifelse(useSeqs2==T,Trimmed_s2$MeanPrimaryRatio,"")`** |
+| Percentage of non-mixed positions : | **`r ifelse(useSeqs2==T,Trimmed_s2$PercNonMixedPos,"")` %** |
+
+
+```{r trimmed seq s2, results='asis', eval=useSeqs2 & TrimOKs2}
+p("Sequence of primary peaks:", style="font-weight: bold ;")
+```
+
+```{r display trimmed seq s2, eval=useSeqs2 & TrimOKs2}
+cat(as.character(Trimmed_s2$PrimarySeq))
+```
+
+
+
+##### Chromatogram
+
+```{r chromatogram trimmed s2, include=F, eval=useSeqs2 & TrimOKs2}
+# Save chromatogram
+chroma_s2_path <- file.path(indivDir$chrom,paste0(fileprefix,"_chromatogram_trimmed_2.pdf"))
+chromatogram(sangerRead_s2, trim5 = Trimmed_s2$StartPos, trim3 = (sangerRead_s2@QualityReport@rawSeqLength - Trimmed_s2$FinishPos), width = 20, height = 2, showcalls = "both", filename = chroma_s2_path) 
+```
+
+```{r display trimmed chromatogram s2, out.width = "100%", fig.align = "center", eval=useSeqs2 & TrimOKs2}
+htmltools::p("Open ",htmltools::a(href = file.path(chroma_s2_path),"chromatogram file",target="_blank")," in a new tab")
+htmltools::tags$iframe(src=file.path(chroma_s2_path), style="width:100%; height:1000px;", frameborder="0") 
+```
+
+
+
+##### Table
+
+```{r trimmed seq table s2,include=F, eval=useSeqs2 & TrimOKs2}
+
+# Create table
+seqtable_trim_s2 <- seqtable_s2[Trimmed_s2$StartPos:Trimmed_s2$FinishPos,]
+
+# Export table data as csv and xlsx
+write.table(seqtable_trim_s2, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_trimmed_2.csv")), row.names = T, col.names = T)
+write.xlsx(seqtable_trim_s2, file = file.path(indivDir$tab,paste0(fileprefix,"_seqtable_trimmed_2.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display table
+seqtable_trim_s2_FT <- seqtable_trim_s2
+colnames(seqtable_trim_s2_FT) <- c("Position","A peak","T peak","G peak","C peak","Total","A ratio","T ratio","G ratio","C ratio","Primary base","Quality score","Primary ratio")
+seqtable_trim_s2_FT <- formattable(
+  seqtable_trim_s2_FT, 
+  align = rep("c",ncol(seqtable_trim_s2_FT)),
+  list("Position" = formatter("span", style = ~ formattable::style(font.weight = "bold")), 
+       "A peak"= color_format("white",bases_colors["A"]),
+       "T peak"= color_format("white",bases_colors["T"]),
+       "G peak"= color_format("white",bases_colors["G"]),
+       "C peak"= color_format("white",bases_colors["C"]),
+       "Total"= color_condi(">=", 100, colorT = "lightgrey", colorF = colors_tables["incorrect_pale"],block="block"),
+       "A ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["A"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "T ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["T"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "G ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["G"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "C ratio"= color_condi(">=", th_mixed_position,colorT = bases_colors["C"],colorF = "white",textcolorT = "white",textcolorF = ""),
+       "Primary base"= color_base("white", bases_colors=bases_colors),
+       "Quality score" = color_condi(">=", th_quality_phred,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block"),
+       "Primary ratio" = color_condi(">=", th_mixed_position,colorT = colors_tables["correct_pale"],colorF = colors_tables["incorrect_pale"],block="block")
+  )) 
+```
+
+```{r display trimmed seq table s2, eval=useSeqs2 & TrimOKs2}
+seqtable_trim_s2_FT
+
+shiny::setProgress(0.4) 
+```
+
+
+
+
+
+```{r check if no trim possible, include=F}
+# Verify if no CG covered by both sequencing
+if (TrimOKs1==F & TrimOKs2==F) {NoTrimmedSeq <- T} else {NoTrimmedSeq <- F}
+```
+  
+```{r output if no trimmed sequence, results='asis', eval=NoTrimmedSeq}
+# Output tab and Directories tab
+cat("## Output data {.tabset .tabset-pills}","### Directories", sep="  \n")
+```
+
+```{r diagram if no trimmed sequence, eval=NoTrimmedSeq}
+# Diagram of directories
+diagram_indiv
+```
+
+```{r stop knit if no trimmed sequence, results='asis', eval=NoTrimmedSeq}
+# Files tab with list of output files
+cat("### Files","  \n")
+list_output_indiv(fileprefix = fileprefix)
+# Abort analysis and error message
+cat("## Analysis aborted","  \n")
+p("Error:  Analysis has been stopped as none of the sequencings are of sufficient quality to be used.",
+  style="color:#bf3232 ; font-weight: bold ;")
+shiny::setProgress(1)
+knit_exit()
+```
+
+
+
+
+
+
+## Alignments {.tabset .tabset-pills}
+
+
+```{r alignments s1, eval=useSeqs1 & TrimOKs1}
+# Alignments #1
+
+pa_s1_S <- pairwiseAlignment(Trimmed_s1$PrimarySeq, seq_BS$seq_BS, type = "local")
+pa_s1_RC <- pairwiseAlignment(Trimmed_s1$PrimarySeq, seq_BS$seq_BS_RC, type = "local")
+
+if (pa_s1_S@subject@range@width < th_min_alg & 
+    pa_s1_RC@subject@range@width < th_min_alg) {NoAlignmts1 <- T} else {NoAlignmts1 <- F}
+
+```
+
+```{r alignments s2, eval=useSeqs2 & TrimOKs2}
+# Alignments #2
+pa_s2_S <- pairwiseAlignment(Trimmed_s2$PrimarySeq, seq_BS$seq_BS, type = "local")
+pa_s2_RC <- pairwiseAlignment(Trimmed_s2$PrimarySeq, seq_BS$seq_BS_RC, type = "local")
+
+if (pa_s2_S@subject@range@width < th_min_alg & 
+    pa_s2_RC@subject@range@width < th_min_alg) {NoAlignmts2 <- T} else {NoAlignmts2 <- F}
+```
+
+
+
+```{r check if alignments, include=F, eval=useSeqs1 & useSeqs2}
+# Verify if alignments of correct trimmed sequence are long enough
+if(TrimOKs1==T & TrimOKs2==T) {
+  if(NoAlignmts1==T & NoAlignmts2==T) {NoAlignmt <- T} else {NoAlignmt <- F}
+}
+if(TrimOKs1==T & TrimOKs2==F) {
+  if(NoAlignmts1==T) {NoAlignmt <- T} else {NoAlignmt <- F}
+}
+if(TrimOKs1==F & TrimOKs2==T) {
+  if(NoAlignmts2==T) {NoAlignmt <- T} else {NoAlignmt <- F}
+}
+```
+
+```{r check if alignments bis, include = F}
+if(useSeqs2==F & TrimOKs1==T) { if(NoAlignmts1==T) {NoAlignmt <- T} else {NoAlignmt <- F} }
+if(useSeqs1==F & TrimOKs2==T) { if(NoAlignmts2==T) {NoAlignmt <- T} else {NoAlignmt <- F} }
+```
+
+```{r output if alignments too shorts, results='asis', eval=NoAlignmt}
+# Output tab and Directories tab
+cat("## Output data {.tabset .tabset-pills}","### Directories", sep="  \n")
+```
+
+```{r diagram if alignments too shorts, eval=NoAlignmt}
+# Diagram of directories
+diagram_indiv
+```
+
+```{r stop knit if alignments too shorts, results='asis', eval=NoAlignmt}
+# Files tab with list of output files
+cat("### Files","  \n")
+list_output_indiv(fileprefix = fileprefix)
+# Abort analysis and error message
+cat("## Analysis aborted","  \n")
+p("Error:  Analysis has been stopped as none of the possible alignments are of sufficient length (< ",th_min_alg," bp) to be used.",
+  style="color:#bf3232 ; font-weight: bold ;")
+shiny::setProgress(1)
+knit_exit()
+```
+
+
+
+
+### Sequencing result #1 {.tabset .tabset-pills}
+
+Sequencing result #1 is aligned on both sense and antisense bisulfite converted DNA sequences to determine the sequencing direction as forward or reverse.
+
+```{r text warning no trim s1, eval=useSeqs1 & !TrimOKs1}
+p("Warning: Trimmed sequence from the sequencing result #1 was found with insufficient length or insufficient quality and will not be used.",
+  style="color:#d37217 ; font-weight: bold ;")
+```
+
+
+
+#### Alignment as forward
+
+Trimmed sequence of primary peaks from sequencing result **#1** is aligned with bisulfite converted reference DNA **sense** sequence
+```{r s1 forward, eval=useSeqs1 & TrimOKs1}
+writePairwiseAlignments(pa_s1_S,block.width=20)
+```
+
+
+
+#### Alignment as reverse
+
+Trimmed sequence of primary peaks from sequencing result **#1** is aligned with bisulfite converted reference DNA **antisense** sequence
+```{r s1 reverse, eval=useSeqs1 & TrimOKs1}
+writePairwiseAlignments(pa_s1_RC,block.width=20)
+```
+
+
+
+#### Direction determination
+```{r direction determination s1, include=F, eval=useSeqs1}
+
+# RESULT 2 : USE ALIGNMENTS LENGHT TO DETERMINE CORRECT DIRECTION
+if(TrimOKs1==T) {
+  if(pa_s1_S@subject@range@width > th_min_alg | pa_s1_RC@subject@range@width > th_min_alg) {
+    
+    # RESULT 2 ALIGNED WITH SENSE SEQUENCE : FORWARD
+    if (pa_s1_S@subject@range@width > pa_s1_RC@subject@range@width) {
+      # Result 2 is in forward direction
+      useSeqF <- useSeqs1
+      TrimOKF <- TrimOKs1
+      seqnumber_F <- 1
+      seqdirection_s1 <- "Forward"
+    }
+    
+    # RESULT 2 ALIGNED WITH ANTISENSE SEQUENCE : REVERSE
+    if (pa_s1_S@subject@range@width < pa_s1_RC@subject@range@width) {
+      # Result 2 is in reverse direction
+      useSeqR <- useSeqs1
+      TrimOKR <- TrimOKs1
+      seqnumber_R <- 1
+      seqdirection_s1 <- "Reverse"
+    }
+    DIRincorrect <- F # Direction determination is sucessfull
+    Dirdeterms2 <- F # not use s2 for direction determination
+  } else {
+    Dirdeterms2 <- T # use s2 for direction determination when aligned length are too small
+  }
+  
+  
+  if (pa_s1_S@subject@range@width == pa_s1_RC@subject@range@width) {
+    Dirdeterms2 <- T # use s2 for direction determination when both length are equal
+  } 
+} else {
+  Dirdeterms2 <- T # use s2 for direction determination when trimming is not correct
+} 
+
+
+# RESULT 1 NO DIRECTION DETERMINATION POSSIBLE : USE RESULT 2
+if(Dirdeterms2==T) {
+  if (useSeqs2==T & TrimOKs2==T) {
+    if (pa_s2_S@subject@range@width > pa_s2_RC@subject@range@width) {
+      # Result 2 is in forward direction
+      # Result 1 is in reverse direction
+      useSeqR <- useSeqs1
+      TrimOKR <- TrimOKs1
+      seqnumber_R <- 2
+      seqdirection_s1 <- "Reverse"
+    }
+    if (pa_s2_S@subject@range@width < pa_s2_RC@subject@range@width) {
+      # Result 2 is in reverse direction
+      # Result 1 is in forward direction
+      useSeqF <- useSeqs1
+      TrimOKF <- TrimOKs1
+      seqnumber_F <- 2
+      seqdirection_s1 <- "Forward"
+    }
+    DIRincorrect <- F # Direction determination is sucessfull
+    # RESULT 2 UNDETERMINED ALIGNMENT : WARNING
+  } else if (useSeqs2==F | TrimOKs2==F) {
+    p("Warning: Sequencing result #1 direction undetermined, aligned sequences length are equal for both directions.",
+      style="color:#d37217 ; font-weight: bold ;")
+    DIRincorrect <- T # Direction determination is not sucessfull
+    seqdirection_s1 <- "undetermined"
+  }
+}
+```
+
+```{r text direction determination s1, results='asis', eval=useSeqs1}
+if(seqdirection_s1=="Forward") {
+  if(TrimOKF==T) {
+    cat("Sequencing result **#1** corresponds to **forward** direction")
+    pa_F <- pa_s1_S
+    seqtable_trim_F <- seqtable_trim_s1
+  } else if (TrimOKF==F) {
+    p("Warning: Insufficient quality of trimmed sequence for direction determination.",
+      style="color:#d37217 ; font-weight: bold ;")
+  }
+}
+
+if(seqdirection_s1=="Reverse") {
+  if(TrimOKR==T) {
+    cat("Sequencing result **#1** corresponds to **reverse** direction")
+    pa_R <- pa_s1_RC
+    seqtable_trim_R <- seqtable_trim_s1
+  } else if (TrimOKR==F) {
+    p("Warning: Insufficient quality of trimmed sequence for direction determination.",
+      style="color:#d37217 ; font-weight: bold ;")
+  }
+}
+```
+
+
+
+
+
+
+### Sequencing result #2 {.tabset .tabset-pills}
+
+Sequencing result #2 is aligned on both sense and antisense bisulfite converted DNA sequences to determine the sequencing direction as forward or reverse.
+
+```{r text warning no trim s2, eval=useSeqs2 & !TrimOKs2}
+p("Warning: Trimmed sequence from the sequencing result #2 was found with insufficient length or insufficient quality and will not be used.",
+  style="color:#d37217 ; font-weight: bold ;")
+```
+
+
+#### Alignment as forward
+
+Trimmed sequence of primary peaks from sequencing result **#2** is aligned with bisulfite converted reference DNA **sense** sequence
+```{r s2 forward, eval=useSeqs2 & TrimOKs2}
+writePairwiseAlignments(pa_s2_S,block.width=20)
+```
+
+
+
+#### Alignment as reverse
+
+Trimmed sequence of primary peaks from sequencing result **#2** is aligned with bisulfite converted reference DNA **antisense** sequence
+```{r s2 reverse, eval=useSeqs2 & TrimOKs2}
+writePairwiseAlignments(pa_s2_RC,block.width=20)
+```
+
+
+
+#### Direction determination
+```{r direction determination s2, include=F, eval=useSeqs2}
+
+# RESULT 2 : USE ALIGNMENTS LENGHT TO DETERMINE CORRECT DIRECTION
+if(TrimOKs2==T) {
+  if(pa_s2_S@subject@range@width > th_min_alg | pa_s2_RC@subject@range@width > th_min_alg) {
+    
+    # RESULT 2 ALIGNED WITH SENSE SEQUENCE : FORWARD
+    if (pa_s2_S@subject@range@width > pa_s2_RC@subject@range@width) {
+      # Result 2 is in forward direction
+      useSeqF <- useSeqs2
+      TrimOKF <- TrimOKs2
+      seqnumber_F <- 2
+      seqdirection_s2 <- "Forward"
+    }
+    
+    # RESULT 2 ALIGNED WITH ANTISENSE SEQUENCE : REVERSE
+    if (pa_s2_S@subject@range@width < pa_s2_RC@subject@range@width) {
+      # Result 2 is in reverse direction
+      useSeqR <- useSeqs2
+      TrimOKR <- TrimOKs2
+      seqnumber_R <- 2
+      seqdirection_s2 <- "Reverse"
+    }
+    DIRincorrect <- F # Direction determination is sucessfull
+    Dirdeterms1 <- F # not use s1 for direction determination
+  } else {
+    Dirdeterms1 <- T # use s1 for direction determination when aligned length are too small
+  }
+  
+  if (pa_s2_S@subject@range@width == pa_s2_RC@subject@range@width) {
+    Dirdeterms1 <- T # use s1 for direction determination when both length are equal
+  } 
+} else {
+  Dirdeterms1 <- T # use s1 for direction determination when trimming is not correct
+} 
+
+
+# RESULT 2 NO DIRECTION DETERMINATION POSSIBLE : USE RESULT 1
+if(Dirdeterms1==T) {
+  if (useSeqs1==T & TrimOKs1==T) {
+    if (pa_s1_S@subject@range@width > pa_s1_RC@subject@range@width) {
+      # Result 1 is in forward direction
+      # Result 2 is in reverse direction
+      useSeqR <- useSeqs2
+      TrimOKR <- TrimOKs2
+      seqnumber_R <- 2
+      seqdirection_s2 <- "Reverse"
+    }
+    if (pa_s1_S@subject@range@width < pa_s1_RC@subject@range@width) {
+      # Result 1 is in reverse direction
+      # Result 2 is in forward direction
+      useSeqF <- useSeqs2
+      TrimOKF <- TrimOKs2
+      seqnumber_F <- 2
+      seqdirection_s2 <- "Forward"
+    }
+    DIRincorrect <- F # Direction determination is sucessfull
+    # RESULT 2 UNDETERMINED ALIGNMENT : WARNING
+  } else if (useSeqs1==F | TrimOKs1==F) {
+    p("Warning: Sequencing result #2 direction undetermined, aligned sequences length are equal for both directions.",
+      style="color:#d37217 ; font-weight: bold ;")
+    DIRincorrect <- T # Direction determination is not sucessfull
+    seqdirection_s2 <- "undetermined"
+  }
+}
+```
+
+
+```{r text direction determination s2, results='asis', eval=useSeqs2}
+if(seqdirection_s2=="Forward") {
+  if(TrimOKF==T) {
+    cat("Sequencing result **#2** corresponds to **forward** direction")
+    pa_F <- pa_s2_S
+    seqtable_trim_F <- seqtable_trim_s2
+  } else if (TrimOKF==F) {
+    p("Warning: Insufficient quality of trimmed sequence for direction determination.",
+      style="color:#d37217 ; font-weight: bold ;")
+  }
+}
+
+if(seqdirection_s2=="Reverse") {
+  if(TrimOKR==T) {
+    cat("Sequencing result **#2** corresponds to **reverse** direction")
+    pa_R <- pa_s2_RC
+    seqtable_trim_R <- seqtable_trim_s2
+  } else if (TrimOKR==F) {
+    p("Warning: Insufficient quality of trimmed sequence for direction determination.",
+      style="color:#d37217 ; font-weight: bold ;")
+  }
+}
+```
+
+
+```{r if same direction for the 2 sequencing, eval=useSeqs1 & useSeqs2}
+if(seqdirection_s1==seqdirection_s2) {DIRincorrect <-T}
+```
+
+
+```{r output if no direction found, results='asis', eval=DIRincorrect}
+# Output tab and Directories tab
+cat("## Output data {.tabset .tabset-pills}","### Directories", sep="  \n")
+```
+
+```{r diagram if no direction found, eval=DIRincorrect}
+# Diagram of directories
+diagram_indiv
+```
+
+```{r stop knit if no direction found, results='asis', eval=DIRincorrect}
+# Files tab with list of output files
+cat("### Files","  \n")
+list_output_indiv(fileprefix = fileprefix)
+# Abort analysis and error message
+cat("## Analysis aborted","  \n")
+p("Error: Analysis has been stopped as sequencing result direction (forward or reverse) could not be found.",
+  style="color:#bf3232 ; font-weight: bold ;")
+shiny::setProgress(1) 
+knit_exit()
+```
+
+
+
+
+
+```{r do not use seq if trimming was not possible, include=F}
+if(useSeqs1==T & seqdirection_s1=="Forward" & TrimOKs1==F) {useSeqF <- F}
+if(useSeqs1==T & seqdirection_s1=="Reverse" & TrimOKs1==F) {useSeqR <- F}
+
+if(useSeqs2==T & seqdirection_s2=="Forward" & TrimOKs2==F) {useSeqF <- F}
+if(useSeqs2==T & seqdirection_s2=="Reverse" & TrimOKs2==F) {useSeqR <- F}
+```
+
+
+```{r get useSeq depending on direction for false values, include=F}
+if(useSeqs1==F & seqdirection_s2=="Forward") {useSeqR <- F}
+if(useSeqs1==F & seqdirection_s2=="Reverse") {useSeqF <- F}
+
+if(useSeqs2==F & seqdirection_s1=="Forward") {useSeqR <- F}
+if(useSeqs2==F & seqdirection_s1=="Reverse") {useSeqF <- F}
+
+shiny::setProgress(0.5) 
+```
+
+
+
+
+```{r check if no sequencing exploitable, include=F}
+# Verify if no CG covered by both sequencing
+if (useSeqF==F & useSeqR==F) {NoSeq <- T} else {NoSeq <- F}
+```
+  
+```{r output if no sequencing exploitable, results='asis', eval=NoSeq}
+# Output tab and Directories tab
+cat("## Output data {.tabset .tabset-pills}","### Directories", sep="  \n")
+```
+
+```{r diagram if no sequencing exploitable, eval=NoSeq}
+# Diagram of directories
+diagram_indiv
+```
+
+```{r stop knit if no sequencing exploitable, results='asis', eval=NoSeq}
+# Files tab with list of output files
+cat("### Files","  \n")
+list_output_indiv(fileprefix = fileprefix)
+# Abort analysis and error message
+cat("## Analysis aborted","  \n")
+p("Error: Analysis has been stopped as none of the provided sequencing are of sufficient quality to be used.",
+  style="color:#bf3232 ; font-weight: bold ;")
+shiny::setProgress(1) 
+knit_exit()
+```
+
+
+
+
+<!-- ALIGNED POSITIONS -->
+
+```{r alignments positions F, include=F, eval=useSeqF}
+# Get positions of start and end of the aligned sequences
+alg_posF <- list(
+  # F Subject : ref DNA BS
+  subject_F_start = pa_F@subject@range@start,
+  subject_F_end = pa_F@subject@range@start+pa_F@subject@range@width,
+  # F Pattern : Sequencing results forward
+  pattern_F_start = pa_F@pattern@range@start,
+  pattern_F_end = pa_F@pattern@range@start+pa_F@pattern@range@width
+)
+```
+
+```{r alignments positions R, include=F, eval=useSeqR}
+# Get positions of start and end of the aligned sequences
+alg_posR <- list(
+  # R Subject : ref DNA BS RC
+  subject_R_start = pa_R@subject@range@start,
+  subject_R_end = pa_R@subject@range@start+pa_R@subject@range@width, 
+  # R Pattern : Sequencing results reverse
+  pattern_R_start = pa_R@pattern@range@start,
+  pattern_R_end = pa_R@pattern@range@start+pa_R@pattern@range@width 
+)
+```
+
+```{r alignments positions, include=F}
+if (useSeqF==T & useSeqR==T) {alg_pos <- c(alg_posF,alg_posR)}
+if (useSeqF==T & useSeqR==F) {alg_pos <- alg_posF}
+if (useSeqF==F & useSeqR==T) {alg_pos <- alg_posR}
+```
+
+
+<!-- ALIGNED COORDINATES -->
+
+
+```{r aligned sequences coordinates F, include=F, eval=useSeqF}
+# Find coordinates of the aligned sequences on genome :
+if(seq_strand=="plus") {
+  alg_coordF = list(
+    F_start = seq_start+alg_pos$subject_F_start-1, 
+    F_end = seq_start+alg_pos$subject_F_end-1 ) 
+}
+
+if(seq_strand=="minus") {
+  alg_coordF = list(
+    F_start = seq_end-alg_pos$subject_F_end+1 , 
+    F_end = seq_end-alg_pos$subject_F_start+1 ) 
+}
+```
+
+```{r aligned sequences coordinates R, include=F, eval=useSeqR}
+# Find coordinates of the aligned sequences on genome :
+if(seq_strand=="plus") {
+  alg_coordR = list(
+    R_start = seq_end-alg_pos$subject_R_end+1 , 
+    R_end = seq_end-alg_pos$subject_R_start+1) 
+} 
+if(seq_strand=="minus") {
+  alg_coordR = list(
+    R_start = seq_start+alg_pos$subject_R_start-1 , 
+    R_end = seq_start+alg_pos$subject_R_end-1) 
+}
+```
+
+```{r aligned sequences coordinates, include=F}
+if (useSeqF==T & useSeqR==T) {alg_coord <- c(alg_coordF,alg_coordR)}
+if (useSeqF==T & useSeqR==F) {alg_coord <- alg_coordF}
+if (useSeqF==F & useSeqR==T) {alg_coord <- alg_coordR}
+```
+
+
+
+
+
+
+
+### Forward {.tabset .tabset-pills}
+
+To find nucleotides of reference DNA sequence positions on sequencing result, the trimmed sequence of primary peaks from **forward** sequencing results is aligned with bisulfite converted reference DNA **sense** sequence.
+
+
+#### Alignment
+
+```{r warning if no aligment F,results='asis'}
+if (TrimOKF==F) {
+  p("Warning: Insufficient length or quality of trimmed forward sequencing.",
+    style="color:#d37217 ; font-weight: bold ;")
+}
+```
+
+```{r display alignment F, eval=useSeqF}
+# Save alignment in .pair format (open in browser)
+pa_F_path <- file.path(indivDir$alg,paste0(fileprefix,"_alignment_F.pair"))
+writePairwiseAlignments(pa_F, file=pa_F_path, block.width=20) 
+# display alignment
+writePairwiseAlignments(pa_F,block.width=20)
+```
+
+
+
+
+
+
+#### Aligned sequences
+
+```{r warning if no aligned seq F,results='asis'}
+if (TrimOKF==F) {
+  p("Warning: Insufficient length or quality of trimmed forward sequencing.",
+    style="color:#d37217 ; font-weight: bold ;")
+}
+```
+
+
+```{r aligned Patt F length, results='asis', eval=useSeqF}
+p("Aligned sequence from forward sequencing result (Pattern P1):", style="font-weight: bold ;")
+p("Length: ",nchar(as.character(alignedPattern(pa_F)))," bp") 
+```
+
+```{r aligned Patt F, eval=useSeqF}
+cat(as.character(alignedPattern(pa_F)))
+fasta_name <- paste(seq_name, 
+                    "aligned sequence from forward sequencing result", 
+                    paste0(nchar(alignedPattern(pa_F)),"bp"),
+                    paste0(seq_chr, ":", alg_coord$F_start, "-", alg_coord$F_end),
+                    sep=" ")
+write.fasta(as.vector(alignedPattern(pa_F)), names=fasta_name, 
+            file.out = file.path(indivDir$alg,paste0(fileprefix,"_aligned_seqresult_F.fasta")))
+rm(fasta_name)
+```
+
+
+
+```{r aligned Sub F length, results='asis', eval=useSeqF}
+p("Aligned sequence from bisulfite converted reference DNA sense sequence (Subject S1):", style="font-weight: bold ;")
+p("Length: ",nchar(as.character(alignedSubject(pa_F)))," bp")
+```
+
+```{r aligned Sub F, eval=useSeqF}
+cat(as.character(alignedSubject(pa_F)))
+fasta_name <- paste(seq_name, 
+                    "aligned sequence from bisulfite converted reference DNA sense sequence", 
+                    paste0(nchar(alignedSubject(pa_F)),"bp"),
+                    paste0(seq_chr, ":", alg_coord$F_start, "-", alg_coord$F_end),
+                    sep=" ")
+write.fasta(as.vector(alignedSubject(pa_F)), names=fasta_name, 
+            file.out = file.path(indivDir$alg,paste0(fileprefix,"_aligned_DNAref_F.fasta")))
+rm(fasta_name)
+```
+
+
+
+
+### Reverse {.tabset .tabset-pills}
+
+To find nucleotides of reference DNA sequence positions on sequencing result, the trimmed sequence of primary peaks from **reverse** sequencing results is aligned with bisulfite converted reference DNA **antisense** sequence. 
+
+#### Alignment
+
+```{r warning if no aligment R,results='asis'}
+if (TrimOKR==F) {
+  p("Warning: Insufficient length or quality of trimmed reverse sequencing.",
+    style="color:#d37217 ; font-weight: bold ;")
+}
+```
+
+```{r display aligment R, eval=useSeqR}
+# Save alignments in .pair format (open in browser)
+pa_R_path <- file.path(indivDir$alg,paste0(fileprefix,"_alignment_R.pair"))
+writePairwiseAlignments(pa_R, file=pa_R_path, block.width=20) 
+# display alignments
+writePairwiseAlignments(pa_R,block.width=20)
+```
+
+
+
+#### Aligned sequences
+
+```{r warning if no aligned seq R,results='asis'}
+if (TrimOKR==F) {
+  p("Warning: Insufficient length or quality of trimmed reverse sequencing.",
+    style="color:#d37217 ; font-weight: bold ;")
+}
+```
+
+
+
+```{r aligned Patt R length, results='asis', eval=useSeqR}
+p("Aligned sequence from reverse sequencing result (Pattern P1):", style="font-weight: bold ;")
+p("Length: ",nchar(as.character(alignedPattern(pa_R)))," bp")
+```
+
+```{r aligned Patt R, eval=useSeqR}
+cat(as.character(alignedPattern(pa_R)))
+fasta_name <- paste(seq_name, 
+                    "aligned sequence from reverse sequencing result", 
+                    paste0(nchar(alignedPattern(pa_R)),"bp"),
+                    paste0(seq_chr, ":", alg_coord$R_start, "-", alg_coord$R_end),
+                    sep=" ")
+write.fasta(as.vector(alignedPattern(pa_R)), names=fasta_name, 
+            file.out = file.path(indivDir$alg,paste0(fileprefix,"_aligned_seqresult_R.fasta")))
+rm(fasta_name)
+```
+
+
+
+```{r aligned Sub R length, results='asis', eval=useSeqR}
+p("Aligned sequence from bisulfite converted reference DNA antisense sequence (Subject S1):", style="font-weight: bold ;")
+p("Length: ",nchar(as.character(alignedSubject(pa_R)))," bp")
+```
+
+```{r aligned Sub R, eval=useSeqR}
+cat(as.character(alignedSubject(pa_R)))
+fasta_name <- paste(seq_name, 
+                    "aligned sequence from bisulfite converted reference DNA antisense sequence", 
+                    paste0(nchar(alignedSubject(pa_R)),"bp"),
+                    paste0(seq_chr, ":", alg_coord$R_start, "-", alg_coord$R_end),
+                    sep=" ")
+write.fasta(as.vector(alignedSubject(pa_R)), names=fasta_name, 
+            file.out = file.path(indivDir$alg,paste0(fileprefix,"_aligned_DNAref_R.fasta")))
+rm(fasta_name)
+```
+
+
+
+
+
+
+
+## Quality control {.tabset .tabset-pills}
+
+```{r QC Thresholds}
+# The aim of the quality control is to control the sequencing quality regarding the reference sequence, using alignments
+
+# Thresholds 
+th_identity <- 75
+th_conv_rate <- 0.90
+
+indel <- list()
+
+shiny::setProgress(0.6) 
+```
+
+```{r QC positions of gaps F, eval=useSeqF}
+# retrieve positions of gaps :
+
+## On ref DNA sequence (Subject):
+indel$dna_ref_F <- alg_pos$subject_F_start + pa_F@subject@indel@unlistData@start -1
+## On sequencing (Pattern) :
+indel$sequencing_F = alg_pos$pattern_F_start + pa_F@pattern@indel@unlistData@start -1
+```
+
+```{r QC positions of gaps R, eval=useSeqR}
+# retrieve positions of gaps :
+ 
+## On ref DNA sequence (Subject):
+indel$dna_ref_R <- alg_pos$subject_R_start + pa_R@subject@indel@unlistData@start -1
+## On sequencing (Pattern) :
+indel$sequencing_R = alg_pos$pattern_R_start + pa_R@pattern@indel@unlistData@start -1
+```
+
+```{r QC bisulfite conv rate}
+# Get bisulfite conversion rate
+BisConRate <- BisulfiteConvRate(sequences=seq, alg_pos=alg_pos, seqtable_trim_F=seqtable_trim_F, seqtable_trim_R=seqtable_trim_R,
+                                indel = indel, useSeqF = useSeqF, useSeqR = useSeqR)
+
+if (useSeqF==T & useSeqR==T) {
+  # Join two data frame to have all data from both sequencing
+  BisConRate_all <- full_join(BisConRate$F[,c(1,9)],BisConRate$R[,c(1,9)], by="C_nb", suffix = c("_F", "_R"))
+}
+if (useSeqF==T & useSeqR==F) {
+  BisConRate_all <- BisConRate$F[,c(1,9)]
+}
+if (useSeqF==F & useSeqR==T) {
+  BisConRate_all <- BisConRate$R[,c(1,9)]
+}
+```
+
+```{r QC table row F, include=F, eval=useSeqF}
+QC_table_F <- data.frame(
+  check.names = FALSE,
+  "Direction" = "Forward",
+  "Sequencing" = paste0("#",seqnumber_F),
+  "Length" = nchar(subject(pa_F)), 
+  "Identity" = round(pid(pa_F),2),
+  "Mismatch" = nmismatch(pa_F),
+  "Indel in DNA reference" = pa_F@subject@indel@partitioning@end, 
+  "Indel in sequencing" = pa_F@pattern@indel@partitioning@end, 
+  "Mean of conversion rates" = round(mean(BisConRate$F$conversion_rate, na.rm=T),2),
+  "SD of conversion rates" = round(sd(BisConRate$F$conversion_rate, na.rm=T),2)
+)
+
+if (QC_table_F[1, "Length"] >= th_min_alg &
+    QC_table_F[1, "Identity"] >= th_identity &
+    QC_table_F[1, "Mean of conversion rates"] >= th_conv_rate) {
+  # Quality of forward sequencing is good enougth :
+  correct_F <- T
+} else {
+  # Quality of forward sequencing is not good enougth :
+  correct_F <- F
+}
+if (useSeqR==F) {correct_R<-F}
+
+QC_table_F[, "Quality Result"] = ifelse(correct_F==T,"Correct","Incorrect")
+```
+
+```{r QC table row R, include=F, eval=useSeqR}
+QC_table_R <- data.frame(
+  check.names = FALSE,
+  "Direction" = "Reverse",
+  "Sequencing" = paste0("#",seqnumber_R),
+  "Length" = nchar(subject(pa_R)),
+  "Identity" = round(pid(pa_R),2), 
+  "Mismatch" = nmismatch(pa_R), 
+  "Indel in DNA reference" = pa_R@subject@indel@partitioning@end, 
+  "Indel in sequencing" = pa_R@pattern@indel@partitioning@end, 
+  "Mean of conversion rates" = round(mean(BisConRate$R$conversion_rate, na.rm=T),2),
+  "SD of conversion rates" = round(sd(BisConRate$R$conversion_rate, na.rm=T),2)
+)
+
+if (QC_table_R[1, "Length"] >= th_min_alg &
+    QC_table_R[1, "Identity"] >= th_identity &
+    QC_table_R[1, "Mean of conversion rates"] >= th_conv_rate) {
+  # Quality of forward sequencing is good enougth :
+  correct_R <- T
+} else {
+  # Quality of forward sequencing is not good enougth :
+  correct_R <- F
+}
+if (useSeqF==F) {correct_F<-F}
+
+QC_table_R[, "Quality Result"] = ifelse(correct_R==T,"Correct","Incorrect")
+```
+
+```{r QC create table}
+# Create table for quality control visualization
+
+if (useSeqF==T & useSeqR==T) {QC_table <- rbind(QC_table_F, QC_table_R )}
+if (useSeqF==T & useSeqR==F) {QC_table <- QC_table_F}
+if (useSeqF==F & useSeqR==T) {QC_table <- QC_table_R}
+```
+
+### Summary
+
+| Thresholds                                  | Values                   |
+|:-------------|:--------------------------|
+| Minimum length of the aligned sequence :        | **`r th_min_alg` bp**    |
+| Minimum identity percentage of alignment :  | **`r th_identity` %**    | 
+| Minimum of bisulfite conversion rate mean : | **`r th_conv_rate`**     |
+  
+  
+```{r QC display table, results='asis'}
+# Export table data as csv and xlsx
+write.table(QC_table, file = file.path(indivDir$tab,paste0(fileprefix,"_QC_table.csv")), row.names = T, col.names = T)
+write.xlsx(QC_table, file = file.path(indivDir$tab,paste0(fileprefix,"_QC_table.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display Quality table
+QC_table_FT <- formattable(
+  QC_table, 
+  align = c("l", rep("c",ncol(QC_table)-1)),
+  list("Direction" = formatter("span", style = ~ formattable::style(font.weight = "bold")),
+       "Sequencing" = formatter("span", style = ~ formattable::style(font.weight = "bold")),
+       "Length" = color_condi(">=", th_min_alg, colors_tables["correct_pale"], colors_tables["incorrect_pale"]),
+       "Identity" = color_condi(">=", th_identity, colors_tables["correct_pale"], colors_tables["incorrect_pale"]),
+       "Mismatch" = color_condi("<=", 20, colors_tables["correct_pale"], colors_tables["warning_pale"]),
+       "Indel in DNA reference" = color_condi("<", 1, colors_tables["correct_pale"], colors_tables["warning_pale"]),
+       "Indel in sequencing" = color_condi("<", 1, colors_tables["correct_pale"], colors_tables["warning_pale"]),
+       "Mean of conversion rates" = color_condi(">=", th_conv_rate,colors_tables["correct_pale"], colors_tables["incorrect_pale"]),
+       "SD of conversion rates" = color_condi("<=", 0.25, colors_tables["correct_pale"], colors_tables["warning_pale"]),
+       "Quality Result" = formatter("span", x ~ icontext(ifelse(x=="Correct", "ok", "remove"), ifelse(x=="Correct", "Correct", "Incorrect")), 
+                                    style = x ~ formattable::style(color = ifelse(x=="Correct", colors_tables["correct"], colors_tables["incorrect"])))))
+
+QC_table_FT
+
+if(TrimOKF==F) { 
+  p("Forward sequencing result could have not been trimmed due to poor quality.",
+  style="color:#bf3232 ; font-weight: bold ;")
+}
+if(TrimOKR==F) { 
+  p("Reverse sequencing result could have not been trimmed due to poor quality.",
+    style="color:#bf3232 ; font-weight: bold ;")
+}
+
+if("Incorrect" %in% QC_table[,"Quality Result"]) {
+  p("Warning: Incorrect sequencing results are excluded from methylation quantification.",
+  style="color:#d37217 ; font-weight: bold ;")
+}
+if(length(QC_table[,"Indel in DNA reference"]==0) != length(QC_table[,"Indel in DNA reference"]) |
+   length(QC_table[,"Indel in sequencing"]==0) != length(QC_table[,"Indel in sequencing"])) {
+  p("Warning: Gaps (insertion/deletions) in alignments are taken into account to retrieve correct C positions and associated peak base values.",
+    style="color:#d37217 ; font-weight: bold ;")
+}
+```
+
+```{r QC export table, include=F}
+export_formattable(QC_table_FT,file=file.path(indivDir$tab,paste0(fileprefix,"_QC.png")))
+```
+
+
+
+  
+### Mismatch positions {.tabset .tabset-pills} 
+
+#### Forward
+```{r QC mismatch F, results='asis', eval=useSeqF}
+mismatch_F <- mismatchTable(pa_F)
+if (nrow(mismatch_F)>0) {
+QC_mismatch_F <- data.frame(
+  "Positions in trimmed sequencing result" = mismatch_F$PatternStart,
+  "Nucleotides in trimmed sequencing result" = mismatch_F$PatternSubstring,
+  "Positions in reference DNA sequence"= mismatch_F$SubjectStart,
+  "Nucleotides in reference DNA sequence" = mismatch_F$SubjectSubstring, check.names=F)
+formattable(QC_mismatch_F, align=rep("c",ncol(QC_mismatch_F)))} else {
+  cat("No mismatch positions in forward alignment.")
+}
+```
+
+
+
+#### Reverse
+```{r QC mismatch R, results='asis', eval=useSeqR}
+mismatch_R <- mismatchTable(pa_R)
+if (nrow(mismatch_R)>0) {
+QC_mismatch_R <- data.frame(
+  "Positions in trimmed sequencing result" = mismatch_R$PatternStart,
+  "Nucleotides in trimmed sequencing result" = mismatch_R$PatternSubstring,
+  "Positions in reference DNA sequence"= mismatch_R$SubjectStart,
+  "Nucleotides in reference DNA sequence" = mismatch_R$SubjectSubstring, check.names=F)
+formattable(QC_mismatch_R, align=rep("c",ncol(QC_mismatch_R)))} else {
+  cat("No mismatch positions in reverse alignment.")
+}
+```
+
+
+
+### Insertions/deletions {.tabset .tabset-pills}
+
+#### Forward
+```{r QC indel F 2, results='asis', eval=useSeqF}
+if (pa_F@pattern@indel@partitioning@end!=0 | pa_F@subject@indel@partitioning@end!=0) {
+  data_length <- max(length(indel$sequencing_F),length(indel$dna_ref_F))
+  QC_indel_F <- data.frame(matrix(nrow=data_length,ncol=2))
+  colnames(QC_indel_F) <- c("Indel positions in \n trimmed sequencing result","Indel positions in \n reference DNA sequence")
+  QC_indel_F[,1] <- indel$sequencing_F
+  QC_indel_F[,2] <- indel$dna_ref_F
+  QC_indel_F[which(is.na(QC_indel_F)==T)] <- ""
+  formattable(QC_indel_F, align=c("c","c"))} else {
+  cat("No insertions/deletions in forward alignment.")
+}
+```
+
+
+
+#### Reverse
+```{r QC indel R 2, results='asis', eval=useSeqR}
+if (pa_R@pattern@indel@partitioning@end!=0 | pa_R@subject@indel@partitioning@end!=0) {
+  data_length <- max(length(indel$sequencing_R),length(indel$dna_ref_R))
+  QC_indel_R <- data.frame(matrix(nrow=data_length,ncol=2))
+  colnames(QC_indel_R) <- c("Indel positions in \n sequence from sequencing result","Indel positions in \n reference DNA sequence")
+  QC_indel_R[,1] <- indel$sequencing_R
+  QC_indel_R[,2] <- indel$dna_ref_R
+  QC_indel_R[which(is.na(QC_indel_R)==T)] <- ""
+  formattable(QC_indel_R, align=c("c","c"))} else {
+  cat("No insertions/deletions in reverse alignment.")
+}
+```
+
+
+
+
+### Conversion rates  {.tabset .tabset-pills}
+
+#### Combined
+```{r QC Conversion rates combined}
+# Export table data as csv and xlsx
+write.table(BisConRate_all, file = file.path(indivDir$tab,paste0(fileprefix,"_bisconv_table.csv")), row.names = T, col.names = T)
+write.xlsx(BisConRate_all, file = file.path(indivDir$tab,paste0(fileprefix,"_bisconv_table.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display
+if (useSeqF==T & useSeqR==T) {
+colnames(BisConRate_all) <- c("C number","Bisulfite conversion rate Forward","Bisulfite conversion rate Reverse")
+BisConRate_all[,c(2,3)] <- format(round(x = BisConRate_all[,c(2,3)],2), nsmall = 2)
+BisConRate_all_FT <- formattable(BisConRate_all,
+                                 align = rep("c",ncol(BisConRate_all)),
+                                 width = "50%",
+                                 list("Bisulfite conversion rate Forward" = color_condi(">=", 
+                                                                                        th_conv_rate,colors_tables["correct_pale"], colors_tables["incorrect_pale"]),
+                                      "Bisulfite conversion rate Reverse" = color_condi(">=", 
+                                                                                        th_conv_rate,colors_tables["correct_pale"], colors_tables["incorrect_pale"])))
+}
+if (useSeqF==T & useSeqR==F) {
+colnames(BisConRate_all) <- c("C number","Bisulfite conversion rate Forward")
+BisConRate_all[,2] <- format(round(x = BisConRate_all[,2],2), nsmall = 2)
+BisConRate_all_FT <- formattable(BisConRate_all,
+                                 align = rep("c",ncol(BisConRate_all)),
+                                 width = "50%",
+                                 list("Bisulfite conversion rate Forward" = color_condi(">=", 
+                                                                                        th_conv_rate,colors_tables["correct_pale"], colors_tables["incorrect_pale"]))) 
+}
+
+if (useSeqF==F & useSeqR==T) {
+  colnames(BisConRate_all) <- c("C number","Bisulfite conversion rate Reverse")
+BisConRate_all[,2] <- format(round(x = BisConRate_all[,2],2), nsmall = 2)
+BisConRate_all_FT <- formattable(BisConRate_all,
+                                 align = rep("c",ncol(BisConRate_all)),
+                                 width = "50%",
+                                 list("Bisulfite conversion rate Reverse" = color_condi(">=", 
+                                                                                        th_conv_rate,colors_tables["correct_pale"], colors_tables["incorrect_pale"]))) 
+}
+
+BisConRate_all_FT
+```
+
+
+#### Forward
+```{r QC Conversion rates F, eval=useSeqF}
+colnames(BisConRate$F) <- c("C number","Position in reference DNA", "Position in sequencing result (trimmed)","Position in sequencing result (raw)",
+                            "A peak", "T peak", "G peak", "C peak", "Bisulfite conversion rate")
+
+formattable(BisConRate$F,
+            align=rep("c",ncol(BisConRate$F)),
+            list("T peak"= color_format("white",bases_colors["T"]),
+                 "C peak"= color_format("white",bases_colors["C"]),
+                 "Bisulfite conversion rate" = color_condi(">=", th_conv_rate, colors_tables["correct_pale"], colors_tables["incorrect_pale"])))
+```
+
+
+
+#### Reverse
+```{r QC Conversion rates R, eval=useSeqR}
+colnames(BisConRate$R) <- c("C number","Position in reference DNA", "Position in sequencing result (trimmed)", "Position in sequencing result (raw)",
+                            "A peak", "T peak", "G peak", "C peak", "Bisulfite conversion rate")
+
+formattable(BisConRate$R,
+            align=rep("c",ncol(BisConRate$R)),
+            list("A peak"= color_format("white",bases_colors["A"]),
+                 "G peak"= color_format("white",bases_colors["G"]),
+                 "Bisulfite conversion rate" = color_condi(">=", th_conv_rate, colors_tables["correct_pale"], colors_tables["incorrect_pale"])))
+```
+
+
+
+
+```{r QC Conversion rates combined export table, include=F}
+export_formattable(BisConRate_all_FT,file=file.path(indivDir$tab,paste0(fileprefix,"_bisconv_table.png")))
+shiny::setProgress(0.7)
+```
+
+
+
+```{r check if QC incorrect}
+# Verify if both sequencing are defined incrorrect by QC
+if (useSeqF==T & useSeqR==T & correct_F==F & correct_R==F) { QCincorrect <- T 
+} else if (useSeqF==T & useSeqR==F & correct_F==F) { QCincorrect <- T 
+} else if (useSeqF==F & useSeqR==T & correct_R==F) { QCincorrect <- T 
+} else { QCincorrect <- F}
+```
+  
+```{r output if QC incorrect, results='asis', eval=QCincorrect}
+# Output tab and Directories tab
+cat("## Output data {.tabset .tabset-pills}","### Directories", sep="  \n")
+```
+
+```{r diagram if QC incorrect, eval=QCincorrect}
+# Diagram of directories
+diagram_indiv
+```
+
+```{r stop knit if QC incorrect, results='asis', eval=QCincorrect}
+# Files tab with list of output files
+cat("### Files","  \n")
+list_output_indiv(fileprefix = fileprefix)
+# Abort analysis and error message
+cat("## Analysis aborted","  \n")
+p("Error: Analysis has been stopped as sequencing results are defined as incorrect by Quality Control. The analysis can not be performed.",
+  style="color:#bf3232 ; font-weight: bold ;")
+shiny::setProgress(1) 
+knit_exit()
+```
+
+
+
+### Maximum aligned sequence  
+
+The maximum aligned sequence corresponds to the maximum sequence covered by at least one correct sequencing.
+
+```{r max aligned sequence coordinates, results='asis'}
+# Larger coordinates of sequence covered by at least one of the two sequencing (called max aligned sequence)
+
+# Both sequencing
+if (useSeqF==T & useSeqR==T) {
+  if(correct_F==T & correct_R==T) {
+    alg_coord <- c(alg_coord, 
+                   min_start = min(alg_coord$F_start,alg_coord$R_start),
+                   max_end = max(alg_coord$F_end,alg_coord$R_end))
+  }
+  if(correct_F==T & correct_R==F) {
+    alg_coord <- c(alg_coord,
+                   min_start = alg_coord$F_start,
+                   max_end = alg_coord$F_end) 
+    p("Warning: Incorrect reverse sequencing, positions of maximum aligned sequence are taken from forward sequencing aligned sequence.",
+      style="color:#d37217 ; font-weight: bold ;")
+  }
+  
+  if(correct_F==F & correct_R==T) {
+    alg_coord <- c(alg_coord,
+                   min_start = alg_coord$R_start,
+                   max_end = alg_coord$R_end)
+    p("Warning: Incorrect forward sequencing, positions of maximum aligned sequence are taken from forward sequencing aligned sequence.",
+      style="color:#d37217 ; font-weight: bold ;")
+  }
+}
+
+# Forward
+if (useSeqF==T & useSeqR==F) {
+  alg_coord <- c(alg_coord,
+                 min_start = alg_coord$F_start,
+                 max_end = alg_coord$F_end) 
+}
+
+if (useSeqF==F & useSeqR==T) {
+  alg_coord <- c(alg_coord,
+                 min_start = alg_coord$R_start,
+                 max_end = alg_coord$R_end)
+}
+
+```
+
+```{r get max aligned sequence, include=F}
+# Get positions of max aligned sequence on reference DNA sequence to extract its sequence
+seq_max_aligned <- getMaxAligned(sequenceBS = seq_BS$seq_BS, seq_strand = seq_strand, 
+                                 alg_coord_start = alg_coord$min_start, alg_coord_end = alg_coord$max_end,
+                                 seq_start = seq_start, seq_end = seq_end)
+alg_coord <- c(alg_coord, max_length = nchar(as.character(seq_max_aligned)))
+
+# Save max aligned sequence as fasta
+fasta_name <- paste(seq_name, 
+                    "maximum aligned sequence from both sequencing", 
+                    paste0(alg_coord$max_length,"bp"),
+                    paste0(seq_chr, ":", alg_coord$min_start, "-", alg_coord$max_end),
+                    sep=" ")
+write.fasta(as.vector(seq_max_aligned), names=fasta_name, 
+            file.out = file.path(indivDir$alg,paste0(fileprefix,"_aligned_max_seq.fasta")))
+rm(fasta_name)
+```
+
+Length of max aligned sequence : **`r paste0(as.character(alg_coord$max_length)," bp")`**  
+Coordinates of max aligned sequence : **`r paste0(seq_chr,":",alg_coord$min_start,"-",alg_coord$max_end)`**
+  
+**Maximum aligned sequence** (on bisulfite converted sense sequence from the `r seq_strand` strand sequence) :
+```{r display max aligned sequence}
+cat(as.character(seq_max_aligned))
+
+shiny::setProgress(0.8) 
+```
+
+
+
+```{r check if no CG covered}
+# Verify if no CG covered by both sequencing
+if (useSeqF==T & useSeqR==T & correct_F==T & correct_R==T) {
+  NoCGcovered_F <- checkCGcover(data_pos=CG_pos$CG_pos, subject_start=alg_pos$subject_F_start, subject_end=alg_pos$subject_F_end)
+  NoCGcovered_R <- checkCGcover(data_pos=CG_pos$CG_pos_RC, type="RC", subject_start=alg_pos$subject_R_start, subject_end=alg_pos$subject_R_end)
+  if (NoCGcovered_F==T & NoCGcovered_R==T) {NoCGcovered <- T} else {NoCGcovered <- F}
+}
+if (useSeqF==T & useSeqR==F | correct_F==T & correct_R==F ) {
+  NoCGcovered <- checkCGcover(data_pos=CG_pos$CG_pos, subject_start=alg_pos$subject_F_start, subject_end=alg_pos$subject_F_end)
+}
+if (useSeqF==F & useSeqR==T | correct_F==F & correct_R==T ) {
+  NoCGcovered <- checkCGcover(data_pos=CG_pos$CG_pos_RC, type="RC", subject_start=alg_pos$subject_R_start, subject_end=alg_pos$subject_R_end)
+}
+```
+  
+```{r output if no CG covered, results='asis', eval=NoCGcovered}
+# Output tab and Directories tab
+cat("## Output data {.tabset .tabset-pills}","### Directories", sep="  \n")
+```
+
+```{r diagram if no CG covered, eval=NoCGcovered}
+# Diagram of directories
+diagram_indiv
+```
+
+```{r stop knit if no CG covered, results='asis', eval=NoCGcovered}
+# Files tab with list of output files
+cat("### Files","  \n")
+list_output_indiv(fileprefix = fileprefix)
+# Abort analysis and error message
+cat("## Analysis aborted","  \n")
+p("Error: Analysis has been stopped as no CpG sites were found covered by sequencing results.",
+  style="color:#bf3232 ; font-weight: bold ;")
+shiny::setProgress(1) 
+knit_exit()
+```
+
+
+## Methylation {.tabset .tabset-pills}
+
+
+```{r}
+if (useSeqF==T) { CG_peaks_F <- getPeaks(CG_pos$CG_pos, alg_pos = alg_pos, seqtable_trim = seqtable_trim_F, indel = indel, sequencing = "forward") }
+if (useSeqR==T) { CG_peaks_R <- getPeaks(CG_pos$CG_pos_RC, alg_pos = alg_pos, seqtable_trim = seqtable_trim_R, indel = indel, sequencing = "reverse") }
+```
+
+
+### Combined  
+
+```{r combine F and R methylation results, results='asis', warning=F}
+
+# Combine dataframes from Forward sequencing and Reverse Sequencing
+if (useSeqF==T & useSeqR==T & correct_F==T & correct_R==T) {
+  CG_meth <- full_join(subset(CG_peaks_F, select= c(CG_nb,chr,start,end,meth_F)),
+                       subset(CG_peaks_R, select= c(CG_nb,chr,start,end,meth_R)),
+                       by = c("CG_nb","chr","start","end"))
+  # Order by CG_nb, mean and sd of methylation 
+  CG_meth = CG_meth %>% 
+    .[with(., order(CG_nb)),] %>% 
+    rowwise() %>% 
+    dplyr::mutate(meth_avg=mean(c(meth_F,meth_R),na.rm=T)) %>%
+    dplyr::mutate(meth_sd=round(sd(c(meth_F,meth_R)),2))
+  
+  p("Methylation mean of entire sequence (CpG covered) : ", round(mean(CG_meth$meth_avg),2)," %", style="font-weight: bold ;")
+  
+  # Preparation for display
+  CG_meth_FT <- CG_meth
+  colnames(CG_meth_FT) <- c("CG number","Chromosome","Start","End","Methylation Percentage Forward", "Methylation Percentage Reverse",
+                            "Methylation Percentage Average", "Methylation Percentage SD")
+  CG_meth_FT <- formattable(CG_meth_FT,
+                            align=rep("c",ncol(CG_meth_FT)),
+                            list("Methylation Percentage Forward" = color_meth(),
+                                 "Methylation Percentage Reverse" = color_meth(),
+                                 "Methylation Percentage Average" = color_meth(),
+                                 "Methylation Percentage SD"= color_condi("<",25,colors_tables["correct_pale"], colors_tables["warning_pale"])))
+}
+
+if (useSeqF==T & useSeqR==F | correct_F==T & correct_R==F) {
+  CG_meth <- subset(CG_peaks_F, select= c(CG_nb,chr,start,end,meth_F))
+  CG_meth[,"meth_R"] <- NA
+  CG_meth[,"meth_avg"] <- CG_meth$meth_F
+  CG_meth[,"meth_sd"] <- NA
+  p("Warning: Only forward sequencing data available.", style="color:#d37217 ; font-weight: bold ;")
+  p("Methylation mean of entire sequence (CpG covered) : ", round(mean(CG_meth$meth_F),2)," %", style="font-weight: bold ;")
+  # Preparation for display
+  CG_meth_FT <- CG_meth
+  colnames(CG_meth_FT) <- c("CG number","Chromosome","Start","End","Methylation Percentage Forward", "Methylation Percentage Reverse",
+                            "Methylation Percentage Average", "Methylation Percentage SD")
+  CG_meth_FT <- formattable(CG_meth_FT,
+                            align=rep("c",ncol(CG_meth_FT)),
+                            list("Methylation Percentage Forward" = color_meth(),
+                                 "Methylation Percentage Reverse" = color_meth(),
+                                 "Methylation Percentage Average" = color_meth(),
+                                 "Methylation Percentage SD"= color_condi("<",25,colors_tables["correct_pale"], colors_tables["warning_pale"])))
+}
+
+if (useSeqF==F & useSeqR==T | correct_F==F & correct_R==T) {
+  CG_meth <- subset(CG_peaks_R, select= c(CG_nb,chr,start,end,meth_R))
+  CG_meth[,"meth_F"] <- NA
+  CG_meth[,"meth_avg"] <- CG_meth$meth_R
+  CG_meth <- CG_meth[,c("CG_nb","chr","start","end","meth_F","meth_R","meth_avg")]
+  CG_meth[,"meth_sd"] <- NA
+  p("Warning: Only reverse sequencing data available.", style="color:#d37217 ; font-weight: bold ;")
+  p("Methylation mean of entire sequence (CpG covered) : ", round(mean(CG_meth$meth_R),2)," %", style="font-weight: bold ;")
+  # Preparation for display
+  CG_meth_FT <- CG_meth
+  colnames(CG_meth_FT) <- c("CG number","Chromosome","Start","End","Methylation Percentage Forward", "Methylation Percentage Reverse",
+                            "Methylation Percentage Average", "Methylation Percentage SD")
+  CG_meth_FT <- formattable(CG_meth_FT,
+                            align=rep("c",ncol(CG_meth_FT)),
+                            list("Methylation Percentage Forward" = color_meth(),
+                                 "Methylation Percentage Reverse" = color_meth(),
+                                 "Methylation Percentage Average" = color_meth(),
+                                 "Methylation Percentage SD"= color_condi("<",25,colors_tables["correct_pale"], colors_tables["warning_pale"])))
+}
+  
+  
+# Export table data as csv and xlsx
+write.table(CG_meth, file = file.path(indivDir$tab,paste0(fileprefix,"_meth_table.csv")), row.names = T, col.names = T)
+write.xlsx(CG_meth, file = file.path(indivDir$tab,paste0(fileprefix,"_meth_table.xlsx")), rowNames = T, colNames = T, overwrite = T)
+
+# Display table
+CG_meth_FT
+```
+
+```{r meth export table, include=F, warning=F}
+export_formattable(CG_meth_FT,file=file.path(indivDir$tab,paste0(fileprefix,"_meth_table.png")))
+```
+
+
+
+### Forward  
+
+```{r peaks meth F, results='asis'}
+# Forward sequening methylation result
+
+# No forward sequencing provided :
+if (useSeqF==F) { p("Warning: No sequencing data from foward direction sequencing.", style="color:#d37217 ; font-weight: bold ;")}
+
+
+# Forward Sequening provided :
+if (useSeqF==T) {
+  
+  # Incorrect Forward Sequencing
+  if (correct_F==F) { p("Warning : Quality Control has defined the forward sequencing as incorrect.", style="color:#d37217 ; font-weight: bold ;")}
+  
+  # Correct Forward Sequencing
+  if (correct_F==T) {
+    
+    # Display Methylation dataframe for Forward Sequencing
+    if (nrow(CG_peaks_F)!=0) {
+      CG_peaks_F_FT <- CG_peaks_F[,-6]
+      colnames(CG_peaks_F_FT) <- c("CG number","Chromosome","Start","End","C position in reference DNA", 
+                                   "C position in sequencing result (trimmed)", "C position in sequencing result (raw)",
+                                   "A peak", "T peak", "G peak", "C peak", "Methylation Percentage")
+      formattable(CG_peaks_F_FT,
+                  align=rep("c",ncol(CG_peaks_F_FT)),
+                  list("T peak"= color_format("white",bases_colors["T"]),
+                       "C peak"= color_format("white",bases_colors["C"]),
+                       "Methylation Percentage" = color_meth()))
+      
+    } else {
+      p("Warning: Table with 0 rows, 0 CG covered by sequencing from forward primer.", style="color:#d37217 ; font-weight: bold ;")
+    }
+  }
+}
+
+```
+
+
+
+
+
+### Reverse  
+
+```{r peaks meth R, results='asis'}
+# Reverse sequening methylation result
+
+# No reverse sequencing provided :
+if (useSeqR==F) { p("Warning: No sequencing data from reverse direction sequencing.", style="color:#d37217 ; font-weight: bold ;")}
+
+
+# Reverse sequening provided :
+if (useSeqR==T) {
+  
+  # Incorrect Reverse Sequencing
+  if (correct_R==F) { p("Warning : Quality Control has defined the reverse sequencing as incorrect.", style="color:#d37217 ; font-weight: bold ;")}
+  
+  # Correct Reverse Sequencing
+  if (correct_R==T) {
+    
+    # Display Methylation dataframe for Reverse Sequencing
+    if (nrow(CG_peaks_R)!=0) {
+      CG_peaks_R_FT <- CG_peaks_R[,-5]
+      colnames(CG_peaks_R_FT) <- c("CG number","Chromosome","Start","End","G position in reference DNA",
+                                    "G position in sequencing result (trimmed)", "G position in sequencing result (raw)",
+                                   "A peak", "T peak", "G peak", "C peak", "Methylation Percentage")
+      formattable(CG_peaks_R_FT,
+                  align=rep("c",ncol(CG_peaks_R_FT)),
+                  list("A peak"= color_format("white",bases_colors["A"]),
+                       "G peak"= color_format("white",bases_colors["G"]),
+                       "Methylation Percentage" = color_meth()))
+      
+    } else {
+      p("Warning: Table with 0 rows, 0 CG covered by sequencing from reverse primer.", style="color:#d37217 ; font-weight: bold ;")
+    }
+  }
+}
+```
+
+
+
+
+
+
+
+
+```{r save meth data file, include=F, warning=F}
+# Save methylation data files for grouped analysis
+CG_meth_data = CG_meth %>% 
+  dplyr::mutate(collection=seq_coll, group=seq_group, rep=seq_rep, clone=clone_nb,
+                alg_coord_start=alg_coord$min_start, alg_coord_end=alg_coord$max_end)
+colnames(CG_meth_data)[colnames(CG_meth_data)=="chr"] <- "chromosome"
+
+
+data_path <- file.path(indivDir$data,paste0(fileprefix,"_methdata.csv"))
+write.table(CG_meth_data, file = data_path, row.names = F)
+
+shiny::setProgress(0.9) 
+```
+
+
+
+
+
+### Individual methylation plot
+
+```{r plot preparation, include=F}
+# Create variable for name of individual experiment
+exp_name <- paste(seq_name,seq_coll,seq_group,seq_rep)
+if(seq_clone!="" & !is.na(clone_nb)) {exp_name <- paste(exp_name,"clone",clone_nb)}
+exp_name <- gsub("  "," ",exp_name)
+exp_name <- gsub("* $","",exp_name)
+
+# methylation data
+CG_meth_plot <- CG_meth[,c(2,3,4,7)]
+colnames(CG_meth_plot) <- c("chromosome","start","end",exp_name)
+```
+
+```{r plot legend, include=F}
+# Generation of plot legend image if not already created
+legend_bases_path <-  file.path(indivDir$plot,"legend_bases.png")
+
+if (!file.exists(legend_bases_path)) { 
+  png(filename=legend_bases_path, width=260, height=60)
+  par(mai=c(0,0,0,0))
+  plot.new()
+  legend(x="center", 
+         legend=c("A","T","G","C"), 
+         fill=c("#43CD80","#D7191C","#FDAE61","#2C7BB6"),
+         border="white", 
+         bty = "n", 
+         cex=1.5,
+         horiz=TRUE)
+  dev.off()
+}
+
+legend_grad_path <-  file.path(indivDir$plot,"legend_methylation_gradient.png")
+
+if (!file.exists(legend_grad_path)) { 
+  png(filename=legend_grad_path, width=600, height=60)
+  par(mai=c(0,0,0,0))
+  plot.new()
+  legend(title = "Methylation levels",
+         x="center", 
+         legend=c("0-20","20-40","40-60","60-80","80-100"), 
+         fill=grey.colors(5,start=0.9,end=0),
+         border="white", 
+         bty = "n", 
+         cex=1.5,
+         horiz=TRUE)
+  dev.off()
+}
+```
+
+```{r plot generation, include=F}
+# Plot generation
+
+plot_path <- file.path(indivDir$plot,paste0(fileprefix,"_plot.png"))
+png(filename=plot_path, width = alg_coord$max_length*10, height = 600)
+individual_meth_plot(meth=CG_meth_plot, start=alg_coord$min_start, end=alg_coord$max_end, genome = genome,
+                     plot_title = paste("Methylation plot of",exp_name), bases_colors=bases_colors)
+dev.off()
+```
+
+
+```{r display plot and legends, results='asis', message=F, warning=F, out.width = "100%", fig.align = "center"}
+cat("\n\n![](",plot_path,")\n\n")
+cat("\n\n![](",legend_bases_path,")")
+cat("![](",legend_grad_path,")\n\n")
+```
+
+
+
+## Output data {.tabset .tabset-pills}
+
+### Directories
+```{r display file chart, fig.align = "center"}
+# Output folders chart
+diagram_indiv
+```
+
+
+
+### Files
+```{r list of output files, results='asis'}
+# List of files related to analysis
+list_output_indiv(fileprefix = fileprefix)
+```
+
+
+
+
+### Methylation data file preview
+```{r meth data file, warning=F}
+# Display methylation data file
+formattable(CG_meth_data,
+            align=rep("c",ncol(CG_meth_data)))
+
+shiny::setProgress(1) 
+```
+
+
+
+
+
+<!--
+
+> sessionInfo()
+R version 4.1.2 (2021-11-01)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 10 x64 (build 19043)
+
+Matrix products: default
+
+locale:
+[1] LC_COLLATE=French_France.1252  LC_CTYPE=French_France.1252    LC_MONETARY=French_France.1252 LC_NUMERIC=C                   LC_TIME=French_France.1252    
+
+attached base packages:
+ [1] tools     parallel  grid      stats4    stats     graphics  grDevices datasets  utils     methods   base     
+
+other attached packages:
+ [1] BSgenome.Hsapiens.UCSC.hg19_1.4.3 webshot_0.5.2                     shinythemes_1.2.0                 rstatix_0.7.0                     Rmisc_1.5                        
+ [6] plyr_1.8.6                        lattice_0.20-45                   rlist_0.4.6.2                     renv_0.15.4                       readr_2.1.2                      
+[11] RColorBrewer_1.1-2                purrr_0.3.4                       png_0.1-7                         pdftools_3.1.1                    htmlwidgets_1.5.4                
+[16] htmltools_0.5.2                   ggpubr_0.4.0                      formattable_0.2.1                 dplyr_1.0.8                       DiagrammeR_1.0.9                 
+[21] compareGroups_4.5.1               BiocManager_1.30.16               arrangements_1.1.9                sangeranalyseR_1.4.0              logger_0.2.2                     
+[26] BiocStyle_2.22.0                  seqinr_4.2-8                      knitr_1.37                        rmarkdown_2.12                    openxlsx_4.2.5                   
+[31] shinyWidgets_0.6.4                ggdendro_0.1.23                   shinycssloaders_1.0.0             excelR_0.4.0                      zeallot_0.1.0                    
+[36] DT_0.21                           plotly_4.10.0                     ggplot2_3.3.5                     data.table_1.14.2                 shinyjs_2.1.0                    
+[41] shinydashboard_0.7.2              shiny_1.7.1                       gridExtra_2.3                     sangerseqR_1.30.0                 phangorn_2.8.1                   
+[46] reshape2_1.4.4                    DECIPHER_2.22.0                   RSQLite_2.2.10                    ape_5.6-2                         stringr_1.4.0                    
+[51] Gviz_1.38.3                       BSgenome_1.62.0                   rtracklayer_1.54.0                GenomicRanges_1.46.1              Biostrings_2.62.0                
+[56] GenomeInfoDb_1.30.1               XVector_0.34.0                    IRanges_2.28.0                    S4Vectors_0.32.3                  BiocGenerics_0.40.0              
+
+loaded via a namespace (and not attached):
+  [1] utf8_1.2.2                  tidyselect_1.1.2            AnnotationDbi_1.56.2        BiocParallel_1.28.3         gmp_0.6-4                   munsell_0.5.0              
+  [7] codetools_0.2-18            chron_2.3-56                withr_2.5.0                 colorspace_2.0-3            Biobase_2.54.0              filelock_1.0.2             
+ [13] uuid_1.0-3                  rstudioapi_0.13             ggsignif_0.6.3              officer_0.4.1               labeling_0.4.2              MatrixGenerics_1.6.0       
+ [19] GenomeInfoDbData_1.2.7      farver_2.1.0                bit64_4.0.5                 vctrs_0.3.8                 generics_0.1.2              xfun_0.30                  
+ [25] biovizBase_1.42.0           BiocFileCache_2.2.1         qpdf_1.1                    R6_2.5.1                    AnnotationFilter_1.18.0     bitops_1.0-7               
+ [31] cachem_1.0.6                DelayedArray_0.20.0         assertthat_0.2.1            promises_1.2.0.1            BiocIO_1.4.0                scales_1.1.1               
+ [37] nnet_7.3-17                 gtable_0.3.0                ensembldb_2.18.3            rlang_1.0.2                 systemfonts_1.0.4           splines_4.1.2              
+ [43] lazyeval_0.2.2              dichromat_2.0-0             broom_0.7.12                checkmate_2.0.0             abind_1.4-5                 yaml_2.3.5                 
+ [49] GenomicFeatures_1.46.5      backports_1.4.1             httpuv_1.6.5                HardyWeinberg_1.7.4         Hmisc_4.6-0                 kableExtra_1.3.4           
+ [55] ellipsis_0.3.2              jquerylib_0.1.4             Rsolnp_1.16                 Rcpp_1.0.8                  visNetwork_2.1.0            base64enc_0.1-3            
+ [61] progress_1.2.2              zlibbioc_1.40.0             RCurl_1.98-1.6              prettyunits_1.1.1           rpart_4.1.16                fontawesome_0.2.2          
+ [67] SummarizedExperiment_1.24.0 cluster_2.1.2               magrittr_2.0.2              flextable_0.7.0             truncnorm_1.0-8             ProtGenerics_1.26.0        
+ [73] matrixStats_0.61.0          hms_1.1.1                   mime_0.12                   evaluate_0.15               xtable_1.8-4                XML_3.99-0.9               
+ [79] jpeg_0.1-9                  compiler_4.1.2              biomaRt_2.50.3              tibble_3.1.6                mice_3.14.0                 writexl_1.4.0              
+ [85] crayon_1.5.0                tzdb_0.2.0                  later_1.3.0                 Formula_1.2-4               tidyr_1.2.0                 DBI_1.1.2                  
+ [91] dbplyr_2.1.1                MASS_7.3-55                 rappdirs_0.3.3              car_3.0-12                  Matrix_1.4-0                ade4_1.7-18                
+ [97] cli_3.2.0                   quadprog_1.5-8              igraph_1.2.11               pkgconfig_2.0.3             GenomicAlignments_1.30.0    foreign_0.8-82             
+[103] xml2_1.3.3                  svglite_2.1.0               bslib_0.3.1                 rvest_1.0.2                 VariantAnnotation_1.40.0    digest_0.6.29              
+[109] fastmatch_1.1-3             htmlTable_2.4.0             gdtools_0.2.4               restfulr_0.0.13             curl_4.3.2                  Rsamtools_2.10.0           
+[115] rjson_0.2.21                lifecycle_1.0.1             nlme_3.1-155                jsonlite_1.8.0              carData_3.0-5               askpass_1.1                
+[121] viridisLite_0.4.0           fansi_1.0.2                 pillar_1.7.0                KEGGREST_1.34.0             fastmap_1.1.0               httr_1.4.2                 
+[127] survival_3.2-13             glue_1.6.2                  zip_2.2.0                   bit_4.0.4                   stringi_1.7.6               sass_0.4.0    
+
+
+-->
