@@ -60,7 +60,7 @@ options(ucscChromosomeNames=FALSE)
 
 ```{r Library sync, include=F}
 # Restore package versions from the renv.lock file : synchronize library with lockfile
-renv::restore()
+renv::restore(prompt=F)
 ```
 
 <!-- PARAMETERS -->

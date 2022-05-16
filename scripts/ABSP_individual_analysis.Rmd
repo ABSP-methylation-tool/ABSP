@@ -70,7 +70,7 @@ Sys.setlocale(category = "LC_ALL", locale = "en_SE.utf8")
 
 ```{r Library sync, include=F}
 # Restore package versions from the renv.lock file : synchronize library with lockfile
-renv::restore()
+renv::restore(prompt=F)
 ```
 
 ```{r TEST SCRIPT files and params, eval=F}
