@@ -7,23 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 
-# *****************************************************************************************************************************************
-
-# Packages 
-
-options(timeout = 600)
-
-renv::restore(prompt=F)
-
-lib <- c("arrangements","BiocGenerics","BiocManager","Biostrings","BSgenome","compareGroups",
-         "DiagrammeR","dplyr","formattable", "GenomeInfoDb","GenomicRanges","ggdendro",
-         "ggplot2", "ggpubr","Gviz","htmltools","htmlwidgets",
-         "knitr","openxlsx","pdftools","plotly",
-         "png","purrr","RColorBrewer", "readr","renv","rlist","rmarkdown",
-         "Rmisc","rstatix","sangeranalyseR","sangerseqR","seqinr", "shiny",
-         "shinythemes","webshot")
-suppressMessages(lapply(lib, library, character.only = TRUE, quietly = TRUE))
-
 
 
 # *****************************************************************************************************************************************
@@ -37,8 +20,6 @@ list_genomes <- c(
     "BSgenome.Ggallus.UCSC.galGal6" , "BSgenome.Drerio.UCSC.danRer11", "BSgenome.Celegans.UCSC.ce11", "BSgenome.Dmelanogaster.UCSC.dm6")
 
 # *****************************************************************************************************************************************
-
-
 
 
 ui <- fluidPage(
@@ -70,7 +51,7 @@ ui <- fluidPage(
                                    br(),
                                    
                                    p("ABSP is a R based tool to analyze Bisulfite Sequencing PCR (BSP) experiment results, which is why it is the acronym for 'Analysis of Bisulfite Sequencing PCR'."), 
-                                   p("It was developed to help researchers estimate and compare methylation percentages of a DNA region studied using BSP experiments."),
+                                   p("It was developed to help researchers estimate and compare CpG methylation percentages of a DNA region studied using BSP experiments."),
                                    p("It provides a complete automated workflow, from trace file sequencing results to data visualization and statistics."),
                                    
                                    br()
