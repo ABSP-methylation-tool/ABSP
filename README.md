@@ -11,4 +11,4 @@ To use ABSP :
 * Install R and RStudio
 * Open the "ABSP Rproject.Rproject" file with Rstudio (it might take a few minutes to open)
 * Open the "app.R" file with Rstuio
-* Click on the "Run App" button on the top right corner (Select "Run external" to open it in web browser)
+* Click on the "Run App" button on the top right corner (select "Run external" to open it in web browser)
