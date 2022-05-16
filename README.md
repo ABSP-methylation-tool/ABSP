@@ -7,7 +7,7 @@ For more detailed information, please read the ABSP User Guide document.
 
 To use ABSP :
 
-* Dowload all the ABSP
+* Dowload all the ABSP files
 * Install R and RStudio
 * Open the "ABSP Rproject.Rproject" file with Rstudio (it might take a few minutes to open)
 * Open the "app.R" file with Rstuio
