@@ -3,7 +3,7 @@ ABSP, standing for *"Analysis of Bisulfite Sequencing PCR"*, is an R based tool 
 It was developed to help researchers to estimate and compare methylation percentages of a DNA region studied using BSP experiments. 
 It provides a complete automated workflow, from trace file sequencing results to data visualization and statistics.
 
-For more detailed information, please read the ABSP User Guide document.
+For more detailed information, please read the "ABSP User Guide" document.
 
 To use ABSP :
 
