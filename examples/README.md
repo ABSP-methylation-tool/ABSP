@@ -38,7 +38,7 @@ The folders
 "ABSP/examples/results/Example data/Test sequence/individual_results_cloning" and "ABSP/examples/results/Example data/Test sequence/individual_results_direct" must be moved to the "ABSP/results" folder with the same structure 
 -> "ABSP/results/Example data/Test sequence/individual_results_cloning" and "ABSP/results/Example data/Test sequence/individual_results_direct"  
 (If the "ABSP/results" folder does not already exist, it can be created)  
-("ABSP/" folder corresponds to the main ABSP folder, with the version identifier in the folder name)  
+(The "ABSP/" folder corresponds to the main ABSP folder, with the version identifier in the folder name)  
 
 - Grouped analysis:  
 Once the methylation data files from individual analyses are in the "ABSP/results" folder, the grouped analysis can be runned from the "grouped analysis" tab.  
