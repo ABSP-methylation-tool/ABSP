@@ -175,7 +175,7 @@ ui <- fluidPage(
                     
                         sidebarPanel(width=5,
                             
-                            h4("Experiment information", style="color:#374e64 ; font-weight: bold ; font-size:18px"),
+                            h4("Sample information", style="color:#374e64 ; font-weight: bold ; font-size:18px"),
                             
                             fluidRow(
                                 column(width = 7,
@@ -314,7 +314,7 @@ ui <- fluidPage(
                                 tabPanel(
                                     
                                     # Tab title
-                                    span("Experiment information", style="font-size:18px"),
+                                    span("Sample information", style="font-size:18px"),
                                     
                                     
                                     br(),
@@ -434,7 +434,6 @@ ui <- fluidPage(
                                         
                                         h5("Example of reference DNA fasta file format :"),
                                         div(img(src="ABSP - fasta file.png")) 
-                                        # tags$code("TEST ",style="color:grey ; background-color:transparent")
                                     )
                                 ),
                                 
@@ -448,7 +447,7 @@ ui <- fluidPage(
                                     
                                     div( # DATE
                                         h4("Select dates of sequencing", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("In a matter of traceability, you can select the dates when the sequencing were performed."),
+                                        p("In a matter of traceability, you can select the dates when the sequencing runs were performed."),
                                         em("If one of the sequencing files is not provided, the date entry must be empty.")
                                     ),
                                     
@@ -456,8 +455,8 @@ ui <- fluidPage(
                                     
                                     div( # SEQ 
                                         h4("Select .ab1 sequencing files", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select the files in your folders corresponding to the .ab1 sequencing files from the 
-                                          sequencing performed in one direction (#1) and in the other direction (#2)."),
+                                        p("Select the files in your folders corresponding to the .ab1 sequencing files. 
+                                          The sequencing reads from one direction (#1) and the other direction (#2) should both be provided, although the analysis can be runned with only one sequencing read provided."),
                                         p("The directions (forward or reverse) will be determined during the analysis.")
                                     )
                                 )
@@ -539,7 +538,7 @@ ui <- fluidPage(
                             tabsetPanel(
                                 type = "tabs",
                                 
-                                # Tabset panel - experiment infos --------------------------------------------------
+                                # Tabset panel - sample infos --------------------------------------------------
                                 
                                 tabPanel(
                                     # Tab title 
@@ -737,7 +736,7 @@ ui <- fluidPage(
                                           br(),
                                           
                                           h4("How to proceed ?"),
-                                          p("1. Fill one or the two input tables below with your experiment information and your choice of parameters 
+                                          p("1. Fill one or the two input tables below with the sample information and the choice of parameters 
                                             (you can open the tables files with the buttons below)."),
                                           
                                           p("2. In the left panel, select an existing folder within the ABSP results folder to locate all of the analyses results."),
@@ -745,7 +744,7 @@ ui <- fluidPage(
                                           
                                           
                                           p("3. In the left panel, select your filled table as input."), 
-                                          p("Both the experiments data table for individual analyses and the parameters table for grouped analyses can be provided at the same time to launch individual analyses followed by grouped analyses,
+                                          p("Both the sample data table for multiple individual analyses and the parameters table for multiple grouped analyses can be provided at the same time to launch the individual analyses followed by the grouped analyses,
                                             or only one of the two tables can be provided and will launch the corresponding analyses, either individual analyses or grouped analyses."),
                                           
                                           p("4. Launch the analyses by clicking on the bottom button 'Run analyses'. "),
@@ -755,7 +754,7 @@ ui <- fluidPage(
                                           
                                           hr(),
                                           
-                                          h4("Experiments data for individual analyses"),
+                                          h4("Sample data for individual analyses"),
                                           p("The table regroups the individual analyses inputs."),
                                           
                                           actionButton("exp_tab_open"," Open multiple individual analysis table file", 
@@ -989,7 +988,7 @@ server <- function(input, output, session) {
         if(input$seqexisting == "Create new sequence folder") { seqname <- input$seqnew } else { seqname <- input$seqexisting }
         
         
-        # Experiment name based on input
+        # Sample name based on input
         indiv_name <- paste(substr(foldername, 1, 6), # folder name 6 first characters
                            seqname,
                            ifelse(input$collection=="0" | input$collection=="", "", input$collection), # collection name if exists
@@ -1190,7 +1189,7 @@ server <- function(input, output, session) {
         values$groupedparams_state <- 'reset'
     })
     
-    # Experiment table for individual analyses
+    # Sample table for individual analyses
     exptable_input <- reactive({
         if (is.null(values$exptable_state)) {
             return(NULL)
@@ -1295,7 +1294,7 @@ server <- function(input, output, session) {
             
 
             #************************************
-            # Run all individual analysis from the experiment data table ----------------------------
+            # Run all individual analysis from the sample data table ----------------------------
             
             list_Ireports <- c()
             
@@ -1305,7 +1304,7 @@ server <- function(input, output, session) {
                 dir_seq <- file.path(output_res,exp_table[i,1])
                 if (!dir.exists(dir_seq)) {suppressWarnings(dir.create(dir_seq))}
                 
-                # Experiment name based on idata table
+                # Sample name based on idata table
                 indiv_name <- paste(substr(foldermain, 1, 6), # folder name 6 first characters
                                     exp_table[i,1],
                                     ifelse(exp_table[i,2]=="0" | is.na(exp_table[i,2]), "", exp_table[i,2]), # collection name if exists
