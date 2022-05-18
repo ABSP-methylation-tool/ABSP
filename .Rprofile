@@ -15,5 +15,3 @@ lib <- c("arrangements","BiocGenerics","BiocManager","Biostrings","BSgenome","co
          "Rmisc","rstatix","sangeranalyseR","sangerseqR","seqinr", "shiny",
          "shinythemes","webshot")
 suppressMessages(lapply(lib, library, character.only = TRUE, quietly = TRUE))
-
-source("./scripts/ABSP_functions.R")
