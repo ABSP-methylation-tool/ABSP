@@ -213,38 +213,38 @@ trimming_plot <- function(sangerRead, seqtable, MixedReport, Trimmed_seq,
                              ratio_color=  ifelse(primary_ratio>=th_mixed_position,colors_tables["correct"],colors_tables["incorrect"]))
   
   # Quality score plot
-  quality_plot <- plot_ly(seqtable, x = ~position, y = ~quality_score, type = "scatter", mode="markers", color = ~I(quality_color),
+  quality_plot <- plot_ly(seqtable, x = ~position, y = ~quality_score, type = "scatter", mode="markers", marker = list(color= ~quality_color),
                           hoverinfo = 'text',
+                          height=450,
                           text = ~paste("</br> Position:", position,
                                         "</br> Primary base:", primary_base,
                                         "</br> Quality score:", quality_score)) %>% 
     layout(xaxis = list(range = c(0,(MixedReport$rawSeqLength+2))),
-           yaxis = list(title = "Quality phred score",range = c(0,65), ticksuffix="  "),
-           height=450)
+           yaxis = list(title = "Quality phred score",range = c(0,65), ticksuffix="  "))
   
   if(!is.na(sangerRead@QualityReport@trimmedStartPos) & !is.na(sangerRead@QualityReport@trimmedFinishPos)) {
     quality_plot <- quality_plot %>% 
-      add_segments(x = sangerRead@QualityReport@trimmedStartPos, xend = sangerRead@QualityReport@trimmedStartPos, y = 0, yend = 65, 
+      add_segments(x = sangerRead@QualityReport@trimmedStartPos, xend = sangerRead@QualityReport@trimmedStartPos, y = 0, yend = 65, marker= NULL,
                    line=list(width=2,color= "coral"), text = ~paste("</br> Trimmed start position :", sangerRead@QualityReport@trimmedStartPos)) %>% 
-      add_segments(x = sangerRead@QualityReport@trimmedFinishPos, xend = sangerRead@QualityReport@trimmedFinishPos, y = 0, yend = 65, 
+      add_segments(x = sangerRead@QualityReport@trimmedFinishPos, xend = sangerRead@QualityReport@trimmedFinishPos, y = 0, yend = 65, marker= NULL,
                    line=list(width=2,color= "coral"),text = ~paste("</br> Trimmed end position :", sangerRead@QualityReport@trimmedFinishPos))            
   }
   
   # Mixed base peak plot
-  mixed_plot <- plot_ly(seqtable, x = ~position, y = ~primary_ratio, type = "scatter", mode="markers", color = ~I(ratio_color),
+  mixed_plot <- plot_ly(seqtable, x = ~position, y = ~primary_ratio, type = "scatter", mode="markers", marker = list(color= ~ratio_color),
                         hoverinfo = 'text',
+                        height=450,
                         text = ~paste("</br> Position:", position,
                                       "</br> Primary base:", primary_base,
                                       "</br> Primary ratio:", primary_ratio)) %>% 
     layout(xaxis = list(range = c(0,(MixedReport$rawSeqLength+2))),
-           yaxis = list(title = "Peak ratio of primary base",range = c(0,1.1), ticksuffix="  "), 
-           height=450)
+           yaxis = list(title = "Peak ratio of primary base",range = c(0,1.1), ticksuffix="  "))
   
   if(!is.na(MixedReport$trimmedStartPos) & !is.na(MixedReport$trimmedFinishPos)) {
     mixed_plot <- mixed_plot %>% 
-      add_segments(x = MixedReport$trimmedStartPos, xend = MixedReport$trimmedStartPos, y = 0, yend = 1.1, 
+      add_segments(x = MixedReport$trimmedStartPos, xend = MixedReport$trimmedStartPos, y = 0, yend = 1.1, marker= NULL,
                    line=list(width=2,color= "turquoise"), text = ~paste("</br> Trimmed start position :", MixedReport$trimmedStartPos)) %>% 
-      add_segments(x = MixedReport$trimmedFinishPos, xend = MixedReport$trimmedFinishPos, y = 0, yend = 1.1, 
+      add_segments(x = MixedReport$trimmedFinishPos, xend = MixedReport$trimmedFinishPos, y = 0, yend = 1.1, marker= NULL,
                    line=list(width=2,color= "turquoise"),text = ~paste("</br> Trimmed end position :", MixedReport$trimmedFinishPos)) 
   }
   
@@ -267,6 +267,7 @@ trimming_plot <- function(sangerRead, seqtable, MixedReport, Trimmed_seq,
   # Plot sequences on position axis
   seq_plot <- plot_ly(seqtable, x = ~position, y = ~raw, type = "scatter", mode="lines", 
                       line=list(width=10, color = as.vector(colors_tables["incorrect"])),
+                      height = 200,
                       hoverinfo = 'text',
                       text = ~paste("</br> <b> Raw sequence </b>",
                                     "</br> Length :",MixedReport$rawSeqLength,"bp",
@@ -295,8 +296,7 @@ trimming_plot <- function(sangerRead, seqtable, MixedReport, Trimmed_seq,
                             "</br> Mean of primary peak ratio :", Trimmed_seq$MeanPrimaryRatio,
                             "</br> Percentage of non-mixed positions :", Trimmed_seq$PercNonMixedPos*100,"%")) %>%
     layout(xaxis = list(title = "Base position",range = c(0,(MixedReport$rawSeqLength+2))), 
-           yaxis = list(title = "", ticksuffix="  "),
-           height = 200)
+           yaxis = list(title = "", ticksuffix="  "))
   
   # Combine plots in one plot
   plot <- subplot(quality_plot,mixed_plot,seq_plot, nrows = 3,  titleY = TRUE, titleX = TRUE, shareX = TRUE,
@@ -753,14 +753,14 @@ preprocess_data <- function(data_files, GroupOrder, cloning_exp, clone_threshold
   # Retrieve the list of all CpG positions
   data_cpg <- lapply(data_all, function(x) {
     x <- x[,c(1:4)] })
-  data_cpg <- purrr::reduce(data_cpg, full_join)
+  data_cpg <- suppressMessages(purrr::reduce(data_cpg, full_join))
   data_cpg <- data_cpg[order(data_cpg$CG_nb),]
   
   # Add rows for missing positions with NA and add sample information
   data_all <- lapply(data_all, function(x) {
     
     # Add rows for missing CpG positions
-    x <- full_join(data_cpg,x)
+    x <- suppressMessages(full_join(data_cpg,x))
     
     # Complete sample info in the new rows
     # check if there is already a value or NA for collection, rep and clone information

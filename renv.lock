@@ -256,6 +256,7 @@
       "Requirements": [
         "BiocGenerics",
         "IRanges",
+        "Matrix",
         "MatrixGenerics",
         "S4Vectors"
       ]
@@ -343,13 +344,13 @@
     },
     "GenomicFeatures": {
       "Package": "GenomicFeatures",
-      "Version": "1.48.0",
+      "Version": "1.48.1",
       "Source": "Bioconductor",
       "git_url": "https://git.bioconductor.org/packages/GenomicFeatures",
       "git_branch": "RELEASE_3_15",
-      "git_last_commit": "8d9869e",
-      "git_last_commit_date": "2022-04-26",
-      "Hash": "b1db75f79a49bcedf1b19b17f481cb2f",
+      "git_last_commit": "4ae689e",
+      "git_last_commit_date": "2022-05-09",
+      "Hash": "a83f566d0dbc3248cd220194c00f21c8",
       "Requirements": [
         "AnnotationDbi",
         "Biobase",
@@ -413,6 +414,7 @@
         "biovizBase",
         "digest",
         "ensembldb",
+        "lattice",
         "latticeExtra",
         "matrixStats",
         "rtracklayer"
@@ -427,7 +429,8 @@
       "Requirements": [
         "Rcpp",
         "Rsolnp",
-        "mice"
+        "mice",
+        "nnet"
       ]
     },
     "Hmisc": {
@@ -439,13 +442,19 @@
       "Requirements": [
         "Formula",
         "base64enc",
+        "cluster",
         "data.table",
+        "foreign",
         "ggplot2",
         "gridExtra",
         "gtable",
         "htmlTable",
         "htmltools",
+        "lattice",
         "latticeExtra",
+        "nnet",
+        "rpart",
+        "survival",
         "viridis"
       ]
     },
@@ -478,6 +487,32 @@
         "png"
       ]
     },
+    "KernSmooth": {
+      "Package": "KernSmooth",
+      "Version": "2.23-20",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "8dcfa99b14c296bc9f1fd64d52fd3ce7",
+      "Requirements": []
+    },
+    "MASS": {
+      "Package": "MASS",
+      "Version": "7.3-56",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "af0e1955cb80bb36b7988cc657db261e",
+      "Requirements": []
+    },
+    "Matrix": {
+      "Package": "Matrix",
+      "Version": "1.4-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "699c47c606293bdfbc9fd78a93c9c8fe",
+      "Requirements": [
+        "lattice"
+      ]
+    },
     "MatrixGenerics": {
       "Package": "MatrixGenerics",
       "Version": "1.8.0",
@@ -497,7 +532,9 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "366a8838782928e398b8762c932a42a3",
-      "Requirements": []
+      "Requirements": [
+        "Matrix"
+      ]
     },
     "ProtGenerics": {
       "Package": "ProtGenerics",
@@ -567,6 +604,7 @@
       "Repository": "CRAN",
       "Hash": "4c86baed78388ceb06f88e3e9a1d87f5",
       "Requirements": [
+        "Matrix",
         "Rcpp"
       ]
     },
@@ -590,6 +628,7 @@
       "Repository": "CRAN",
       "Hash": "c3c3d6c3abc276bc7849835d5d54c44d",
       "Requirements": [
+        "lattice",
         "plyr"
       ]
     },
@@ -663,6 +702,7 @@
         "GenomeInfoDb",
         "GenomicRanges",
         "IRanges",
+        "Matrix",
         "MatrixGenerics",
         "S4Vectors"
       ]
@@ -736,6 +776,7 @@
       "Repository": "CRAN",
       "Hash": "eb001fa57cd7bc0db0cc59b2dbedb0b0",
       "Requirements": [
+        "MASS",
         "pixmap",
         "sp"
       ]
@@ -747,7 +788,9 @@
       "Repository": "CRAN",
       "Hash": "894108412a7ec23d5de85cdcce871c8b",
       "Requirements": [
-        "Rcpp"
+        "Rcpp",
+        "lattice",
+        "nlme"
       ]
     },
     "arrangements": {
@@ -900,6 +943,14 @@
         "yaml"
       ]
     },
+    "boot": {
+      "Package": "boot",
+      "Version": "1.3-28",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0baa960e3b49c6176a4f42addcbacc59",
+      "Requirements": []
+    },
     "brio": {
       "Package": "brio",
       "Version": "1.1.3",
@@ -971,10 +1022,14 @@
       "Repository": "CRAN",
       "Hash": "69e00596e08b7f64e5a7d16447bec44d",
       "Requirements": [
+        "MASS",
         "abind",
         "carData",
         "lme4",
         "maptools",
+        "mgcv",
+        "nlme",
+        "nnet",
         "pbkrtest",
         "quantreg"
       ]
@@ -1005,6 +1060,16 @@
       "Hash": "2d8e9b1143af1caf26a521ed26e8736b",
       "Requirements": []
     },
+    "class": {
+      "Package": "class",
+      "Version": "7.3-20",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "da09d82223e669d270e47ed24ac8686e",
+      "Requirements": [
+        "MASS"
+      ]
+    },
     "cli": {
       "Package": "cli",
       "Version": "3.3.0",
@@ -1021,6 +1086,22 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "3f038e5ac7f41d4ac41ce658c85e3042",
+      "Requirements": []
+    },
+    "cluster": {
+      "Package": "cluster",
+      "Version": "2.1.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c5f8447373ec2a0f593c694024e5b7ee",
+      "Requirements": []
+    },
+    "codetools": {
+      "Package": "codetools",
+      "Version": "0.2-18",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "019388fc48e48b3da0d3a76ff94608a8",
       "Requirements": []
     },
     "colorspace": {
@@ -1053,6 +1134,7 @@
         "knitr",
         "officer",
         "rmarkdown",
+        "survival",
         "writexl"
       ]
     },
@@ -1340,6 +1422,14 @@
         "rlang"
       ]
     },
+    "foreign": {
+      "Package": "foreign",
+      "Version": "0.8-82",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "32b25c97ce306a760c4d9f787991b5d9",
+      "Requirements": []
+    },
     "formatR": {
       "Package": "formatR",
       "Version": "1.12",
@@ -1414,6 +1504,7 @@
       "Repository": "CRAN",
       "Hash": "3b5b879c6228531eb1c5fdb78c2024b3",
       "Requirements": [
+        "MASS",
         "ggplot2"
       ]
     },
@@ -1424,10 +1515,12 @@
       "Repository": "CRAN",
       "Hash": "0fb26d0674c82705c6b701d1a61e02ea",
       "Requirements": [
+        "MASS",
         "digest",
         "glue",
         "gtable",
         "isoband",
+        "mgcv",
         "rlang",
         "scales",
         "tibble",
@@ -1626,6 +1719,7 @@
       "Repository": "CRAN",
       "Hash": "820595efd173f9bac4ea76c1be007299",
       "Requirements": [
+        "Matrix",
         "magrittr",
         "pkgconfig"
       ]
@@ -1637,6 +1731,7 @@
       "Repository": "CRAN",
       "Hash": "04a569c515130c758eff1939499d7cc5",
       "Requirements": [
+        "Matrix",
         "igraph"
       ]
     },
@@ -1740,6 +1835,14 @@
         "rlang"
       ]
     },
+    "lattice": {
+      "Package": "lattice",
+      "Version": "0.20-45",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b64cdbb2b340437c4ee047a1f4c4377b",
+      "Requirements": []
+    },
     "latticeExtra": {
       "Package": "latticeExtra",
       "Version": "0.6-29",
@@ -1749,6 +1852,7 @@
       "Requirements": [
         "RColorBrewer",
         "jpeg",
+        "lattice",
         "png"
       ]
     },
@@ -1778,9 +1882,14 @@
       "Repository": "CRAN",
       "Hash": "4f55df530bfb9fe95fc42738fa55f183",
       "Requirements": [
+        "MASS",
+        "Matrix",
         "Rcpp",
         "RcppEigen",
+        "boot",
+        "lattice",
         "minqa",
+        "nlme",
         "nloptr"
       ]
     },
@@ -1807,6 +1916,8 @@
       "Repository": "CRAN",
       "Hash": "e60a1728ad29c48a3491777e0c55a07d",
       "Requirements": [
+        "foreign",
+        "lattice",
         "sp"
       ]
     },
@@ -1829,6 +1940,17 @@
         "rlang"
       ]
     },
+    "mgcv": {
+      "Package": "mgcv",
+      "Version": "1.8-40",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c6b2fdb18cf68ab613bd564363e1ba0d",
+      "Requirements": [
+        "Matrix",
+        "nlme"
+      ]
+    },
     "mice": {
       "Package": "mice",
       "Version": "3.14.0",
@@ -1841,6 +1963,7 @@
         "cpp11",
         "dplyr",
         "generics",
+        "lattice",
         "rlang",
         "tidyr",
         "withr"
@@ -1874,6 +1997,16 @@
         "colorspace"
       ]
     },
+    "nlme": {
+      "Package": "nlme",
+      "Version": "3.1-157",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "dbca60742be0c9eddc5205e5c7ca1f44",
+      "Requirements": [
+        "lattice"
+      ]
+    },
     "nloptr": {
       "Package": "nloptr",
       "Version": "2.0.1",
@@ -1883,6 +2016,14 @@
       "Requirements": [
         "testthat"
       ]
+    },
+    "nnet": {
+      "Package": "nnet",
+      "Version": "7.3-17",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "cb1d8d9f300a7e536b89c8a88c53f610",
+      "Requirements": []
     },
     "numDeriv": {
       "Package": "numDeriv",
@@ -1934,6 +2075,8 @@
       "Repository": "CRAN",
       "Hash": "b304ff5955f37b48bd30518faf582929",
       "Requirements": [
+        "MASS",
+        "Matrix",
         "broom",
         "dplyr",
         "knitr",
@@ -1960,6 +2103,7 @@
       "Repository": "CRAN",
       "Hash": "ffb0779579a24fc4d26c89fb2e6077bb",
       "Requirements": [
+        "Matrix",
         "Rcpp",
         "ape",
         "fastmatch",
@@ -2181,8 +2325,11 @@
       "Repository": "CRAN",
       "Hash": "48485e5cbfe385caf47ce1d9442f5147",
       "Requirements": [
+        "MASS",
+        "Matrix",
         "MatrixModels",
-        "SparseM"
+        "SparseM",
+        "survival"
       ]
     },
     "rappdirs": {
@@ -2305,6 +2452,14 @@
         "yaml"
       ]
     },
+    "rpart": {
+      "Package": "rpart",
+      "Version": "4.1.16",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ea3ca1d9473daabb3cd0f1b4f974c1ed",
+      "Requirements": []
+    },
     "rprojroot": {
       "Package": "rprojroot",
       "Version": "2.0.3",
@@ -2385,13 +2540,13 @@
     },
     "sangeranalyseR": {
       "Package": "sangeranalyseR",
-      "Version": "1.5.1",
+      "Version": "1.6.1",
       "Source": "Bioconductor",
       "git_url": "https://git.bioconductor.org/packages/sangeranalyseR",
-      "git_branch": "master",
-      "git_last_commit": "e892ca0",
-      "git_last_commit_date": "2022-01-11",
-      "Hash": "1bd2339e91b04b67b4164189fd064d3f",
+      "git_branch": "RELEASE_3_15",
+      "git_last_commit": "d939fcb",
+      "git_last_commit_date": "2022-05-04",
+      "Hash": "5593b660ccac4ed2daab2cc3a25e407f",
       "Requirements": [
         "BiocStyle",
         "Biostrings",
@@ -2471,7 +2626,9 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "eefd32a9f572433282949f775c7d5bf0",
-      "Requirements": []
+      "Requirements": [
+        "MASS"
+      ]
     },
     "selectr": {
       "Package": "selectr",
@@ -2493,6 +2650,16 @@
       "Requirements": [
         "ade4",
         "segmented"
+      ]
+    },
+    "sessioninfo": {
+      "Package": "sessioninfo",
+      "Version": "1.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "3f9796a8d0a0e8c6eb49a4b029359d1f",
+      "Requirements": [
+        "cli"
       ]
     },
     "shiny": {
@@ -2607,6 +2774,16 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "c5dad1d43440f0c426a6d29b30b333fa",
+      "Requirements": [
+        "lattice"
+      ]
+    },
+    "spatial": {
+      "Package": "spatial",
+      "Version": "7.3-15",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c23666fdb7789c8a45e65340bb334607",
       "Requirements": []
     },
     "stringi": {
@@ -2627,6 +2804,16 @@
         "glue",
         "magrittr",
         "stringi"
+      ]
+    },
+    "survival": {
+      "Package": "survival",
+      "Version": "3.3-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f6189c70451d3d68e0d571235576e833",
+      "Requirements": [
+        "Matrix"
       ]
     },
     "svglite": {
@@ -2739,10 +2926,10 @@
     },
     "tinytex": {
       "Package": "tinytex",
-      "Version": "0.38",
+      "Version": "0.39",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "759d047596ac173433985deddf313450",
+      "Hash": "29f67ab15405b390b90e56ff22198ead",
       "Requirements": [
         "xfun"
       ]

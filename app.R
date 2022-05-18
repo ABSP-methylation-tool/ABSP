@@ -91,47 +91,49 @@ ui <- fluidPage(
                                        )
                                    )
                                ),
-                              
+                               
                                
                                br(),
                                
                                div(
-                                   
-                                   h3("Please, cite"),
-                                   
-                                   br()
-                                   
-                                   
+                                 
+                                 h3("Please, cite"),
+                                 
+                                 br()
+                                 
+                                 
                                ),
                                
                                div(
-                                   
-                                   p("Publication yet to come..."),
-                                   
-                                   br(),
-                                   br()
-                                   
+                                 
+                                 p(icon(name="newspaper", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"Denoulet ", em("et al."),", 2022"),
+                                 
+                                 br(),
+                                 br()
+                                 
                                ),
                                
                                div(
-                                   
-                                   h3("Ressources"),
-                                   
-                                   br(),
-                                   
-                                   p("Find the ABSP tool on github at", tags$a(href="https://github.com/ABSP-methylation-tool/ABSP", "https://github.com/ABSP-methylation-tool/ABSP",target="_blank")),
-                                   p("Find the user guide in the ", em("documents")," folder of your ABSP folder"),
-                                   
-                                   br(),
-                                   br()
-                                   
+                                 
+                                 h3("Ressources"),
+                                 
+                                 br(),
+                                 
+                                 p(icon(name="download", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"The ABSP tool is available for download on github at", tags$a(href="https://github.com/ABSP-methylation-tool/ABSP", "https://github.com/ABSP-methylation-tool/ABSP",target="_blank"),"."),
+                                 p(icon(name="file", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"For detailled instructions, please find the user guide in your ABSP folder."),
+                                 
+                                 br(),
+                                 br()
+                                 
                                ),
                                
-                               
                                div(
-                                   h3("Contact"),
-                                   
-                                   br()
+                                 
+                                 h3("Contact"),
+                                 
+                                 br(),
+                                 
+                                 p(icon(name="envelope", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"), tags$a(href="mailto:absp@univ-lille.fr","absp@univ-lille.fr"))
                                )
                         ),
                         
@@ -781,17 +783,7 @@ ui <- fluidPage(
                                       ) 
                                   )     
                         )
-               ),
-               
-               tabPanel("Tutorial",
-                        
-                        
-                        
-   
                )
-               
-               
-               
     ),
     
     br(),
