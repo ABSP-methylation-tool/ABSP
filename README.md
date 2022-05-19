@@ -29,6 +29,8 @@ For more detailed information, please read the "ABSP User Guide" document.
 * Run the analysis to compute the CpG methylation levels of your sample 
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
+<img src="./examples/results/Example data/CDH1/individual_results_direct/tables/CDH1_High methylated DNA_3/CDH1_High methylated DNA_3_meth_table.png" width="800" />
+
 
 #### Grouped samples analysis:
 * Once all of your samples have been individually analyzed, in the "Grouped analysis" tab, fill the entries and choose your parameters for plotting
