@@ -22,19 +22,19 @@ For more detailed information, please read the "ABSP User Guide" document.
 
 ### Analysis with ABSP
 
-Individual sample analysis: 
+#### Individual sample analysis: 
 * In the "Individual analysis" tab, fill the entries and add input files (reference sequence .fasta file and sequencing .ab1 files)
 * Run the analysis to compute the CpG methylation levels of your sample 
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-Grouped samples analysis:
+#### Grouped samples analysis:
 * Once all of your samples have been individually analyzed, in the "Grouped analysis" tab, fill the entries and choose your parameters for plotting
 * Run the analysis to gather samples, generate visualization plots (lollipop plots) and compare methylation data between groups by comparative statistics
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-Launch multiple analysis:  
+#### Launch multiple analysis:  
 The "Multiple analysis" tab is useful to analyze multiple samples and/or for multiple grouping analysis, launched in one click, using as input tables filled with the required input entries.
 
 
