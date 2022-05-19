@@ -6,6 +6,7 @@ It provides a complete automated workflow, from trace file sequencing results to
 
 For more detailed information, please read the "ABSP User Guide" document.
 
+![ABSP Logo](/www/logo.svg)
 
 ## Quick start guide
 
