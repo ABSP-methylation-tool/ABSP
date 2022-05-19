@@ -1,6 +1,3 @@
-[![GitHub latest commit](https://badgen.net/github/last-commit/Naereen/Strapdown.js)](https://GitHub.com/Naereen/StrapDown.js/commit/)
-***
-
 # ABSP - Analysis of Bisulfite Sequencing PCR
 
 <img src="./documents/logo.png" width="200" />
