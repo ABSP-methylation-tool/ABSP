@@ -36,6 +36,10 @@ For more detailed information, please read the "ABSP User Guide" document.
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
+[<img src=".examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="400" />](.examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png)
+
+
+
 #### Launch multiple analysis:  
 The "Multiple analysis" tab is useful to analyze multiple samples and/or for multiple grouping analysis, launched in one click, using as input tables filled with the required input entries.
 
