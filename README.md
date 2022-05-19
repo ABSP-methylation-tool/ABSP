@@ -9,6 +9,11 @@ It provides a complete automated workflow, from trace file sequencing results to
 For more detailed information, please read the "ABSP User Guide" document.
 
 
+## Availability
+
+Currently, ABSP is not functional on MacOS devices due to compatibility issues of the renv package with the 4.2.0 R version on MacOS.
+
+
 ## Quick start guide
 
 ### Installation
@@ -46,10 +51,6 @@ For more detailed information, please read the "ABSP User Guide" document.
 #### Launch multiple analysis:  
 The "Multiple analysis" tab is useful to analyze multiple samples and/or for multiple grouping analysis, launched in one click, using as input tables filled with the required input entries.
 
-
-## Availability
-
-Currently, ABSP is not functional on MacOS devices due to compatibility issues of the renv package with the 4.2.0 R version on MacOS.
 
 ## License
 
