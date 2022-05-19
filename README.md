@@ -11,7 +11,7 @@ For more detailed information, please read the "ABSP User Guide" document.
 
 ## Availability
 
-Currently, ABSP is not functional on MacOS devices due to compatibility issues of the renv package with the 4.2.0 R version on MacOS.
+Currently, ABSP is not functional on MacOS devices due to compatibility issues of the *renv* package with the 4.2.0 R version on MacOS.
 
 
 ## Quick start guide
