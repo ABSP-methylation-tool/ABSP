@@ -8,6 +8,8 @@ For more detailed information, please read the "ABSP User Guide" document.
 
 ![ABSP Logo](/documents/logo.png)
 
+[<img src="./documents/logo.png" width="30" />](./documents/logo.png)
+
 ## Quick start guide
 
 ### Installation
