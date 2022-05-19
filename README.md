@@ -40,6 +40,7 @@ For more detailed information, please read the "ABSP User Guide" document.
 
 <img src="./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="800" />
 
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct/meth_profile_plots/meth_profile_collection1_proportional_psign.png" width="800" />
 
 
 #### Launch multiple analysis:  
