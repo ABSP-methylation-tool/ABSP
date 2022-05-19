@@ -251,13 +251,17 @@ ui <- fluidPage(
                                        
                                        fluidRow(
                                                 column(width = 9,
-                                                       uiOutput("ab1_s1")
+                                                       fileInput("ab1_s1","Select sequencing file #1")
                                                 ),
                                                 column(width = 3,
                                                        # input$reset_s1
                                                        actionButton("reset_s1", "Reset",  style="padding:10px; margin-top:25px;") 
                                                 )
                                                 
+                                       ),
+                                       
+                                       fluidRow(
+                                         div(verbatimTextOutput("summary_ab1_s1"), style="padding: 0px 15px 15px 15px;")
                                        )
                                 ),
                                 
@@ -268,7 +272,7 @@ ui <- fluidPage(
                                        
                                        fluidRow(
                                                 column(width = 9,
-                                                       uiOutput("ab1_s2")
+                                                       fileInput("ab1_s2","Select sequencing file #2")
                                                        #fileInput("ab1_s2","Select sequencing file #2")
                                                 ),
                                                 column(width = 3,
@@ -276,6 +280,10 @@ ui <- fluidPage(
                                                        actionButton("reset_s2", "Reset",  style="padding:10px; margin-top:25px;") 
                                                 )
                                                 
+                                       ),
+                                       
+                                       fluidRow(
+                                         div(verbatimTextOutput("summary_ab1_s2"), style="padding: 0px 15px 15px 15px;")
                                        )
                                        
                                 )
@@ -865,41 +873,106 @@ server <- function(input, output, session) {
         return(inFile$datapath)
     })
     
-    # Reset file input s1
-    output$ab1_s1 <- renderUI(
-        fileInput("ab1_s1","Select sequencing file #1")
+    # # Reset file input s1
+    # output$ab1_s1 <- renderUI(
+    #     fileInput("ab1_s1","Select sequencing file #1")
+    # )
+    # observeEvent(input$reset_s1, {
+    #     output$ab1_s1 <- renderUI(
+    #         fileInput("ab1_s1","Select sequencing file #1")
+    #     )
+    # })
+    # 
+    # # Reset file input s2
+    # output$ab1_s2 <- renderUI(
+    #     fileInput("ab1_s2","Select sequencing file #2")
+    # )
+    # observeEvent(input$reset_s2, {
+    #     output$ab1_s2 <- renderUI(
+    #         fileInput("ab1_s2","Select sequencing file #2")
+    #     )
+    # })
+    # 
+    # 
+    # # Get file path as reactive value
+    # upload_ab1_s1<-reactive({
+    #     inFile <- input$ab1_s1
+    #     if (is.null(inFile))
+    #         return(NULL)
+    #     return(inFile$datapath)
+    # })
+    # 
+    # upload_ab1_s2<-reactive({
+    #     inFile <- input$ab1_s2
+    #     if (is.null(inFile))
+    #         return(NULL)
+    #     return(inFile$datapath)
+    # })
+    
+    
+    # State values
+    values <- reactiveValues(
+      ab1_s1_state = NULL,
+      ab1_s2_state = NULL
     )
+    
+    # If file uploaded
+    observeEvent(input$ab1_s1, {
+      values$ab1_s1_state <- 'uploaded'
+    })
+    observeEvent(input$ab1_s2, {
+      values$ab1_s2_state <- 'uploaded'
+    })
+    
+    # If file is reset
     observeEvent(input$reset_s1, {
-        output$ab1_s1 <- renderUI(
-            fileInput("ab1_s1","Select sequencing file #1")
-        )
+      values$ab1_s1_state <- 'reset'
     })
-    
-    # Reset file input s2
-    output$ab1_s2 <- renderUI(
-        fileInput("ab1_s2","Select sequencing file #2")
-    )
     observeEvent(input$reset_s2, {
-        output$ab1_s2 <- renderUI(
-            fileInput("ab1_s2","Select sequencing file #2")
-        )
+      values$ab1_s2_state <- 'reset'
     })
     
-
-    # Get file path as reactive value
-    upload_ab1_s1<-reactive({
-        inFile <- input$ab1_s1
-        if (is.null(inFile))
-            return(NULL)
-        return(inFile$datapath)
+    # Sample table for individual analyses
+    ab1_s1_input <- reactive({
+      if (is.null(values$ab1_s1_state)) {
+        return(NULL)
+      } else if (values$ab1_s1_state == 'uploaded') {
+        return(input$ab1_s1)
+      } else if (values$ab1_s1_state == 'reset') {
+        return(NULL)
+      }
+    })
+    ab1_s1_file <- reactive({
+      inFile <- ab1_s1_input()
+      return(inFile$datapath)
     })
     
-    upload_ab1_s2<-reactive({
-        inFile <- input$ab1_s2
-        if (is.null(inFile))
-            return(NULL)
-        return(inFile$datapath)
+    # Grouped parameters for grouped analyses
+    ab1_s2_input <- reactive({
+      if (is.null(values$ab1_s2_state)) {
+        return(NULL)
+      } else if (values$ab1_s2_state == 'uploaded') {
+        return(input$ab1_s2)
+      } else if (values$ab1_s2_state == 'reset') {
+        return(NULL)
+      }
     })
+    ab1_s2_file <- reactive({
+      inFile <- ab1_s2_input()
+      return(inFile$datapath)
+    })
+    
+    # Display the uploaded file names
+    output$summary_ab1_s1 <- renderText({
+      return(paste("Uploaded file:", ab1_s1_input()$name))
+    })
+    output$summary_ab1_s2 <- renderText({
+      return(paste("Uploaded file:", ab1_s2_input()$name))
+    })
+    
+    
+    
+    
     
     
     # Add input to enter new folder name
@@ -1016,8 +1089,8 @@ server <- function(input, output, session) {
                              date_s2 = input$date_s2,
                              genome = input$genomeI,
                              DNA_seq = upload_DNA_seq(),
-                             ab1_s1 = upload_ab1_s1(),
-                             ab1_s2 = upload_ab1_s2())
+                             ab1_s1 = ab1_s1_file(),
+                             ab1_s2 = ab1_s2_file())
         
         indiv_RMD <- list.files(path=file.path(getwd(),"scripts"), pattern ="ABSP_individual_analysis.Rmd$", full.names = T)
         
@@ -1319,7 +1392,6 @@ server <- function(input, output, session) {
                 
                 # Path of report file
                 indiv_path <- file.path(output_rep,indiv_file)
-                list_Ireports[i]<- paste(basename(indiv_path),"has been generated in the ", em("reports")," directory")
                 
                 # Set up parameters to pass to Rmd document
                 indiv_params <- list(foldername = foldermain,
@@ -1396,7 +1468,6 @@ server <- function(input, output, session) {
                 
                 # Path of report file
                 grouped_path <- file.path(getwd(),"reports",grouped_file)
-                list_Greports[i]<- p(paste(basename(grouped_path),"has been generated in the "), em("reports")," directory", style="font-size:15px ;")
                 
                 # Split string by commas to get list of sample orders
                 sample_order <- strsplit(grouped_table[i,7],",")[[1]] 
