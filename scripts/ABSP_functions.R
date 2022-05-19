@@ -1009,19 +1009,19 @@ lollipop_plot <- function(table, filename, coord, plot_title, SampleOrder, Group
   if(pos_labels=="coordinates") {
     pos_lab <-unique(table$CG_coord)
     angle <- 90
-    vjust = 0.5
+    vjust <- 0.5
     height_pos <- max(nchar(table$CG_coord))*70
   } 
   if(pos_labels=="numbers") {
     pos_lab <- seq(from=1, to=length(unique(table$position)), by=1) 
     angle <- 0
-    vjust = 0
+    vjust <- 0
     height_pos <- 150
   }
   if(pos_labels=="none") {
     pos_lab <- rep("",length(unique(table$position)))
     angle <- 0
-    vjust = 0
+    vjust <- 0
     height_pos <- 150
   }
   
@@ -1307,9 +1307,22 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pva
   nb <- list(
     CG = length(unique(table$CG_coord)),
     collection = length(levels(table$collection)),
-    group = length(levels(table$group)))
+    group = length(as.character(unique(table$group))))
   
-  list_comb <- as.list(data.frame(t(combinations(levels(table$group), k=2))))
+  if (nchar(max(as.character(unique(table$group))))<=12) {
+    angle <- 0 
+    vjust <- 0
+    hjust <- 0.5
+    size <- 14
+    ratio <- 3/nb$group
+  } else {
+    angle <- 45 
+    vjust <- 1
+    hjust <- 1
+    size <- 12 
+    ratio <- 2/nb$group }
+  
+  list_comb <- as.list(data.frame(t(combinations(as.character(unique(table$group)), k=2))))
   group_colors <- as.vector(plot_colors[1:nb$group])
   
   # Boxplot or points for clones
@@ -1331,8 +1344,8 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pva
       stat_boxplot(aes(col=group), geom = "errorbar", width=0.3, size=1, na.rm=T) +
       stat_summary(aes(col=group),fun = "mean", size = 1.5, shape = 18) +
       scale_y_continuous(limits = c(0, max(label_y)+10), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10))
-  } 
-  else if (length(unique(table$samples))<3) {
+    
+  } else if (length(unique(table$samples))<3) {
     label_y <- 100
     
     boxplot <- ggplot(table, aes(x = group, y = meth)) + 
@@ -1355,6 +1368,7 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pva
       plot.title = element_text(hjust=0.5, size = 19, face = "bold", color = "black"), # center title
       axis.title.x.bottom = element_text(size = 16, face = "bold", vjust = -2),
       axis.title.y.left = element_text(size = 16, face = "bold", vjust = 2),
+      axis.text.x = element_text(angle = angle, vjust = vjust, hjust = hjust, size = size),
       axis.text.x.bottom = element_text(size = 15, color = "black"),
       axis.text.y.left = element_text(size = 14, color = "black"),
       strip.text.x = element_text(size = 14, color = "black"),
@@ -1363,7 +1377,7 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pva
       legend.position = "none",
       panel.spacing = unit(1, "line"),
       plot.margin = unit(c(1,1,1,1),"line"),
-      aspect.ratio = 3/nb$group) # ratio height/width of plots
+      aspect.ratio = ratio) # ratio height/width of plots
   
   # p value format : p value
   if (p_label=="pval") { 
@@ -1397,9 +1411,20 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"),
   # Parameters
   nb <- list(
     collection = length(unique(table$collection)),
-    group = length(levels(table$group)))
+    group = length(as.character(unique(table$group))))
   
-  list_comb <- as.list(data.frame(t(combinations(levels(table$group), k=2))))
+  if (nchar(max(as.character(unique(table$group))))<=12) {
+    angle <- 0 
+    vjust <- 0
+    hjust <- 0.5
+    size <- 14
+  } else {
+    angle <- 45 
+    vjust <- 1
+    hjust <- 1
+    size <- 12 }
+  
+  list_comb <- as.list(data.frame(t(combinations(as.character(unique(table$group)), k=2))))
   label_y <- seq(length.out = length(list_comb), from=100, by=12)
   group_colors <- as.vector(plot_colors[1:nb$group])
   
@@ -1422,6 +1447,7 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"),
       plot.title = element_text(hjust=0.5,size = 19, face = "bold", color = "black"), # center title
       axis.title.x.bottom = element_text(size = 16, face = "bold", vjust = -2),
       axis.title.y.left = element_text(size = 16, face = "bold", vjust = 2),
+      axis.text.x = element_text(angle = angle, vjust = vjust, hjust = hjust, size = size),
       axis.text.x.bottom = element_text(size = 15, color = "black"),
       axis.text.y.left = element_text(size = 14, color = "black"),
       strip.text.x = element_text(size = 16, color = "black"),
@@ -1471,7 +1497,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   # Parameters
   nb <- list(
     CG = length(unique(table$CG_nb)),
-    group = length(levels(table$group)))
+    group = length(as.character(unique(table$group))))
   group_colors <- as.vector(plot_colors[1:nb$group])
   group_shapes <- as.vector(plot_shapes[1:nb$group])
   
@@ -1503,7 +1529,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
     group_by(CG) %>% 
     mutate("nb_group"=length(unique(group))) # Get the number of group concerned with no data
 
-  cg_no_data <- KW_no_data[which(length(unique(table$group))-KW_no_data$nb_group ==1),"CG"]$CG # if the difference between number total of groups and number of groups with no data is 1, KW test not possible
+  cg_no_data <- KW_no_data[which(length(as.character(unique(table$group)))-KW_no_data$nb_group ==1),"CG"]$CG # if the difference between number total of groups and number of groups with no data is 1, KW test not possible
   KW_df <- KW_df[which(KW_df$CG %in% setdiff(KW_df$CG,cg_no_data)),] # Remove CG positions for which 1 grop only have data
   
   
