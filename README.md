@@ -36,7 +36,7 @@ For more detailed information, please read the "ABSP User Guide" document.
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-[<img src=".examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="400" />](.examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png)
+[<img src="./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="400" />](./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png)
 
 
 
