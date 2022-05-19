@@ -1,3 +1,0 @@
-"Sequencing" "Length" "Start position" "End position" "Mean of Phred quality scores" "Mean of primary peak ratio" "Percentage of non-mixed positions" "Trimmed sequence quality"
-"1" "#1" 170 30 199 24.22 0.82 69.41 FALSE
-"2" "#2" 203 7 209 44.82 0.94 92.12 TRUE
