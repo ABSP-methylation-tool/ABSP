@@ -34,7 +34,7 @@ Grouped samples analysis:
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-Launch multiple analysis:
+Launch multiple analysis:  
 The "Multiple analysis" tab is useful to analyze multiple samples and/or for multiple grouping analysis, launched in one click, using as input tables filled with the required input entries.
 
 
