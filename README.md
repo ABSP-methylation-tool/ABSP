@@ -1,4 +1,5 @@
-![Platform - Windows](https://img.shields.io/badge/Platform-Windows-E99041)
+![Version - 1.0.0](https://img.shields.io/badge/Version-1.0.0-0d7ebf) 
+![OS - Windows](https://img.shields.io/badge/OS-Windows-0d7ebf)
 
 # ABSP - Analysis of Bisulfite Sequencing PCR
 
