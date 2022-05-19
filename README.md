@@ -1,6 +1,6 @@
 # ABSP - Analysis of Bisulfite Sequencing PCR
 
-[<img src="./documents/logo.png" width="200" />](./documents/logo.png)
+<img src="./documents/logo.png" width="200" />
 
 ABSP, standing for *"Analysis of Bisulfite Sequencing PCR"*, is an R based tool to analyze CpG methylation profiles using data from Bisulfite Sequencing PCR (BSP) experiment results. 
 It was developed to help researchers to estimate and compare methylation percentages of a DNA region studied using BSP experiments. 
@@ -36,7 +36,7 @@ For more detailed information, please read the "ABSP User Guide" document.
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-[<img src="./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="400" />](./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png)
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="800" />
 
 
 
