@@ -18,7 +18,7 @@ Currently, ABSP is not functional on MacOS devices due to compatibility issues o
 
 ### Installation
 
-* Download all the ABSP files ("Code", "Download Zip")
+* Download all the ABSP files from github ("Code", "Download Zip")
 * Install R and RStudio
 
 ### Open the ABSP app
