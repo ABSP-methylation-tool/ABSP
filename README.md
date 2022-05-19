@@ -6,9 +6,7 @@ It provides a complete automated workflow, from trace file sequencing results to
 
 For more detailed information, please read the "ABSP User Guide" document.
 
-![ABSP Logo](/documents/logo.png)
-
-[<img src="./documents/logo.png" width="30" />](./documents/logo.png)
+[<img src="./documents/logo.png" width="100" />](./documents/logo.png)
 
 ## Quick start guide
 
