@@ -15,6 +15,7 @@ Find in the "input" folder:
     + 2 sequencing files per sample: "Forward" and "Reverse"  
 * The CDH1_sequence.fasta file corresponding to the reference DNA sequence  
     + The reference genome is "BSgenome.Hsapiens.UCSC.hg19"   
+  
 Use these files and information as input in the "individual analysis" tab and run analysis   
 
 ### Grouped analysis 
@@ -22,6 +23,7 @@ After running all the individual analyses of samples:
 * The grouped analysis can be runned from the "grouped analysis" tab  
 * Select the folder corresponding to the outputs of the individual results  
 * Select the experiment information and the plot parameters of your choice  
+  
 Run analysis
 
 ### Multiple analyses
@@ -31,6 +33,7 @@ To launch several the analyses in one click:
 * Modify the copied files:  
     + Change the file path of reference sequence .fasta files and sequencing .ab1 files with your own file path of the same files present in the "input" folder
     + Change the parameters of your choice.   
+  
 Use the modified table files as input in the "multiple analyses" tab and run analyses
 
 
@@ -41,6 +44,7 @@ The methylation data files, resulting from the individual analyses, have been ge
 * Move the folders 
 "ABSP/examples/results/Example data/Test sequence" to the "ABSP/results" folder with the same structure 
 -> "ABSP/results/Example data/Test sequence"  
+  
 (If the "ABSP/results" folder does not already exist, it can be created)   
 (The "ABSP/" folder corresponds to the main ABSP folder, with the version identifier in the folder name)  
 
@@ -49,10 +53,12 @@ Once the methylation data files from individual analyses are in the "ABSP/result
 * The grouped analysis can be runned from the "grouped analysis" tab
 * Select the folder corresponding to the outputs of the individual results 
 * Select the experiment information and the plot parameters of your choice  
+  
 Run analysis
 
 ### Multiple analyses  
 Once the methylation data files from individual analyses are in the "ABSP/results" folder:
 * The multiple grouped analyses can be runned from the "multiple analysis" tab
 * The "multiple_grouped_analyses_table-Test sequence" file can be modified or directly used as input  
+  
 Use it as input in the "multiple analyses" tab and run analyses
