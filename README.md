@@ -11,32 +11,39 @@ It provides a complete automated workflow, from trace file sequencing results to
 
 For more detailed information, please read the "ABSP User Guide" document.
 
-# Citation
+<br>
+
+## Citation
 
 f you use ABSP in your published work, please cite
 > **Denoulet et al. (2022). "ABSP: ..." . DOI: [doi.org](https://doi.org)**
 
-# Availability
+<br>
+
+## Availability
 
 Currently, ABSP is not functional on MacOS devices due to compatibility issues of the *renv* package with the R version 4.2.0 on MacOS.
 
+<br>
 
-# Quick start guide
+## Quick start guide
 
-## Installation
+### Installation
 
 * Download all the ABSP files from github ("Code", "Download Zip")
 * Install R and RStudio
 
-## Open the ABSP app
+### Open the ABSP app
 
 * Open the "ABSP Rproject.Rproject" file with Rstudio (it might take a few minutes to open)
 * Open the "app.R" file with Rstudio
 * Click on the "Run App" button on the top right corner (select "Run external" to open it in web browser)
 
-## Analysis with ABSP
+### Analysis with ABSP
 
-### Individual sample analysis: 
+Find example data of inputs and outputs in the "examples" folder.
+
+#### Individual sample analysis: 
 * In the "Individual analysis" tab, fill the entries and add input files (reference sequence .fasta file and sequencing .ab1 files)
 * Run the analysis to compute the CpG methylation levels of your sample 
 * View the results in the .html report generated in your "reports" folder
@@ -44,7 +51,7 @@ Currently, ABSP is not functional on MacOS devices due to compatibility issues o
 <img src="./examples/results/Example data/CDH1/individual_results_direct/tables/CDH1_High methylated DNA_3/CDH1_High methylated DNA_3_meth_table.png" width="600" />
 
 
-### Grouped samples analysis:
+#### Grouped samples analysis:
 * Once all of your samples have been individually analyzed, in the "Grouped analysis" tab, fill the entries and choose your parameters for plotting
 * Run the analysis to gather samples, generate visualization plots (lollipop plots) and compare methylation data between groups by comparative statistics
 * View the results in the .html report generated in your "reports" folder
@@ -55,9 +62,10 @@ Currently, ABSP is not functional on MacOS devices due to compatibility issues o
 <img src="./examples/results/Example data/Test sequence/grouped_results_direct/meth_profile_plots/meth_profile_collection1_proportional_psign.png" width="600" />
 
 
-### Launch multiple analysis:  
+#### Launch multiple analysis:  
 The "Multiple analysis" tab is useful to analyze multiple samples and/or for multiple grouping analysis, launched in one click, using as input tables filled with the required input entries.
 
+<br>
 
-# License
+## License
 
