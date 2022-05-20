@@ -14,7 +14,7 @@ For more detailed information, please read the "ABSP User Guide" document.
 # Citation
 
 f you use ABSP in your published work, please cite
-> **Denoulet et al. (2022). "ABSP: simple and interactive processing of Sanger sequencing data in R" in Genome Biology and Evolution. DOI: [doi.org](https://doi.org)**
+> **Denoulet et al. (2022). "ABSP: ..." . DOI: [doi.org](https://doi.org)**
 
 # Availability
 
