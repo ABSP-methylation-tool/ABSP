@@ -37,7 +37,7 @@ Currently, ABSP is not functional on MacOS devices due to compatibility issues o
 * Run the analysis to compute the CpG methylation levels of your sample 
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
-<img src="./examples/results/Example data/CDH1/individual_results_direct/tables/CDH1_High methylated DNA_3/CDH1_High methylated DNA_3_meth_table.png" width="800" />
+<img src="./examples/results/Example data/CDH1/individual_results_direct/tables/CDH1_High methylated DNA_3/CDH1_High methylated DNA_3_meth_table.png" width="700" />
 
 
 #### Grouped samples analysis:
@@ -46,9 +46,9 @@ Currently, ABSP is not functional on MacOS devices due to compatibility issues o
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-<img src="./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="800" />
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/lollipop_replicates_as-is_proportional.png" width="700" />
 
-<img src="./examples/results/Example data/Test sequence/grouped_results_direct/meth_profile_plots/meth_profile_collection1_proportional_psign.png" width="800" />
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct/meth_profile_plots/meth_profile_collection1_proportional_psign.png" width="700" />
 
 
 #### Launch multiple analysis:  
