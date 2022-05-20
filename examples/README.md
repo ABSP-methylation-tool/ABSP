@@ -1,8 +1,10 @@
 # How to use the examples of data ?
 
 Two data sets are available:
-* Data from a real sequence named "CDH1" corresponding to real direct-BSP data. Low and high methylated DNA were bisulfite converted, the CDH1 sequence amplified by PCR and PCR products were directly sequenced three times, using forward and reverse primers.
-* Data from a mock sequence named "Test sequence" generated *in silico*. The methylation data tables of several samples were generated to reproduce both direct-BSP and cloning-BSP data: from two collections "collection1" and collection2", two groups "group1" and "group2" and 3 replicates for direct-BSP or 10 clones for cloning-BSP.
+* Data from a real sequence named "CDH1" corresponding to real direct-BSP data.  
+Low and high methylated DNA were bisulfite converted, the CDH1 sequence amplified by PCR and PCR products were directly sequenced three times, using forward and reverse primers.
+* Data from a mock sequence named "Test sequence" generated *in silico*.  
+The methylation data tables of several samples were generated to reproduce both direct-BSP and cloning-BSP data: from two collections "collection1" and collection2", two groups "group1" and "group2" and 3 replicates for direct-BSP or 10 clones for cloning-BSP.
 
 
 ## "CDH1" data set
