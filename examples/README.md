@@ -34,7 +34,7 @@ To launch several the analyses in one click:
 Use the modified table files as input in the "multiple analyses" tab and run analyses
 
 
-## "Test sequence data" set
+## "Test sequence" data set
 
 ### Individual analysis  
 The methylation data files, resulting from the individual analyses, have been generated *in silico* 
