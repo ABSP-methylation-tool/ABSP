@@ -7,7 +7,7 @@ output:
     css: custom.css
 params:
   foldername:
-    label: "Enter folder name already in the results folder"
+    label: "Enter folder name from the results folder"
     input: text
     value: folder-name
   seqname:
@@ -30,17 +30,17 @@ params:
     input: checkbox
     value: FALSE
   pos_labels:
-    label: "Position labels for plots"
+    label: "Type of position labels for plots"
     input: select
     choices: [CpG coordinates, CpG numbers, None]
     selected: CpG coordinates
     value: CpG coordinates
   group_order:
-    label: "Indicate order of groups (comma separated)"
+    label: "Indicate the list of groups in the correct order (comma separated)"
     input: text
     value: group1, group2, group3
   sample_order:
-    label: "Select sample order (multiple choice allowed)"
+    label: "Select the type(s) of sample ordering (multiple choice allowed)"
     input: select
     multiple: TRUE
     choices: [As it is, By groups, By methylation levels, By clusters]
@@ -65,37 +65,79 @@ renv::restore(prompt=F)
 
 <!-- PARAMETERS -->
 
-```{r Manual parameters 1,eval=F}
-# TEST CHUNK
-folder_name <- "TEST 2 groups"
-seq_name <- "Test"
+```{r Manual parameters 1 for TESTS, eval=F}
+## TO TEST THE SCRIPT WITHOUT KNITTING
+
+# FOLDER NAME ────────────────────────────────────────────────────────────────────────────────────────────
+folder_name <- "Example data"
+
+# SEQUENCE NAME ──────────────────────────────────────────────────────────────────────────────────────────
+seq_name <- "CDH1"
+
+# GENOME ─────────────────────────────────────────────────────────────────────────────────────────────────
 selected_genome <- "BSgenome.Hsapiens.UCSC.hg19"
-cloning_exp <- T
-coll_sep <- T
-pos_labels <- "numbers"
-GroupOrder <- c("group1","group2")
-list_SampleOrder = c("as-is","by-group","by-meth","clust")
+
+# TYPE OF EXPERIMENT ─────────────────────────────────────────────────────────────────────────────────────
+cloning_exp <- F 
+# TRUE for cloning-BSP and FALSE for direct-BSP
+
+# COLLECTION SEPARATION ──────────────────────────────────────────────────────────────────────────────────
+coll_sep <- F 
+# TRUE for collection separation and FALSE for all collections on plot
+
+# LABEL TYPE FOR CG POSITIONS ────────────────────────────────────────────────────────────────────────────
+pos_labels <- "none" 
+# "coordinates" or "numbers" or "none"
+
+# LIST OF GROUPS ORDERED ─────────────────────────────────────────────────────────────────────────────────
+GroupOrder <- c("Low methylated DNA","High methylated DNA")
+
+# TYPE OF SAMPLE ORDERING ────────────────────────────────────────────────────────────────────────────────
+list_SampleOrder = c("as-is","by-group","by-meth","clust") 
+# multiple choice among "as-is","by-group","by-meth","clust"
+
 ```
 
-```{r Manual parameters 2,eval=F}
-# TEST CHUNK
-folder_name <- "Test"
-seq_name <- "TEST 200"
+```{r Manual parameters 2 for TESTS, eval=F}
+## TO TEST THE SCRIPT WITHOUT KNITTING
+
+# FOLDER NAME ────────────────────────────────────────────────────────────────────────────────────────────
+folder_name <- "Example data"
+
+# SEQUENCE NAME ──────────────────────────────────────────────────────────────────────────────────────────
+seq_name <- "Test sequence"
+
+# GENOME ─────────────────────────────────────────────────────────────────────────────────────────────────
 selected_genome <- "BSgenome.Hsapiens.UCSC.hg19"
-cloning_exp <- F
-coll_sep <- F
+
+# TYPE OF EXPERIMENT ─────────────────────────────────────────────────────────────────────────────────────
+cloning_exp <- T
+# TRUE for cloning-BSP and FALSE for direct-BSP
+
+# COLLECTION SEPARATION ──────────────────────────────────────────────────────────────────────────────────
+coll_sep <- T
+# TRUE for collection separation and FALSE for all collections on plot
+
+# LABEL TYPE FOR CG POSITIONS ────────────────────────────────────────────────────────────────────────────
 pos_labels <- "coordinates"
-GroupOrder <- c("group1","group2","group3","group4")
-list_SampleOrder = c("as-is","by-group","by-meth","clust")
+# "coordinates" or "numbers" or "none"
+
+# LIST OF GROUPS ORDERED ─────────────────────────────────────────────────────────────────────────────────
+GroupOrder <- c("group1","group2")
+
+# TYPE OF SAMPLE ORDERING ────────────────────────────────────────────────────────────────────────────────
+list_SampleOrder = c("as-is","by-group","by-meth","clust") 
+# multiple choice among "as-is","by-group","by-meth","clust"
+
 ```
 
 ```{r Read parameters from YAML header,include=FALSE}
+## SCRIPT TO USE PARAMS FOR KNITING : DO NOT RUN IF TESTING THE SCRIPT WITHOUT KNITTING
+
 # Parameters variables
 
 folder_name <- params$foldername
-
 seq_name <- params$seqname
-
 selected_genome <- params$genome
 
 # Type of experiment
@@ -352,7 +394,7 @@ plot_shapes <- c("round"=19,
 ```{r about colors and shapes, include=F, eval=F}
 # About colors and shapes : modifications
 
-# **********************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # Display default custom palette :
 displayColors(plot_colors)
 displayColors(bases_colors)
@@ -380,7 +422,7 @@ plot_colors3 <- brewer.pal(12, "Paired")
 displayColors(plot_colors3)
 
 
-# **********************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # Display all point shapes :
 suppressMessages(show_point_shapes()+theme_classic()+theme(axis.title=element_blank(),axis.ticks=element_blank(),axis.text=element_blank(),axis.line=element_blank()))
 
@@ -405,12 +447,12 @@ plot_shapes2 <- c("round"=19,
                   "square_border"=22,
                   "diamond_border"=23)
 
-# **********************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # To display the selected colors and shpes in the two objects plot_colors and plot_shapes :
 displayColorsShapes(plot_colors, plot_shapes)
 
 # To modify colors and shape, modify the objects plot_colors and plot_shapes in the previous chunk
-# **********************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
 
@@ -629,8 +671,8 @@ data_clone[,"SD"] <- SDs
 
 
 # Export table data as csv and xlsx
-write.table(data_clone, file = file.path(groupDir$tables,"methylation_table_clones.csv"), row.names = T, col.names = T)
-write.xlsx(data_clone, file = file.path(groupDir$tables,"methylation_table_clones.xlsx"), rowNames = T, colNames = T, overwrite = T)
+write.table(data_clone, file = file.path(groupDir$tables,paste0(seq_name,"_methylation_table_clones.csv")), row.names = T, col.names = T)
+write.xlsx(data_clone, file = file.path(groupDir$tables,paste0(seq_name,"_methylation_table_clones.xlsx")), rowNames = T, colNames = T, overwrite = T)
 
 # Display table
 formattable(data_clone,
@@ -665,8 +707,8 @@ data_rep[,"SD"] <- SDs
 
 
 # Export table data as csv and xlsx
-write.table(data_rep, file = file.path(groupDir$tables,"methylation_table_replicates.csv"), row.names = T, col.names = T)
-write.xlsx(data_rep, file = file.path(groupDir$tables,"methylation_table_replicates.xlsx"), rowNames = T, colNames = T, overwrite = T)
+write.table(data_rep, file = file.path(groupDir$tables,paste0(seq_name,"_methylation_table_replicates.csv")), row.names = T, col.names = T)
+write.xlsx(data_rep, file = file.path(groupDir$tables,paste0(seq_name,"_methylation_table_replicates.xlsx")), rowNames = T, colNames = T, overwrite = T)
 
 # Display table
 formattable(data_rep,
@@ -701,8 +743,8 @@ data_group[,"SD"] <- SDs
 
 
 # Export table data as csv and xlsx
-write.table(data_group, file = file.path(groupDir$tables,"methylation_table_groups.csv"), row.names = T, col.names = T)
-write.xlsx(data_group, file = file.path(groupDir$tables,"methylation_table_groups.xlsx"), rowNames = T, colNames = T, overwrite = T)
+write.table(data_group, file = file.path(groupDir$tables,paste0(seq_name,"_methylation_table_groups.csv")), row.names = T, col.names = T)
+write.xlsx(data_group, file = file.path(groupDir$tables,paste0(seq_name,"_methylation_table_groups.xlsx")), rowNames = T, colNames = T, overwrite = T)
 
 # Display table
 formattable(data_group,
@@ -720,19 +762,19 @@ shiny::setProgress(0.2)
 
 ```{r Plots of CLONES for Cloning, results='asis', message=F, warning=F, out.width = "100%", fig.align = "center", eval=cloning_exp}
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # HEADER
 cat("\n\n## Plots of clones {.tabset .tabset-pills}\n\n")
 
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PARAMETERS
 list_group_ID <- names(data$table_clones) 
 list_SampleOrder_clones <- list_SampleOrder[list_SampleOrder!="by-group"] # as each plot corresponds to a unique group, samples can not be ordered by groups
 list_plotType <- c("proportional", "condensed")
 
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PLOTS OF CLONES
 for (g in list_group_ID) {
   
@@ -741,13 +783,13 @@ for (g in list_group_ID) {
   
   # cluster dendrogram
   # path to save png
-  dendro_path = file.path(groupDir$dendro,paste0("dendro_clones_",gsub(" ", "_",g),".png"))
+  dendro_path = file.path(groupDir$dendro,paste0(seq_name,"_dendro_clones_",gsub(" ", "_",g),".png"))
   # plot generation
   dendro_plot(data$table_clones[[g]], filename = dendro_path,
               plot_title = paste("Cluster dendrogram of",seq_name,"for clones in",g))
   
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # LOLLIPOP PLOTS
   cat("\n\n#### Lollipop plots {.tabset .tabset-pills}\n\n")
   
@@ -763,7 +805,7 @@ for (g in list_group_ID) {
       cat("\n\n###### Type : ",j,"  \n")
       
       # path to save png
-      lollipop_path <- file.path(groupDir$lollipop_clones,paste0("lollipop_clones_",i,"_",j,"_",gsub(" ","_",g),".png"))
+      lollipop_path <- file.path(groupDir$lollipop_clones,paste0(seq_name,"_lollipop_clones_",i,"_",j,"_",gsub(" ","_",g),".png"))
       # plot generation
       lollipop_plot(data$table_clones[[g]], filename = lollipop_path, coord = data$coord,
                     plot_title = paste("Methylation plot of",seq_name,"for clones in",g),
@@ -776,7 +818,7 @@ for (g in list_group_ID) {
     }
   }
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # GENOMIC PLOTS
   cat("\n\n#### Genomic plots {.tabset .tabset-pills}\n\n")
   
@@ -787,7 +829,7 @@ for (g in list_group_ID) {
     cat("\n\n##### Sample order : ",i,"  \n")
     
     # path to save png
-    genomic_path <- file.path(groupDir$genomic_clones,paste0("genomic_clones_",i,"_",gsub(" ","_",g),".png"))
+    genomic_path <- file.path(groupDir$genomic_clones,paste0(seq_name,"_genomic_clones_",i,"_",gsub(" ","_",g),".png"))
     # plot generation 
     genomic_plot(data$table_clones[[g]], filename = genomic_path, coord = data$coord,
                  plot_title = paste("Methylation plot of",seq_name,"for clones in",g),
@@ -818,27 +860,27 @@ shiny::setProgress(0.5)
 
 ```{r Plots of REPLICATES for Direct, results='asis', message=F, warning=F, out.width = "100%", fig.align = "center", eval=!cloning_exp}
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PARAMETERS
 list_plotType <- c("proportional", "condensed")
 list_coll <- levels(data$table_rep$collection)
 
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PLOTS OF REPLICATES, collections on same plot
 if (coll_sep==FALSE | length(list_coll)<=1) { 
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # HEADER
   cat("\n\n## Plots of replicates {.tabset}\n\n")
   
   # cluster dendrogram
   # path to save png
-  dendro_path = file.path(groupDir$dendro,"dendro_replicates.png")
+  dendro_path = file.path(groupDir$dendro,paste0(seq_name,"_dendro_replicates.png"))
   # plot generation
   dendro_plot(data$table_rep, filename = dendro_path, plot_title = paste("Cluster dendrogram of", seq_name))
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # LOLLIPOP PLOTS
   cat("\n\n### Lollipop plots {.tabset .tabset-pills}\n\n")
   
@@ -853,7 +895,7 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
       cat("\n\n##### Type : ",j,"  \n")
       
       # path to save png
-      lollipop_path <- file.path(groupDir$lollipop_rep,paste0("lollipop_replicates_",i,"_",j,".png"))
+      lollipop_path <- file.path(groupDir$lollipop_rep,paste0(seq_name,"_lollipop_replicates_",i,"_",j,".png"))
       # plot generation
       lollipop_plot(data$table_rep, filename = lollipop_path, coord = data$coord,
                     plot_title = paste("Methylation plot of",seq_name),
@@ -866,7 +908,7 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     }
   }
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # GENOMIC PLOTS
   cat("\n\n### Genomic plots {.tabset .tabset-pills}\n\n")
   
@@ -876,7 +918,7 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     cat("\n\n#### Sample order : ",i,"  \n")
     
     # path to save png
-    genomic_path <- file.path(groupDir$genomic_rep,paste0("genomic_replicates_",i,".png"))
+    genomic_path <- file.path(groupDir$genomic_rep,paste0(seq_name,"_genomic_replicates_",i,".png"))
     # plot generation
     genomic_plot(data$table_rep, filename = genomic_path, coord = data$coord,
                  plot_title = paste("Methylation plot of",seq_name),
@@ -898,11 +940,11 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
 
 
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PLOTS OF REPLICATES, collections separated on different plots
 if (coll_sep==TRUE & length(list_coll)>1) {
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # HEADER
   cat("\n\n## Plots of replicates {.tabset .tabset-pills}\n\n")
   
@@ -913,14 +955,14 @@ if (coll_sep==TRUE & length(list_coll)>1) {
     
     # cluster dendrogram
     # path to save png
-    dendro_path = file.path(groupDir$dendro,paste0("dendro_replicates_",h,".png"))
+    dendro_path = file.path(groupDir$dendro,paste0(seq_name,"_dendro_replicates_",h,".png"))
     # plot generation
     dendro_plot(table_coll, filename = dendro_path, plot_title = paste("Cluter dendrogram of",seq_name,"in",h))
     
     # header
     cat("\n\n### ",h,"{.tabset}\n\n")
     
-    #****************************************************************
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # LOLLIPOP PLOTS
     cat("\n\n#### Lollipop plots {.tabset .tabset-pills}\n\n")
     
@@ -935,7 +977,7 @@ if (coll_sep==TRUE & length(list_coll)>1) {
         cat("\n\n###### Type : ",j,"  \n")
         
         # path to save png
-        lollipop_path <- file.path(groupDir$lollipop_rep,paste0("lollipop_replicates_",h,"_",i,"_",j,".png"))
+        lollipop_path <- file.path(groupDir$lollipop_rep,paste0(seq_name,"_lollipop_replicates_",h,"_",i,"_",j,".png"))
         # plot generation
         lollipop_plot(table_coll, filename = lollipop_path, coord = data$coord,
                       plot_title = paste("Methylation plot of",seq_name,"in",h),
@@ -949,7 +991,7 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       }
     }
     
-    #****************************************************************
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # GENOMIC PLOTS
     cat("\n\n#### Genomic plots {.tabset .tabset-pills}\n\n")
     
@@ -959,7 +1001,7 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       cat("\n\n##### Sample order : ",i,"  \n")
       
       # path to save png
-      genomic_path <- file.path(groupDir$genomic_rep,paste0("genomic_replicates_",h,"_",i,".png"))
+      genomic_path <- file.path(groupDir$genomic_rep,paste0(seq_name,"_genomic_replicates_",h,"_",i,".png"))
       # plot generation
       genomic_plot(table_coll, filename = genomic_path, coord = data$coord,
                    plot_title = paste("Methylation plot of",seq_name, "in",h),
@@ -986,27 +1028,27 @@ shiny::setProgress(0.5)
 
 ```{r Plots of GROUPS, results='asis', message=F, warning=F, out.width = "100%", fig.align = "center"}
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PARAMETERS
 list_plotType <- c("proportional", "condensed")
 list_coll <- levels(data$table_group$collection)
 
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PLOTS OF REPLICATES, collections on same plot
 if (coll_sep==FALSE | length(list_coll)<=1) { 
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # HEADER
   cat("\n\n## Plots of groups {.tabset}\n\n")
   
   # cluster dendrogram
   # path to save png
-  dendro_path = file.path(groupDir$dendro,"dendro_groups.png")
+  dendro_path = file.path(groupDir$dendro,paste0(seq_name,"_dendro_groups.png"))
   # plot generation
   dendro_plot(data$table_group, filename = dendro_path, plot_title = paste("Cluster dendrogram of", seq_name))
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # LOLLIPOP PLOTS
   cat("\n\n### Lollipop plots {.tabset .tabset-pills}\n\n")
   
@@ -1021,7 +1063,7 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
       cat("\n\n##### Type : ",j,"  \n")
       
       # path to save png
-      lollipop_path <- file.path(groupDir$lollipop_group,paste0("lollipop_groups_",i,"_",j,".png"))
+      lollipop_path <- file.path(groupDir$lollipop_group,paste0(seq_name,"_lollipop_groups_",i,"_",j,".png"))
       # plot generation
       lollipop_plot(data$table_group, filename = lollipop_path, coord = data$coord,
                     plot_title = paste("Methylation plot of",seq_name),
@@ -1034,7 +1076,7 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     }
   }
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # GENOMIC PLOTS
   cat("\n\n### Genomic plots {.tabset .tabset-pills}\n\n")
   
@@ -1044,7 +1086,7 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     cat("\n\n#### Sample order : ",i,"  \n")
     
     # path to save png
-    genomic_path <- file.path(groupDir$genomic_group,paste0("genomic_groups_",i,".png"))
+    genomic_path <- file.path(groupDir$genomic_group,paste0(seq_name,"_genomic_groups_",i,".png"))
     # plot generation
     genomic_plot(data$table_group, filename = genomic_path, coord = data$coord,
                  plot_title = paste("Methylation plot of",seq_name),
@@ -1062,11 +1104,11 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
 }
 
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PLOTS OF REPLICATES, collections separated on different plots
 if (coll_sep==TRUE & length(list_coll)>1) {
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # HEADER
   cat("\n\n## Plots of groups {.tabset .tabset-pills}\n\n")
   
@@ -1077,14 +1119,14 @@ if (coll_sep==TRUE & length(list_coll)>1) {
     
     # cluster dendrogram
     # path to save png
-    dendro_path = file.path(groupDir$dendro,paste0("dendro_groups_",h,".png"))
+    dendro_path = file.path(groupDir$dendro,paste0(seq_name,"_dendro_groups_",h,".png"))
     # plot generation
     dendro_plot(table_coll, filename = dendro_path, plot_title = paste("Cluter dendrogram of",seq_name,"in",h))
     
     # header
     cat("\n\n### ",h,"{.tabset}\n\n")
     
-    #****************************************************************
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # LOLLIPOP PLOTS
     cat("\n\n#### Lollipop plots {.tabset .tabset-pills}\n\n")
     
@@ -1099,7 +1141,7 @@ if (coll_sep==TRUE & length(list_coll)>1) {
         cat("\n\n###### Type : ",j,"  \n")
         
         # path to save png
-        lollipop_path <- file.path(groupDir$lollipop_group,paste0("lollipop_groups_",h,"_",i,"_",j,".png"))
+        lollipop_path <- file.path(groupDir$lollipop_group,paste0(seq_name,"_lollipop_groups_",h,"_",i,"_",j,".png"))
         # plot generation
         lollipop_plot(table_coll, filename = lollipop_path, coord = data$coord,
                       plot_title = paste("Methylation plot of",seq_name,"in",h),
@@ -1113,7 +1155,7 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       }
     }
     
-    #****************************************************************
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # GENOMIC PLOTS
     cat("\n\n#### Genomic plots {.tabset .tabset-pills}\n\n")
     
@@ -1123,7 +1165,7 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       cat("\n\n##### Sample order : ",i,"  \n")
       
       # path to save png
-      genomic_path <- file.path(groupDir$genomic_group,paste0("genomic_groups_",h,"_",i,".png"))
+      genomic_path <- file.path(groupDir$genomic_group,paste0(seq_name,"_genomic_groups_",h,"_",i,".png"))
       # plot generation
       genomic_plot(table_coll, filename = genomic_path, coord = data$coord,
                    plot_title = paste("Methylation plot of",seq_name, "in",h),
@@ -1164,8 +1206,8 @@ colnames(stats_sum_pos)[6:9] <- c("meth_mean","SD","SEM","conf_int_95")
 stats_sum_pos[,6:9] <- round(stats_sum_pos[,6:9],2)
 
 # Export table data as csv and xlsx
-write.table(stats_sum_pos, file = file.path(groupDir$tables,"descriptive_statistics_positions.csv"), row.names = T, col.names = T)
-write.xlsx(stats_sum_pos, file = file.path(groupDir$tables,"descriptive_statistics_positions.xlsx"), rowNames = T, colNames = T, overwrite = T)
+write.table(stats_sum_pos, file = file.path(groupDir$tables,paste0(seq_name,"_descriptive_statistics_positions.csv")), row.names = F, col.names = T)
+write.xlsx(stats_sum_pos, file = file.path(groupDir$tables,paste0(seq_name,"_descriptive_statistics_positions.xlsx")), rowNames = F, colNames = T, overwrite = T)
 
 # Display table
 colnames(stats_sum_pos) <- c("CpG number","CpG coordinate","Collection","Group", "N", "Methylation mean", "SD", "SEM", "Confidence interval of 95% (±)")
@@ -1202,8 +1244,8 @@ colnames(stats_sum_mean)[4:7] <- c("meth_mean","SD","SEM","conf_int_95")
 stats_sum_mean[,4:7] <- round(stats_sum_mean[,4:7],2)
 
 # Export table data as csv and xlsx
-write.table(stats_sum_mean, file = file.path(groupDir$tables,"descriptive_statistics_means.csv"), row.names = T, col.names = T)
-write.xlsx(stats_sum_mean, file = file.path(groupDir$tables,"descriptive_statistics_means.xlsx"), rowNames = T, colNames = T, overwrite = T)
+write.table(stats_sum_mean, file = file.path(groupDir$tables,paste0(seq_name,"_descriptive_statistics_means.csv")), row.names = F, col.names = T)
+write.xlsx(stats_sum_mean, file = file.path(groupDir$tables,paste0(seq_name,"_descriptive_statistics_means.xlsx")), rowNames = F, colNames = T, overwrite = T)
 
 # Display table
 colnames(stats_sum_mean) <- c("Collection","Group", "N", "Methylation mean", "SD", "SEM", "Confidence interval of 95% (±)")
@@ -1218,14 +1260,30 @@ formattable(
 #### For each CpG position
 
 ```{r STATS T test positions, results='asis'}
-# CHECK FOR N 
-if(min(stats_sum_pos$N)<3) {
-  cat("\n\n**Warning: N < 3 for at least one group at one position, T tests can not be performed.**\n\n")
+# CHECK FOR CG POSITIONS 
+CG_ok <- c()
+for (i in unique(data$all$CG_nb)) {
+  
+  Test_Error <- tryCatch( {
+  data$all[which(data$all$CG_nb==i),] %>%
+    group_by(collection) %>%
+    t_test(meth ~ group, paired = FALSE, p.adjust.method = "none") %>%
+    add_significance("p") }, 
+  error=function(e) e)
+  
+  if(!inherits(Test_Error, "error")){
+    CG_ok <- append(CG_ok, i)} # vector of positions for which the t tests can be done between every group
+} 
+
+data_Ttest <- data$all[which(data$all$CG_nb%in%CG_ok),]
+
+if(!identical(as.vector(unique(data$all$CG_nb)),CG_ok)) {
+  p( paste0("Warning: CpG sites ", toString(setdiff(as.vector(unique(data$all$CG_nb)),CG_ok))," are removed as T test can not be performed due to N<3 for at least one group or essentially constant data between two groups."), style="color:#d37217; font-weight: bold;")
 }
 
-# ERROR HANDLING
+# ERROR HANDLING 
 Test_Error <- tryCatch( {
-  data$all %>%
+  data_Ttest %>%
     group_by(collection,CG_nb,CG_coord) %>%
     t_test(meth ~ group, paired = FALSE, p.adjust.method = "none") %>%
     add_significance("p") }, 
@@ -1234,23 +1292,21 @@ Test_Error <- tryCatch( {
 
 # IF NO ERROR
 if(!inherits(Test_Error, "error")){
-  stat_test_pos <- data$all %>%
+  stat_test_pos <- data_Ttest %>%
     group_by(collection,CG_nb,CG_coord) %>%
     t_test(meth ~ group, paired = FALSE, p.adjust.method = "none") %>%
     add_significance("p") %>% 
     select(c(CG_nb, CG_coord, collection, group1, group2, n1, n2, p, p.signif))
 } else {
   stat_test_pos <- NA
-  cat("\n\n**Error: T tests could not be performed on the provided data.**\n\n")
+  p("Error: T tests could not be performed on the provided data.", style="color:#bf3232 ; font-weight: bold ;")
 }
 
 if("data.frame" %in% class(stat_test_pos)) {
   
-  cat("\n\n Student's T test (two-samples, unpaired) \n\n")
-  
-  # Export table data as csv and xlsx
-  write.table(stat_test_pos, file = file.path(groupDir$tables,"t_test_table_positions.csv"), row.names = T, col.names = T)
-  write.xlsx(stat_test_pos, file = file.path(groupDir$tables,"t_test_table_positions.xlsx"), rowNames = T, colNames = T, overwrite = T)
+    # Export table data as csv and xlsx
+  write.table(stat_test_pos, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_positions.csv")), row.names = F, col.names = T)
+  write.xlsx(stat_test_pos, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_positions.xlsx")), rowNames = F, colNames = T, overwrite = T)
   
   # Change * for display (transformed in a dot by R markdown) and regex (gsub function) can not be used for * special character
   for (i in 1:length(stat_test_pos$p.signif)) {
@@ -1263,7 +1319,9 @@ if("data.frame" %in% class(stat_test_pos)) {
   # Rename columns for display
   colnames(stat_test_pos) <- c("CpG number","CpG coordinate","Collection","Compared group 1","Compared group 2",
                                "N group 1","N group 2","p-value","p-value significance level")
-
+  
+  cat("\n\n Student's T test (two-samples, unpaired).\n\n")
+  
   formattable(stat_test_pos, align=rep("c",ncol(stat_test_pos)))
 }
 
@@ -1272,12 +1330,6 @@ if("data.frame" %in% class(stat_test_pos)) {
 #### For means of CpG positions
 
 ```{r STATS T test means, results='asis'}
-# CHECK FOR N 
-if(min(stats_sum_mean$N)<3) {
-  cat("\n\n**Warning: N < 3 for at least one group, T tests can not be performed.**\n\n")
-}
-
-
 # ERROR HANDLING
 Test_Error <- tryCatch( {
   data_mean %>%
@@ -1296,16 +1348,14 @@ if(!inherits(Test_Error, "error")){
     select(c(collection, group1, group2, n1, n2, p, p.signif))
 } else {
   stat_test_mean <- NA
-  cat("\n\n**Error: T tests could not be performed on the provided data.**\n\n")
+  p("Error: T tests could not be performed on the provided data.", style="color:#bf3232 ; font-weight: bold ;")
 }
 
 if("data.frame" %in% class(stat_test_mean)) {
   
-  cat("\n\n Student's T test (two-samples, unpaired) \n\n")
-  
   # Export table data as csv and xlsx
-  write.table(stat_test_mean, file = file.path(groupDir$tables,"t_test_table_means.csv"), row.names = T, col.names = T)
-  write.xlsx(stat_test_mean, file = file.path(groupDir$tables,"t_test_table_means.xlsx"), rowNames = T, colNames = T, overwrite = T)
+  write.table(stat_test_mean, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_means.csv")), row.names = F, col.names = T)
+  write.xlsx(stat_test_mean, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_means.xlsx")), rowNames = F, colNames = T, overwrite = T)
   
   # Change * for display (transformed in a dot by R markdown) and regex (gsub function) can not be used for * special character
   for (i in 1:length(stat_test_mean$p.signif)) {
@@ -1317,6 +1367,8 @@ if("data.frame" %in% class(stat_test_mean)) {
   
   # Rename columns for display
   colnames(stat_test_mean) <- c("Collection","Compared group 1","Compared group 2","N group 1","N group 2","p-value","p-value significance level")
+  
+  cat("\n\n Student's T test (two-samples, unpaired).\n\n")
   
   formattable(stat_test_mean, align=rep("c",ncol(stat_test_mean)))
 }
@@ -1332,50 +1384,46 @@ shiny::setProgress(0.8)
 
 ```{r STATS text positions, warning = F, results = 'asis'}
 if(cloning_exp==T) {
-  cat("\n\n Individual clone methylation is represented as a round shape and the methylation mean of clones as a diamond shape.\n\n")
+  p("Individual clone methylation is represented as a round shape and the methylation mean of clones as a diamond shape.")
 }
 if(cloning_exp==F) {
-  cat("\n\n Boxplots represent methylation median and quartiles of each group with errors bars. Methylation mean are represented as diamond shapes.\n\n")
+  p("Boxplots represent methylation median and quartiles of each group with errors bars. Methylation mean are represented as diamond shapes.")
 }
 
-cat("\n\n The p-values and p-value significance levels are determined by Student's T tests (unpaired).\n\n")
-
-# CHECK FOR N 
-if(min(stats_sum_pos$N)<3) {
-  cat("\n\n**Warning: N < 3 for at least one group at one position, T tests can not be performed.**\n\n")
-}
+p("The p-values and p-value significance levels are determined by Student's T tests (two-samples, unpaired).")
 ```
 
 ```{r STATS boxplots positions, results = 'asis', fig.align = "center", warning=F, message=F}
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PARAMETERS
 list_coll <- levels(data$all$collection)
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # BOXPLOTS, collections on same plot
 if (coll_sep==FALSE | length(list_coll)<=1) {
   
   for(p in c("pval","psign")) {
     
-    if(p=="pval") cat("\n\n##### p-values")
-    if(p=="psign") cat("\n\n##### p-values significance levels")
+    if(p=="pval") cat("\n\n##### p-values\n\n")
+    if(p=="psign") cat("\n\n##### p-values significance levels\n\n")
     
     # File paths
-    path_pos <- file.path(groupDir$boxplot,paste0("boxplot_positions_",p,".png"))
+    path_pos <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_positions_",p,".png"))
     
     ## Plot of each position
     suppressWarnings(boxplot_pos(data$all, filename=path_pos, plot_title = paste("Methylation of each CpG positions for",seq_name), 
                                  cloning_exp = cloning_exp, p_label=p, plot_colors = plot_colors))
     
-    #***********************************************************************************************
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # Display boxplots : 
-    htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab")
+    
+    cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab.")))
     cat("\n\n![](",path_pos,")\n\n")
   }
   
 }
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # BOXPLOTS, collections separated on different plots
 if (coll_sep==TRUE & length(list_coll)>1) {
   
@@ -1388,19 +1436,20 @@ if (coll_sep==TRUE & length(list_coll)>1) {
     
     for(p in c("pval","psign")) {
       
-      if(p=="pval") cat("\n\n###### p-values")
-      if(p=="psign") cat("\n\n###### p-values significance levels")
+      if(p=="pval") cat("\n\n###### p-values\n\n")
+      if(p=="psign") cat("\n\n###### p-values significance levels\n\n")
       
       # File paths
-      path_pos <- file.path(groupDir$boxplot,paste0("boxplot_",h,"_positions_",p,".png"))
+      path_pos <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_",h,"_positions_",p,".png"))
       
       ## Plot of each position
       suppressWarnings(boxplot_pos(data_coll, filename=path_pos, plot_title = paste("Methylation of each CpG positions for",seq_name,"in",h), 
                                    cloning_exp = cloning_exp, p_label=p, plot_colors = plot_colors))
       
-      #***********************************************************************************************
+      #─────────────────────────────────────────────────────────────────────────────────────────────────────────
       # Display boxplots
-      htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab")
+
+      cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab.")))
       cat("\n\n![](",path_pos,")\n\n")
       
     }
@@ -1414,49 +1463,43 @@ if (coll_sep==TRUE & length(list_coll)>1) {
 #### For means of CpG positions {.tabset .tabset-pills}
 
 ```{r STATS text means, results = 'asis', warning=F, message=F}
+p("Boxplots represent methylation median and quartiles of each group with errors bars. Methylation mean are represented as diamond shapes.")
 
-cat("\n\n Boxplots represent methylation median and quartiles of each group with errors bars. Methylation mean are represented as diamond shapes.\n\n")
-
-cat("\n\n The p-values and p-value significance levels are determined by Student's T tests (unpaired).\n\n")
-
-# CHECK FOR N 
-if(min(stats_sum_mean$N)<3) {
-  cat("\n\n**Warning: N < 3 for at least one group, T tests can not be performed.**\n\n")
-}
+p("The p-values and p-value significance levels are determined by Student's T tests (two-samples, unpaired).")
 ```
 
 ```{r STATS boxplots means, results = 'asis', fig.align = "center", warning=F, message=F}
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PARAMETERS
 list_coll <- levels(data_mean$collection)
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # BOXPLOTS, collections on same plot
 if (coll_sep==FALSE | length(list_coll)<=1) {
   
     
   for(p in c("pval","psign")) {
     
-    if(p=="pval") cat("\n\n##### p-values")
-    if(p=="psign") cat("\n\n##### p-values significance levels")
+    if(p=="pval") cat("\n\n##### p-values\n\n")
+    if(p=="psign") cat("\n\n##### p-values significance levels\n\n")
     
     # File paths
-    path_mean <- file.path(groupDir$boxplot,paste0("boxplot_means_",p,".png"))
+    path_mean <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_means_",p,".png"))
     
     ## Plot of each position
     suppressWarnings(boxplot_mean(data_mean, filename=path_mean, plot_title = paste("Methylation of all CpG positions for",seq_name),
                                   p_label=p, plot_colors = plot_colors))
     
-    #***********************************************************************************************
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # Display boxplots 
-    
-    htmltools::p("Open ",htmltools::a(href = file.path(path_mean),"boxplot image",target="_blank")," in a new tab")
+
+    cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_mean),"boxplot image",target="_blank")," in a new tab.")))
     cat("\n\n![](",path_mean,")\n\n")
     
   }
 }
 
-#***********************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # BOXPLOTS, collections separated on different plots
 if (coll_sep==TRUE & length(list_coll)>1) {
 
@@ -1470,21 +1513,20 @@ if (coll_sep==TRUE & length(list_coll)>1) {
     
     for(p in c("pval","psign")) {
       
-      if(p=="pval") cat("\n\n###### p-values")
-      if(p=="psign") cat("\n\n###### p-values significance levels")
+      if(p=="pval") cat("\n\n###### p-values\n\n")
+      if(p=="psign") cat("\n\n###### p-values significance levels\n\n")
       
       # File paths
-      path_mean <- file.path(groupDir$boxplot,paste0("boxplot_",h,"_means_",p,".png"))
+      path_mean <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_",h,"_means_",p,".png"))
       
       ## Plot of each position 
       suppressWarnings(boxplot_mean(data_coll, filename=path_mean, plot_title = paste("Methylation of all CpG positions for",seq_name,"in",h),
                                     p_label=p, plot_colors = plot_colors))
       
-      #***********************************************************************************************
+      #─────────────────────────────────────────────────────────────────────────────────────────────────────────
       # Display boxplots : p values numeric
-      
-      htmltools::p("Open ",htmltools::a(href = file.path(path_mean),"boxplot image",target="_blank")," in a new tab")
-      
+
+      cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_mean),"boxplot image",target="_blank")," in a new tab.")))
       cat("\n\n![](",path_mean,")\n\n")
       
     }
@@ -1499,7 +1541,6 @@ shiny::setProgress(0.9)
 
 
 
-
 <!-- STATISTICS METHYLATION PROFILE PLOTS -->
 
 ### Methylation profile plots {.tabset .tabset-pills}
@@ -1508,11 +1549,12 @@ Each points represent the methylation mean of clones or replicates for a given C
 The p-values and p-value significance levels are determined by Kruskal-Wallis tests. 
 
 ```{r STATS profile plots, results='asis', warning=F, message=F}
+
 list_coll <- levels(data$all$collection)
 
 if(length(list_coll)<=1) {
   
-  #****************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # METHYLATION PROFILE PLOTS
   
   for (j in list_plotType) {
@@ -1526,7 +1568,7 @@ if(length(list_coll)<=1) {
       if(p=="psign") cat("\n\n##### p-values significance levels\n\n")
       
       # path to save png
-      meth_profile_path <- file.path(groupDir$profile,paste0("meth_profile_",j,"_",p,".png"))
+      meth_profile_path <- file.path(groupDir$profile,paste0(seq_name,"_meth_profile_",j,"_",p,".png"))
       # plot generation
       suppressWarnings(profile_plot(data$all, filename = meth_profile_path, 
                                     plot_title = paste("Methylation profile of",seq_name), 
@@ -1549,7 +1591,7 @@ if(length(list_coll)>1) {
     # header
     cat("\n\n#### ",h,"{.tabset .tabset-pills}\n\n")
     
-    #****************************************************************
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # METHYLATION PROFILE PLOTS
     
     for (j in list_plotType) {
@@ -1559,11 +1601,11 @@ if(length(list_coll)>1) {
       
       for(p in c("pval","psign")) {
         
-        if(p=="pval") cat("\n\n###### p-values")
-        if(p=="psign") cat("\n\n###### p-values significance levels")
+        if(p=="pval") cat("\n\n###### p-values\n\n")
+        if(p=="psign") cat("\n\n###### p-values significance levels\n\n")
         
         # path to save png
-        meth_profile_path <- file.path(groupDir$profile,paste0("meth_profile_",h,"_",j,"_",p,".png"))
+        meth_profile_path <- file.path(groupDir$profile,paste0(seq_name,"_meth_profile_",h,"_",j,"_",p,".png"))
         # plot generation
         suppressWarnings(profile_plot(data_coll, filename = meth_profile_path, 
                                       plot_title = paste("Methylation profile of",seq_name,"in",h), 

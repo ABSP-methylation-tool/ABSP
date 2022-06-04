@@ -15,19 +15,19 @@ params:
     value: sequence-name
     input: text
   collection:
-    label: "Enter collection name (distinct groups, not to compare)"
+    label: "Enter collection name"
     value: collection
     input: text
   group:
-    label: "Enter condition / group name (to compare) (examples: control, treated...)"
+    label: "Enter group name"
     value: group1
     input: text
   replicate:
-    label: "Enter replicate number"
+    label: "Enter replicate number (direct-BSP)"
     value: 1
     input: numeric
   clone:
-    label: "Enter clone number (for direct sequencing, please leave empty or enter 0)"
+    label: "Enter clone number (cloning-BSP)"
     value: 0
     input: numeric
   DNA_seq:
@@ -73,34 +73,34 @@ Sys.setlocale(category = "LC_ALL", locale = "en_SE.utf8")
 renv::restore(prompt=F)
 ```
 
-```{r TEST SCRIPT files and params, eval=F}
-## TEST SCRIPT WITHOUT KNITTING
+```{r Manual parameters and files for TESTS, eval=F}
+## TO TEST THE SCRIPT WITHOUT KNITTING
 
 # Parameters variables
-folder_name <- "Test"
+folder_name <- "Example data"
 seq_name = "CDH1"
 seq_coll = "" ; seq_coll = ifelse(seq_coll==0,"",seq_coll)
-seq_group = "0"
-seq_rep = "1"  ; seq_rep = ifelse(seq_rep==0,"",seq_rep)
+seq_group = "High methylated DNA"
+seq_rep = "3"  ; seq_rep = ifelse(seq_rep==0,"",seq_rep)
 seq_clone = "0" ; seq_clone = ifelse(seq_clone=="0"|seq_clone==""|seq_clone==" ","",paste0("clone",str_pad(seq_clone, 2, "0", side="left")))
 clone_nb = 0
-seq_date_s1 = "2022-03-04"
-seq_date_s2 = "2022-03-04"
+seq_date_s1 = "2022-05-02"
+seq_date_s2 = "2022-05-02"
 selected_genome = "BSgenome.Hsapiens.UCSC.hg19"
 
 # Get files paths using choose.files function (Windows only)
-DNA_seq_path = choose.files(default = "", caption = "Select .fasta file corresponding to DNA sequence",
+DNA_seq_path = choose.files(default = "", caption = "Select .fasta file of reference DNA sequence",
                                 multi = FALSE, filters=Filters, index=nrow(Filters))
-sangerseq_s1_path = choose.files(default = "", caption = "Select .ab1 file corresponding to the result of sequencing in one direction #1",
+sangerseq_s1_path = choose.files(default = "", caption = "Select .ab1 file of sequencing result from one direction #1",
                                 multi = FALSE, filters=Filters, index=nrow(Filters))
-sangerseq_s2_path = choose.files(default = "", caption = "Select .ab1 file corresponding to the result of sequencing in the other direction #2",
+sangerseq_s2_path = choose.files(default = "", caption = "Select .ab1 file of sequencing result from the other direction #2",
                                 multi = FALSE, filters=Filters, index=nrow(Filters))
 
 useSeqs1 <- T
 useSeqs2 <- T
 ```
 
-```{r read input params, include=F}
+```{r Read parameters from YAML header, include=F}
 ## SCRIPT TO USE PARAMS FOR KNITING : DO NOT RUN IF TESTING THE SCRIPT WITHOUT KNITTING
 
 # Parameters variables
@@ -410,7 +410,7 @@ values <- c(
 if(seq_rep!="") values[5] <- "Direct-BSP"
 if(seq_clone!="") values[5] <- "Cloning-BSP"
 # Create data frame
-paramTable <- data.frame("Parameters" = parameters, "Input values" = values)
+paramTable <- data.frame("Parameters" = parameters, "Input values" = values, check.names = F)
 # Remove empty unecessary rows
 paramTable <- paramTable[which(paramTable[,2]!=""),]
 rownames(paramTable) <- NULL # reset row names, as row numbers are displayed if rows are missing
@@ -1400,7 +1400,7 @@ writePairwiseAlignments(pa_s1_RC,block.width=20)
 
 #### Direction determination
 ```{r direction determination s1, include=F, eval=useSeqs1}
-
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # RESULT 2 : USE ALIGNMENTS LENGHT TO DETERMINE CORRECT DIRECTION
 if(TrimOKs1==T) {
   if(pa_s1_S@subject@range@width > th_min_alg | pa_s1_RC@subject@range@width > th_min_alg) {
@@ -1436,7 +1436,7 @@ if(TrimOKs1==T) {
   Dirdeterms2 <- T # use s2 for direction determination when trimming is not correct
 } 
 
-
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # RESULT 1 NO DIRECTION DETERMINATION POSSIBLE : USE RESULT 2
 if(Dirdeterms2==T) {
   if (useSeqs2==T & TrimOKs2==T) {
@@ -1526,7 +1526,7 @@ writePairwiseAlignments(pa_s2_RC,block.width=20)
 
 #### Direction determination
 ```{r direction determination s2, include=F, eval=useSeqs2}
-
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # RESULT 2 : USE ALIGNMENTS LENGHT TO DETERMINE CORRECT DIRECTION
 if(TrimOKs2==T) {
   if(pa_s2_S@subject@range@width > th_min_alg | pa_s2_RC@subject@range@width > th_min_alg) {
@@ -1561,7 +1561,7 @@ if(TrimOKs2==T) {
   Dirdeterms1 <- T # use s1 for direction determination when trimming is not correct
 } 
 
-
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # RESULT 2 NO DIRECTION DETERMINATION POSSIBLE : USE RESULT 1
 if(Dirdeterms1==T) {
   if (useSeqs1==T & TrimOKs1==T) {
@@ -2191,6 +2191,7 @@ if (useSeqF==T & useSeqR==T) {
                                         "Bisulfite conversion rate Reverse" = color_condi(">=", 
                                                                                           th_conv_rate,colors_tables["correct_pale"], colors_tables["incorrect_pale"])))
 }
+
 if (useSeqF==T & useSeqR==F) {
   colnames(BisConRate_all) <- c("C number","Bisulfite conversion rate Forward")
   BisConRate_all[,2] <- format(round(BisConRate_all[,2],2),nsmall=2)
@@ -2415,9 +2416,13 @@ if (useSeqF==T & useSeqR==T & correct_F==T & correct_R==T) {
   CG_meth <- full_join(subset(CG_peaks_F, select= c(CG_nb,chr,start,end,meth_F)),
                        subset(CG_peaks_R, select= c(CG_nb,chr,start,end,meth_R)),
                        by = c("CG_nb","chr","start","end"))
-  # Order by CG_nb, mean and sd of methylation 
+  # Order by CG_nb 
   CG_meth = CG_meth %>% 
-    .[with(., order(CG_nb)),] %>% 
+    .[with(., order(CG_nb)),]
+  # Reset row number
+  rownames(CG_meth) <- NULL 
+  # Add mean and sd of methylation
+  CG_meth = CG_meth %>% 
     rowwise() %>% 
     dplyr::mutate(meth_avg=mean(c(meth_F,meth_R),na.rm=T)) %>%
     dplyr::mutate(meth_sd=round(sd(c(meth_F,meth_R)),2))
