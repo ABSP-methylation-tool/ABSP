@@ -499,12 +499,14 @@ getPeaks <- function (x, alg_pos, seqtable_trim, indel, sequencing) {
 individual_meth_plot <- function(meth, start, end, genome, plot_title, bases_colors) {
   # Data track of methylation
   genomeID <- unique(genome@seqinfo@genome)
-  track_meth <- DataTrack(range=meth, genome=genomeID, lwd.title = 2, showColorBar = FALSE, cex.axis = 1.5, lineheight = 1,
-                          type="heatmap", background.title = "transparent", col = "black", col.border.title="transparent",
-                          col.axis="transparent", col.frame="black", ylim = c(0,100), 
+
+  track_meth <- DataTrack(range = meth, genome = genomeID, chromosome = unique(meth$chromosome), 
+                          lwd.title=2, showColorBar=T, cex.axis=1.6, lineheight=1,
+                          type="heatmap",
+                          col.border.title="transparent", col="black", col.axis="black", col.frame="black", ylim=c(0,100),
                           lwd.border=10, lwd=10, min.height=10, min.width=10, lwd.grid=10, 
-                          fontcolor.title="black", name="Methylation",
-                          ncolor=5, gradient=c("grey90","black"))
+                          background.title = "transparent", name="Methylation", fontcolor.title="black",
+                          gradient=c("grey95","black"))
   
   # CG track
   track_CG <- AnnotationTrack(meth, name ="CpG", fontcolor.title="black", col=NULL, fill = "navy", 
@@ -515,7 +517,7 @@ individual_meth_plot <- function(meth, start, end, genome, plot_title, bases_col
   # Genomic axis track
   gtrack <- GenomeAxisTrack(cex=2,col="black",fontcolor="black", distFromAxis = 5, lwd=2)
   plot_ticks <- seq(from=round(start,-2), to=round(end+50,-2), by=20)
-  ############################################################################################
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   plotTracks(list(track_meth,track_CG,sTrack,gtrack),
              sizes = c(6,1,1,2.5), main=plot_title, cex.main = 2.2,
              cex.title = 2, title.width = 1.2,from=start, to=end, add53=TRUE,labelPos="below",ticksAt=plot_ticks)
@@ -609,7 +611,7 @@ color_base <- function(text_color, bases_colors) {
 
 # COLORS FOR METHYLATION INTERVALS FORMATTABLE FUNCTION -------------------
 
-color_meth <- function(b_colors=c(grey(0.80),grey(0.5),grey(0.3),"black"),t_colors=c("black","white")) { 
+color_meth <- function(b_colors=grey.colors(5,start=0.95,end=0),t_colors=c("black","white")) { 
   formatter("span", 
             style = x ~ formattable::style(display = "block", 
                                            padding = "0 4px", 
@@ -618,12 +620,13 @@ color_meth <- function(b_colors=c(grey(0.80),grey(0.5),grey(0.3),"black"),t_colo
                                            direction = "rtl", 
                                            "unicode-bidi" = "plaintext",
                                            "background-color" = csscolor(ifelse(is.na(x),"#F2F2F2",
-                                                                                ifelse(x<=25,b_colors[1],
-                                                                                       ifelse(x<=50,b_colors[2],
-                                                                                              ifelse(x<=75,b_colors[3],
-                                                                                                     ifelse(x<=100,b_colors[4],"white")))))),
+                                                                                ifelse(x<=20,b_colors[1],
+                                                                                       ifelse(x<=40,b_colors[2],
+                                                                                              ifelse(x<=60,b_colors[3],
+                                                                                                     ifelse(x<=80,b_colors[4],
+                                                                                                            ifelse(x<=100,b_colors[5],"white"))))))),
                                            "color" = csscolor(ifelse(is.na(x),"black",
-                                                                     ifelse(x<=50,t_colors[1],t_colors[2])))))
+                                                                     ifelse(x<=60,t_colors[1],t_colors[2])))))
 }
 
 
@@ -708,8 +711,8 @@ displayColorsShapes <- function(a,b) {
 
 
 
-
-#************************************************************************************
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
+#─────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
 
@@ -963,7 +966,7 @@ dendro_plot <- function(table, filename, plot_title) {
 lollipop_plot <- function(table, filename, coord, plot_title, SampleOrder, GroupOrder, plotType, MethLevels=c(2,4,5), pos_labels) {
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # METHYLATIONS LEVELS
   if (MethLevels==2) { # for clones
     table <- table %>% 
@@ -1004,7 +1007,7 @@ lollipop_plot <- function(table, filename, coord, plot_title, SampleOrder, Group
     legend_width <- 1000 #px
   }
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Change position label depending on input request
   if(pos_labels=="coordinates") {
     pos_lab <-unique(table$CG_coord)
@@ -1026,7 +1029,7 @@ lollipop_plot <- function(table, filename, coord, plot_title, SampleOrder, Group
   }
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Sort samples
   
   if(SampleOrder == "as-is"){
@@ -1081,7 +1084,7 @@ lollipop_plot <- function(table, filename, coord, plot_title, SampleOrder, Group
   }
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Proportional
   if(plotType=="proportional"){
     
@@ -1120,7 +1123,7 @@ lollipop_plot <- function(table, filename, coord, plot_title, SampleOrder, Group
     ggsave(filename = filename, width = width_plot, height = height_plot, dpi=600, units = c("px"))
   }
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Condensed
   if(plotType=="condensed"){
     
@@ -1170,10 +1173,10 @@ lollipop_plot <- function(table, filename, coord, plot_title, SampleOrder, Group
 
 # GENOMIC METHYLATION PLOT FUNCTION ---------------------------------------
 
-genomic_plot <- function(table, filename, coord, plot_title, SampleOrder, GroupOrder, MethLevels=c(2,4,5), genome, bases_colors) {
+genomic_plot <- function(table, filename, coord, plot_title, SampleOrder, GroupOrder, genome, bases_colors) {
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Sort samples
   
   if(SampleOrder == "as-is"){
@@ -1228,7 +1231,7 @@ genomic_plot <- function(table, filename, coord, plot_title, SampleOrder, GroupO
   }
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Get Methylation as data frame with samples as ordered
   list_df <- list()
   for (i in unique(as.character(table$samples))) {
@@ -1239,19 +1242,19 @@ genomic_plot <- function(table, filename, coord, plot_title, SampleOrder, GroupO
   meth_df <- suppressMessages(purrr::reduce(list_df, full_join)) 
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Data track
   # change column names to conserve spaces and - in data track title
   colnames(meth_df) <- gsub(" ","__",colnames(meth_df))
   colnames(meth_df) <- gsub("-","_",colnames(meth_df))
   genomeID <- metadata(genome)$genome
   track_meth <- DataTrack(range = meth_df, genome = genomeID, chromosome = unique(meth_df$chromosome), 
-                          lwd.title=5, showColorBar=F, cex.axis=3, lineheight=0,
+                          lwd.title=5, showColorBar=T, cex.axis=3, lineheight=1,
                           type="heatmap", showSampleNames=TRUE, cex.sampleNames=3, col.sampleNames="black", 
-                          col.border.title="transparent", col="black", col.axis="transparent", col.frame="black", ylim=c(0,100),
+                          col.border.title="transparent", col="black", col.axis="black", col.frame="black", ylim=c(0,100),
                           lwd.border=10, lwd=10, min.height=10, min.width=10, lwd.grid=10, 
                           background.title = "transparent", name="Methylation", fontcolor.title="transparent",
-                          ncolor=MethLevels, gradient=c("grey90","black"))
+                          gradient=c("grey95","black"))
   rownames(track_meth@data) <- gsub("__"," ",rownames(track_meth@data))
   rownames(track_meth@data) <- gsub("_","-",rownames(track_meth@data))
   
@@ -1275,13 +1278,13 @@ genomic_plot <- function(table, filename, coord, plot_title, SampleOrder, GroupO
   plot_ticks <- seq(from=round(coord$start,-2), to=round(coord$end+100,-2), by=by)
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   track_meth_width = max(nchar(colnames(meth_df)[-c(1,2,3)]))*0.003+1
   
   width_plot <- (220 + max(nchar(colnames(meth_df[-c(1,2,3)])))*22) + ((coord$end-coord$start)*5+1000) + 50
   heigh_plot <- (ncol(meth_df[,-c(1,2,3)]))*56 + 400
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   png(filename = filename, width = width_plot, height = heigh_plot)
   plotTracks(list(track_meth,track_CG,sTrack,gtrack),
              sizes = c(ncol(meth_df[,-c(1,2,3)]),1,1,2.5),
@@ -1493,7 +1496,7 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"),
 
 profile_plot <- function(table, filename, plot_title, plotType=c("proportional","condensed"), p_label=c("pval","psign"), pos_labels, plot_colors, plot_shapes){
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Parameters
   nb <- list(
     CG = length(unique(table$CG_nb)),
@@ -1502,7 +1505,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   group_shapes <- as.vector(plot_shapes[1:nb$group])
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Plot type
   if(plotType=="proportional") {
     table[,"CG"] <- table$position
@@ -1515,7 +1518,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
     width_x <- nb$CG*500
   }
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Compute KW test
   KW_df <- table %>% 
     group_by(CG,group) %>%
@@ -1548,7 +1551,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   KW_df$p <- p_format(KW_df$p)
   KW_df$p.signif[which(KW_df$p.signif=="ns")] <- ""
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Get means of groups
   table <- table %>% 
     group_by(CG,group_ID) %>%
@@ -1557,7 +1560,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
     unique()
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Change position label depending on input request
   if(pos_labels=="coordinates") {
     pos_lab <-unique(table$CG_coord)
@@ -1579,7 +1582,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   }
   
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Plot
   
   plot <- ggplot(table, aes(x=CG, y=meth)) +
@@ -1609,7 +1612,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   
   
   
-  #************************************************************************************************  
+  #───────────────────────────────────────────────────────────────────────────────────────────────────────── 
   # Kruskal Wallis significance
   if (p_label=="pval") {
     plot <- plot +
@@ -1621,7 +1624,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
       geom_text(data = KW_df, aes(x = CG, y = meth_max, label = p.signif), size = 3.5, vjust=-2)
   }
   
-  #************************************************************************************************
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # save ggplot
   width_plot <- width_x + 240 # margins 120x2
   height_plot <- height_pos + 2500 + 650 

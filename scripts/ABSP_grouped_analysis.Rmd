@@ -475,41 +475,6 @@ if (!file.exists(legend_bases_path)) {
          horiz=TRUE)
   dev.off()
 }
-
-legend_status_path <-  file.path(groupDir$genomic,"legend_methylation_status.png")
-
-if (!file.exists(legend_status_path)) { 
-  png(filename=legend_status_path, width=300, height=60)
-  par(mai=c(0,0,0,0))
-  plot.new()
-  legend(title = "Methylation status",
-         x="center", 
-         legend=c("Unmethylated","Methylated"), 
-         fill=grey.colors(2,start=0.9,end=0),
-         border="white", 
-         bty = "n", 
-         cex=1.5,
-         horiz=TRUE)
-  dev.off()
-}
-
-
-legend_grad_path <-  file.path(groupDir$genomic,"legend_methylation_gradient.png")
-
-if (!file.exists(legend_grad_path)) { 
-  png(filename=legend_grad_path, width=550, height=60)
-  par(mai=c(0,0,0,0))
-  plot.new()
-  legend(title = "Methylation levels",
-         x="center", 
-         legend=c("0-20","20-40","40-60","60-80","80-100"), 
-         fill=grey.colors(5,start=0.9,end=0),
-         border="white", 
-         bty = "n", 
-         cex=1.5,
-         horiz=TRUE)
-  dev.off()
-}
 ```
 
 
@@ -833,12 +798,11 @@ for (g in list_group_ID) {
     # plot generation 
     genomic_plot(data$table_clones[[g]], filename = genomic_path, coord = data$coord,
                  plot_title = paste("Methylation plot of",seq_name,"for clones in",g),
-                 SampleOrder = i, GroupOrder = GroupOrder, MethLevels = 2, 
+                 SampleOrder = i, GroupOrder = GroupOrder,
                  genome = genome, bases_colors = bases_colors)
     # display created plot
     cat("\n\n![](",genomic_path,")\n\n")
     cat("\n\n![](",legend_bases_path,")")
-    cat("![](",legend_status_path,")\n\n")
     
     # display dendrogram associated with Sample Order "clust"
     if(i == "clust"){cat("\n\n![](",dendro_path,"){width=50%}\n\n")}
@@ -922,12 +886,11 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     # plot generation
     genomic_plot(data$table_rep, filename = genomic_path, coord = data$coord,
                  plot_title = paste("Methylation plot of",seq_name),
-                 SampleOrder = i, GroupOrder = GroupOrder, MethLevels = 5,
+                 SampleOrder = i, GroupOrder = GroupOrder,
                  genome = genome, bases_colors = bases_colors)
     # display created plot
     cat("\n\n![](",genomic_path,")\n\n")
     cat("\n\n![](",legend_bases_path,")")
-    cat("![](",legend_grad_path,")\n\n")
     
     # display dendrogram associated with Sample Order "clust"
     if(i == "clust"){cat("\n\n![](",dendro_path,"){width=50%}\n\n")}
@@ -1005,13 +968,12 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       # plot generation
       genomic_plot(table_coll, filename = genomic_path, coord = data$coord,
                    plot_title = paste("Methylation plot of",seq_name, "in",h),
-                   SampleOrder = i, GroupOrder = GroupOrder, MethLevels = 5, 
+                   SampleOrder = i, GroupOrder = GroupOrder,
                    genome = genome, bases_colors = bases_colors)
       
       # display created plot
       cat("\n\n![](",genomic_path,")\n\n")
       cat("\n\n![](",legend_bases_path,")")
-      cat("![](",legend_grad_path,")\n\n")
       
 
       # display dendrogram associated with Sample Order "clust"
@@ -1090,13 +1052,12 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     # plot generation
     genomic_plot(data$table_group, filename = genomic_path, coord = data$coord,
                  plot_title = paste("Methylation plot of",seq_name),
-                 SampleOrder = i, GroupOrder = GroupOrder, MethLevels = 5, 
+                 SampleOrder = i, GroupOrder = GroupOrder,
                  genome = genome, bases_colors = bases_colors)
     
     # display created plot
     cat("\n\n![](",genomic_path,")\n\n")
     cat("\n\n![](",legend_bases_path,")")
-    cat("![](",legend_grad_path,")\n\n")
     
     # display dendrogram associated with Sample Order "clust"
     if(i == "clust"){cat("\n\n![](",dendro_path,"){width=50%}\n\n")}
@@ -1169,12 +1130,11 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       # plot generation
       genomic_plot(table_coll, filename = genomic_path, coord = data$coord,
                    plot_title = paste("Methylation plot of",seq_name, "in",h),
-                   SampleOrder = i, GroupOrder = GroupOrder, MethLevels = 5, 
+                   SampleOrder = i, GroupOrder = GroupOrder,
                    genome = genome, bases_colors = bases_colors)
       # display created plot
       cat("\n\n![](",genomic_path,")\n\n")
       cat("\n\n![](",legend_bases_path,")")
-      cat("![](",legend_grad_path,")\n\n")
       
       # display dendrogram associated with Sample Order "clust"
       if(i == "clust"){cat("\n\n![](",dendro_path,"){width=50%}\n\n")}

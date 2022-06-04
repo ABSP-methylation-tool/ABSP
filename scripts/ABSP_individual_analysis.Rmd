@@ -1401,22 +1401,22 @@ writePairwiseAlignments(pa_s1_RC,block.width=20)
 #### Direction determination
 ```{r direction determination s1, include=F, eval=useSeqs1}
 #─────────────────────────────────────────────────────────────────────────────────────────────────────────
-# RESULT 2 : USE ALIGNMENTS LENGHT TO DETERMINE CORRECT DIRECTION
+# RESULT 1 : USE ALIGNMENTS LENGHT TO DETERMINE CORRECT DIRECTION
 if(TrimOKs1==T) {
   if(pa_s1_S@subject@range@width > th_min_alg | pa_s1_RC@subject@range@width > th_min_alg) {
     
-    # RESULT 2 ALIGNED WITH SENSE SEQUENCE : FORWARD
+    # RESULT 1 ALIGNED WITH SENSE SEQUENCE : FORWARD
     if (pa_s1_S@subject@range@width > pa_s1_RC@subject@range@width) {
-      # Result 2 is in forward direction
+      # Result 1 is in forward direction
       useSeqF <- useSeqs1
       TrimOKF <- TrimOKs1
       seqnumber_F <- 1
       seqdirection_s1 <- "Forward"
     }
     
-    # RESULT 2 ALIGNED WITH ANTISENSE SEQUENCE : REVERSE
+    # RESULT 1 ALIGNED WITH ANTISENSE SEQUENCE : REVERSE
     if (pa_s1_S@subject@range@width < pa_s1_RC@subject@range@width) {
-      # Result 2 is in reverse direction
+      # Result 1 is in reverse direction
       useSeqR <- useSeqs1
       TrimOKR <- TrimOKs1
       seqnumber_R <- 1
@@ -2618,29 +2618,13 @@ colnames(CG_meth_plot) <- c("chromosome","start","end",exp_name)
 legend_bases_path <-  file.path(indivDir$plot,"legend_bases.png")
 
 if (!file.exists(legend_bases_path)) { 
-  png(filename=legend_bases_path, width=260, height=60)
+  png(filename=legend_bases_path, width=320, height=60)
   par(mai=c(0,0,0,0))
   plot.new()
-  legend(x="center", 
-         legend=c("A","T","G","C"), 
-         fill=c("#43CD80","#D7191C","#FDAE61","#2C7BB6"),
-         border="white", 
-         bty = "n", 
-         cex=1.5,
-         horiz=TRUE)
-  dev.off()
-}
-
-legend_grad_path <-  file.path(indivDir$plot,"legend_methylation_gradient.png")
-
-if (!file.exists(legend_grad_path)) { 
-  png(filename=legend_grad_path, width=600, height=60)
-  par(mai=c(0,0,0,0))
-  plot.new()
-  legend(title = "Methylation levels",
+  legend(title = "Colors of bases", 
          x="center", 
-         legend=c("0-20","20-40","40-60","60-80","80-100"), 
-         fill=grey.colors(5,start=0.9,end=0),
+         legend=c("A","T","G","C","N"), 
+         fill=bases_colors[1:5],
          border="white", 
          bty = "n", 
          cex=1.5,
@@ -2663,7 +2647,6 @@ dev.off()
 ```{r display plot and legends, results='asis', message=F, warning=F, out.width = "100%", fig.align = "center"}
 cat("\n\n![](",plot_path,")\n\n")
 cat("\n\n![](",legend_bases_path,")")
-cat("![](",legend_grad_path,")\n\n")
 ```
 
 

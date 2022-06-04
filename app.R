@@ -9,7 +9,7 @@
 
 
 
-# *****************************************************************************************************************************************
+#────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 # Here, to simplify, a short list of genomes is displayed but all BSgenome can be used
 # To get the list of all genomes of BSgenome package run : 'BSgenome::available.genomes()', more information on genomes at https://genome.ucsc.edu/cgi-bin/hgGateway
@@ -19,7 +19,7 @@ list_genomes <- c(
     "BSgenome.Rnorvegicus.UCSC.rn6", "BSgenome.Rnorvegicus.UCSC.rn7", "BSgenome.Cfamiliaris.UCSC.canFam3", "BSgenome.Mmulatta.UCSC.rheMac8",
     "BSgenome.Ggallus.UCSC.galGal6" , "BSgenome.Drerio.UCSC.danRer11", "BSgenome.Celegans.UCSC.ce11", "BSgenome.Dmelanogaster.UCSC.dm6")
 
-# *****************************************************************************************************************************************
+#────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
 ui <- fluidPage(
@@ -38,8 +38,8 @@ ui <- fluidPage(
     
     navbarPage("",
                
-               
-               # MAIN PAGE ---------------------------------------------------------------
+               #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+               # MAIN PAGE ----------------------------------------------------------------------------------------------
                
                tabPanel("Main",
                         
@@ -120,7 +120,7 @@ ui <- fluidPage(
                                  br(),
                                  
                                  p(icon(name="download", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"The ABSP tool is available for download on github at", tags$a(href="https://github.com/ABSP-methylation-tool/ABSP", "https://github.com/ABSP-methylation-tool/ABSP",target="_blank"),"."),
-                                 p(icon(name="file", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"For detailled instructions, please find the user guide in your ABSP folder."),
+                                 p(icon(name="file", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"For detailed instructions, please find the user guide in your ABSP folder."),
                                  
                                  br(),
                                  br()
@@ -158,20 +158,16 @@ ui <- fluidPage(
                                           style="text-align:center")
                                )
                         )
-                        
-                        
                ),
                
-
     
-    
-               
-               # TAB PANEL INDIVIDUAL ANALYSIS -------------------------------------------
+               #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+               # TAB PANEL INDIVIDUAL ANALYSIS --------------------------------------------------------------------------
                
                tabPanel("Individual analysis",
                         
-                        
-                        # Side bar indiv ----------------------------------------------------------
+                        #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                        # Side bar indiv -----------------------------------------------------------------------------------------
                     
                         sidebarPanel(width=5,
                             
@@ -291,8 +287,8 @@ ui <- fluidPage(
                             
                             
                             
-                            #*********************************************************************************************
-                            # Action button indiv -----------------------------------------------------
+                            #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                            # Action button indiv ------------------------------------------------------------------------------------
                             
                             # input$indiv
                             fluidRow( 
@@ -306,8 +302,8 @@ ui <- fluidPage(
                             
                         ),
                         
-                        
-                        # Main panel indiv --------------------------------------------------------
+                        #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                        # Main panel indiv ---------------------------------------------------------------------------------------
                         
                         mainPanel(width=7,
                             
@@ -316,7 +312,8 @@ ui <- fluidPage(
                             tabsetPanel(
                                 type = "tabs",
                                 
-                                # Tabset panel - experiments infos ----------------------------------------
+                                #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                                # Tabset panel - experiments infos -----------------------------------------------------------------------
                                 
                                 
                                 tabPanel(
@@ -404,7 +401,8 @@ ui <- fluidPage(
                                     )
                                 ),
                                 
-                                # Tabset panel - Ref DNA sequence ----------------------------------------
+                                #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                                # Tabset panel - Ref DNA sequence ------------------------------------------------------------------------
                                 
                                 tabPanel(
                                     # Tab title
@@ -445,7 +443,8 @@ ui <- fluidPage(
                                     )
                                 ),
                                 
-                                # Tabset panel - sequencing results ----------------------------------------
+                                #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                                # Tabset panel - sequencing results ----------------------------------------------------------------------
                                 
                                 tabPanel(
                                     # Tab title
@@ -472,13 +471,13 @@ ui <- fluidPage(
                          )
                ),
                
-               
-               
-               # TAB PANEL GROUPED ANALYSIS ----------------------------------------------
+               #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+               # TAB PANEL GROUPED ANALYSIS -----------------------------------------------------------------------------
                
                tabPanel("Grouped analysis",
                         
-                        # Side bar grouped -------------------------------------------------------
+                        #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                        # Side bar grouped ---------------------------------------------------------------------------------------
                         
                         sidebarPanel(width=5,
                             
@@ -525,8 +524,8 @@ ui <- fluidPage(
                                         choices = c("As it is", "By groups", "By methylation levels", "By clusters"), multiple=T),
                             
                             
-                            #*********************************************************************************************
-                            # Action button grouped -------------------------------------------------------
+                            #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                            # Action button grouped ----------------------------------------------------------------------------------
                             
                             # input$grouped
                             fluidRow( 
@@ -539,14 +538,16 @@ ui <- fluidPage(
                                 uiOutput("groupedReport")
                         ),
                         
-                        # Main panel grouped -------------------------------------------------------
+                        #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                        # Main panel grouped -------------------------------------------------------------------------------------
                         
                         mainPanel(width=7,
                             
                             tabsetPanel(
                                 type = "tabs",
                                 
-                                # Tabset panel - sample infos --------------------------------------------------
+                                #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                                # Tabset panel - sample infos ----------------------------------------------------------------------------
                                 
                                 tabPanel(
                                     # Tab title 
@@ -587,7 +588,8 @@ ui <- fluidPage(
                                     
                                 ),
                                 
-                                # Tabset panel - plot parameters --------------------------------------------------
+                                #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                                # Tabset panel - plot parameters -------------------------------------------------------------------------
                                 
                                 tabPanel(
                                     # Tab title
@@ -636,9 +638,8 @@ ui <- fluidPage(
                ),
                
                
-               
-               
-               # TAB PANEL MULTIPLE ANALYSIS ---------------------------------------
+               #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+               # TAB PANEL MULTIPLE ANALYSIS ----------------------------------------------------------------------------
 
                tabPanel("Multiple analyses",
                         
@@ -704,10 +705,8 @@ ui <- fluidPage(
                             
                             
                             
-                            
-                            
-                            #*********************************************************************************************
-                            # Action button multiple -------------------------------------------------
+                            #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+                            # Action button multiple ---------------------------------------------------------------------------------
                             
 
                             # input$multiple
@@ -798,8 +797,8 @@ ui <- fluidPage(
     br(),
     br(),
     
-    
-    # Close button -------------------------------------------------
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+    # Close button -------------------------------------------------------------------------------------------
     
     div(class="navbar navbar-default navbar-fixed-bottom",
         style="min-height: 40px;",
@@ -831,681 +830,632 @@ ui <- fluidPage(
 
 
 
-##########################################################################################
+##############################################################################################################
 
 
 
 server <- function(input, output, session) {
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Close button -------------------------------------------------------------------------------------------
+  observe({
+    if (input$close > 0) stopApp() # stop shiny
+  })
+  # Close app when browser page is closed
+  session$onSessionEnded(stopApp)
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Multiple analyses tables to open -----------------------------------------------------------------------
+  observeEvent(input$exp_tab_open,{
+    shell.exec(file.path(getwd(),"documents","multiple_individual_analyses_table.xlsx"))
+  })
+  
+  observeEvent(input$group_tab_open,{
+    shell.exec(file.path(getwd(),"documents","multiple_grouped_analyses_table.xlsx"))
+  })
+  
+  
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # INDIVIDUAL ANALYSIS ------------------------------------------------------------------------------------
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Files input --------------------------------------------------------------------------------------------
+  
+  upload_DNA_seq<-reactive({
+    inFile <- input$DNA_seq
+    if (is.null(inFile))
+      return(NULL)
+    return(inFile$datapath)
+  })
+  
+  
+  # State values
+  values <- reactiveValues(
+    ab1_s1_state = NULL,
+    ab1_s2_state = NULL
+  )
+  
+  # If file uploaded
+  observeEvent(input$ab1_s1, {
+    values$ab1_s1_state <- 'uploaded'
+  })
+  observeEvent(input$ab1_s2, {
+    values$ab1_s2_state <- 'uploaded'
+  })
+  
+  # If file is reset
+  observeEvent(input$reset_s1, {
+    values$ab1_s1_state <- 'reset'
+  })
+  observeEvent(input$reset_s2, {
+    values$ab1_s2_state <- 'reset'
+  })
+  
+  # Sample table for individual analyses
+  ab1_s1_input <- reactive({
+    if (is.null(values$ab1_s1_state)) {
+      return(NULL)
+    } else if (values$ab1_s1_state == 'uploaded') {
+      return(input$ab1_s1)
+    } else if (values$ab1_s1_state == 'reset') {
+      return(NULL)
+    }
+  })
+  ab1_s1_file <- reactive({
+    inFile <- ab1_s1_input()
+    return(inFile$datapath)
+  })
+  
+  # Grouped parameters for grouped analyses
+  ab1_s2_input <- reactive({
+    if (is.null(values$ab1_s2_state)) {
+      return(NULL)
+    } else if (values$ab1_s2_state == 'uploaded') {
+      return(input$ab1_s2)
+    } else if (values$ab1_s2_state == 'reset') {
+      return(NULL)
+    }
+  })
+  ab1_s2_file <- reactive({
+    inFile <- ab1_s2_input()
+    return(inFile$datapath)
+  })
+  
+  # Display the uploaded file names
+  output$summary_ab1_s1 <- renderText({
+    return(paste("Uploaded file:", ab1_s1_input()$name))
+  })
+  output$summary_ab1_s2 <- renderText({
+    return(paste("Uploaded file:", ab1_s2_input()$name))
+  })
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Add input to enter new folder name
+  observeEvent(input$folderexisting, {
     
-    #addResourcePath("documents","./documents")
+    if(input$folderexisting=="Create new folder") {
+      output$foldernew <- renderUI({
+        # input$foldernew
+        textInput("foldernew", label = "Enter new folder name","folder name") })
+    } else {
+      output$foldernew <- NULL
+    }
+  })
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Update seqname folder 'input$folderselect' depending on input$folderselect
+  observeEvent(input$folderexisting, {
+    
+    if(input$folderexisting=="Create new folder") {
+      updateSelectInput(session = getDefaultReactiveDomain(), "seqexisting",
+                        choices = "Create new sequence folder",
+                        selected = "Create new sequence folder")
+      
+    } else { 
+      updateSelectInput(session = getDefaultReactiveDomain(), "seqexisting",
+                        choices = c(basename(list.dirs(file.path(getwd(), "results", input$folderexisting), recursive = F)), "Create new sequence folder"))
+    }
+  })
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Add input to enter new folder name
+  observeEvent(input$seqexisting, {
+    
+    if(input$seqexisting=="Create new sequence folder") {
+      output$seqnew <- renderUI({
+        # input$seqnew
+        textInput("seqnew", label = "Enter new sequence folder name","sequence name") })
+    } else {
+      output$seqnew <- NULL
+    }
+  })
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Pre-install genome -------------------------------------------------------------------------------------
+  
+  observeEvent(input$install_genomeI, {
+    
+    if (!(input$genomeI %in% installed.packages()[,"Package"])) {
+      
+      withProgress(message = "Genome pre-installation in progress, please wait !", value=0, {
+        shiny::setProgress(0.1)
+        BiocManager::install(input$genomeI, ask = FALSE)
+        shiny::setProgress(0.8)
+        suppressMessages(lapply(input$genomeI, library, character.only = TRUE, quietly = TRUE))  
+        on.exit(
+          output$installed_genomeI <- renderUI({
+            fluidRow(p("Genome successfully pre-installed !", style="font-size:15px ;")) 
+          }) 
+        )
+      })
+    } else {
+      output$installed_genomeI <- renderUI({
+        fluidRow(p("Genome already pre-installed !", style="font-size:15px ;")) 
+      })
+    }
+  })
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Render Rmarkdown report of analysis --------------------------------------------------------------------
+  
+  observeEvent(input$indiv, {
+    
+    output$indivReport <- renderUI(NULL)
+    
+    # Get folder name
+    if(input$folderexisting == "Create new folder") { foldername <- input$foldernew } else { foldername <- input$folderexisting }
+    
+    # Get sequence folder name
+    if(input$seqexisting == "Create new sequence folder") { seqname <- input$seqnew } else { seqname <- input$seqexisting }
     
     
-    # Close button
-    observe({
-        if (input$close > 0) stopApp() # stop shiny
+    # Sample name based on input
+    indiv_name <- paste(substr(foldername, 1, 6), # folder name 6 first characters
+                        seqname,
+                        ifelse(input$collection=="0" | input$collection=="", "", input$collection), # collection name if exists
+                        input$group,
+                        ifelse(input$replicate=="0" | input$replicate=="", "", input$replicate),
+                        ifelse(input$clone=="0" | input$clone=="", "", input$clone),sep="-")
+    indiv_name <- gsub("--","-",indiv_name)
+    indiv_name <- gsub("-$","",indiv_name)
+    
+    # Name of report file [ABSP-Indiv]_[folder-seqname-collection-group-replicate-clone]_[YYYYMMDD-HHMM].html
+    indiv_file <- paste0(paste("ABSP-Indiv", indiv_name, format(Sys.time(), "%Y%m%d-%H%M"), sep = "_"),".html")
+    
+    # Path of report file 
+    if (!dir.exists(file.path(getwd(),"reports"))) {suppressWarnings(dir.create(file.path(getwd(),"reports")))}
+    indiv_path <- file.path(getwd(),"reports",indiv_file)
+    
+    # Set up parameters to pass to Rmd document
+    indiv_params <- list(foldername = foldername,
+                         seqname = seqname,
+                         collection = input$collection,
+                         group = input$group,
+                         replicate = input$replicate,
+                         clone = input$clone,
+                         date_s1 = input$date_s1,
+                         date_s2 = input$date_s2,
+                         genome = input$genomeI,
+                         DNA_seq = upload_DNA_seq(),
+                         ab1_s1 = ab1_s1_file(),
+                         ab1_s2 = ab1_s2_file())
+    
+    indiv_RMD <- list.files(path=file.path(getwd(),"scripts"), pattern ="ABSP_individual_analysis.Rmd$", full.names = T)
+    
+    withProgress(message = "Analysis in progress, please wait!", {
+      rmarkdown::render(indiv_RMD, encoding = 'UTF-8', output_file = indiv_path, params = indiv_params, envir = new.env(parent = globalenv()))
+      on.exit( {
+        output$indivReport <- renderUI({
+          fluidRow(
+            align="center",
+            br(),
+            p("Analysis done !", style="font-size:17px ;"),
+            p("The report file ",em(basename(indiv_path)), " has been generated in the ",em("reports")," directory", style="font-size:15px ;")
+            
+          )
+        })
+      })
     })
-    # Close app when browser page is closed
-    session$onSessionEnded(stopApp)
+  })
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  
+  
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # GROUPED ANALYSIS ---------------------------------------------------------------------------------------
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  
+  
+  
+  # Update seqname folder 'input$folderselect' depending on input$folderselect
+  observeEvent(input$folderselect, {
+    updateSelectInput(session = getDefaultReactiveDomain(), "seqselect",
+                      choices = basename(list.dirs(file.path(getwd(), "results", input$folderselect), recursive = F)),
+                      selected = basename(list.dirs(file.path(getwd(), "results", input$folderselect), recursive = F))[1])
     
+  })
+  
+  
+  # Update group order selection with groups
+  observeEvent( c(input$seqselect,input$exptype), {
     
-    observeEvent(input$exp_tab_open,{
-        shell.exec(file.path(getwd(),"documents","multiple_individual_analyses_table.xlsx"))
-    })
+    output$groupedReport <- renderUI(NULL) # Clear the displayed text of the previous report
     
-    observeEvent(input$group_tab_open,{
-        shell.exec(file.path(getwd(),"documents","multiple_grouped_analyses_table.xlsx"))
-    })
-    
-    
-    # Reset the Files input
-    
-
-    
-    
-    #************************************************************************************
-    # INDIVIDUAL ANALYSIS -----------------------------------------------------
-    
-    
-    upload_DNA_seq<-reactive({
-        inFile <- input$DNA_seq
-        if (is.null(inFile))
-            return(NULL)
-        return(inFile$datapath)
-    })
-    
-    # # Reset file input s1
-    # output$ab1_s1 <- renderUI(
-    #     fileInput("ab1_s1","Select sequencing file #1")
-    # )
-    # observeEvent(input$reset_s1, {
-    #     output$ab1_s1 <- renderUI(
-    #         fileInput("ab1_s1","Select sequencing file #1")
-    #     )
-    # })
-    # 
-    # # Reset file input s2
-    # output$ab1_s2 <- renderUI(
-    #     fileInput("ab1_s2","Select sequencing file #2")
-    # )
-    # observeEvent(input$reset_s2, {
-    #     output$ab1_s2 <- renderUI(
-    #         fileInput("ab1_s2","Select sequencing file #2")
-    #     )
-    # })
-    # 
-    # 
-    # # Get file path as reactive value
-    # upload_ab1_s1<-reactive({
-    #     inFile <- input$ab1_s1
-    #     if (is.null(inFile))
-    #         return(NULL)
-    #     return(inFile$datapath)
-    # })
-    # 
-    # upload_ab1_s2<-reactive({
-    #     inFile <- input$ab1_s2
-    #     if (is.null(inFile))
-    #         return(NULL)
-    #     return(inFile$datapath)
-    # })
-    
-    
-    # State values
-    values <- reactiveValues(
-      ab1_s1_state = NULL,
-      ab1_s2_state = NULL
-    )
-    
-    # If file uploaded
-    observeEvent(input$ab1_s1, {
-      values$ab1_s1_state <- 'uploaded'
-    })
-    observeEvent(input$ab1_s2, {
-      values$ab1_s2_state <- 'uploaded'
-    })
-    
-    # If file is reset
-    observeEvent(input$reset_s1, {
-      values$ab1_s1_state <- 'reset'
-    })
-    observeEvent(input$reset_s2, {
-      values$ab1_s2_state <- 'reset'
-    })
-    
-    # Sample table for individual analyses
-    ab1_s1_input <- reactive({
-      if (is.null(values$ab1_s1_state)) {
-        return(NULL)
-      } else if (values$ab1_s1_state == 'uploaded') {
-        return(input$ab1_s1)
-      } else if (values$ab1_s1_state == 'reset') {
-        return(NULL)
+    data_files <- reactive( {
+      if(input$exptype =="Cloning-BSP") {
+        data_path <- file.path(getwd(),"results",input$folderselect,input$seqselect,"individual_results_cloning","data")
       }
-    })
-    ab1_s1_file <- reactive({
-      inFile <- ab1_s1_input()
-      return(inFile$datapath)
-    })
-    
-    # Grouped parameters for grouped analyses
-    ab1_s2_input <- reactive({
-      if (is.null(values$ab1_s2_state)) {
-        return(NULL)
-      } else if (values$ab1_s2_state == 'uploaded') {
-        return(input$ab1_s2)
-      } else if (values$ab1_s2_state == 'reset') {
-        return(NULL)
+      if(input$exptype =="Direct-BSP") {
+        data_path <- file.path(getwd(),"results",input$folderselect,input$seqselect,"individual_results_direct","data")
       }
-    })
-    ab1_s2_file <- reactive({
-      inFile <- ab1_s2_input()
-      return(inFile$datapath)
-    })
-    
-    # Display the uploaded file names
-    output$summary_ab1_s1 <- renderText({
-      return(paste("Uploaded file:", ab1_s1_input()$name))
-    })
-    output$summary_ab1_s2 <- renderText({
-      return(paste("Uploaded file:", ab1_s2_input()$name))
+      
+      data_files <- as.list(list.files(path = data_path, pattern = "*_methdata.csv$",
+                                       all.files = T, full.names = T, recursive = T, ignore.case = F, include.dirs = T))
+      return(data_files)
     })
     
     
+    if(length(data_files())!=0) {
+      data_all <- lapply(data_files(), read.table, header=TRUE, check.names = FALSE)
+      all <- purrr::reduce(data_all, rbind)
+      listgroup <- unique(all$group)  
+      updateSelectInput(session = getDefaultReactiveDomain(), "group_order",choices = listgroup)
+    } else {
+      updateSelectInput(session = getDefaultReactiveDomain(), "group_order",choices = "No files found for the provided sequence and experiment type")
+    }
+    
+  })
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Render Rmarkdown report of analysis --------------------------------------------------------------------
+  
+  observeEvent(input$grouped, {
+    
+    # Experiment name based on input
+    grouped_name <- paste(substr(input$folderselect, 1, 6), # folder name 6 first characters
+                          input$seqselect,
+                          ifelse(input$exptype=="Direct-BSP", "directBSP", "cloningBSP"),sep="-")
+    
+    # Name of report file [ABSP-Indiv]_[folder-seqname-collection-group-replicate-clone]_[YYYYMMDD-HHMM].html
+    grouped_file <- paste0(paste("ABSP-Grouped", grouped_name, format(Sys.time(), "%Y%m%d-%H%M"), sep = "_"),".html")
+    
+    # Path of report file 
+    
+    if (!dir.exists(file.path(getwd(),"reports"))) {suppressWarnings(dir.create(file.path(getwd(),"reports")))}
+    grouped_path <- file.path(getwd(),"reports",grouped_file)
+    
+    # Set up parameters to pass to Rmd document
+    grouped_params <- list(foldername = input$folderselect,
+                           seqname = input$seqselect,
+                           genome = input$genomeG,
+                           cloning = input$exptype,
+                           coll_sep = input$coll_sep,
+                           pos_labels = input$pos_labels,
+                           group_order = paste(input$group_order,collapse = ","),
+                           sample_order = input$sample_order)
+    
+    grouped_RMD <- list.files(path=file.path(getwd(),"scripts"), pattern ="ABSP_grouped_analysis.Rmd$", full.names = T)
     
     
-    
-    
-    # Add input to enter new folder name
-    observeEvent(input$folderexisting, {
-        
-        if(input$folderexisting=="Create new folder") {
-            output$foldernew <- renderUI({
-                # input$foldernew
-                textInput("foldernew", label = "Enter new folder name","folder name") })
-        } else {
-            output$foldernew <- NULL
-        }
-    })
-    
-    
-    # Update seqname folder 'input$folderselect' depending on input$folderselect
-    observeEvent(input$folderexisting, {
-        
-        if(input$folderexisting=="Create new folder") {
-            updateSelectInput(session = getDefaultReactiveDomain(), "seqexisting",
-                              choices = "Create new sequence folder",
-                              selected = "Create new sequence folder")
+    withProgress(message = "Analysis in progress, please wait!", {
+      rmarkdown::render(grouped_RMD, encoding = 'UTF-8', output_file = grouped_path, params = grouped_params, envir = new.env(parent = globalenv()))
+      on.exit( {
+        output$groupedReport <- renderUI({
+          fluidRow(
+            align="center",
+            br(),
+            p("Analysis done !", style="font-size:17px ;"),
+            p("The report file ",em(basename(grouped_path)), " has been generated in the ",em("reports")," directory", style="font-size:15px ;")
             
-        } else { 
-            updateSelectInput(session = getDefaultReactiveDomain(), "seqexisting",
-                          choices = c(basename(list.dirs(file.path(getwd(), "results", input$folderexisting), recursive = F)), "Create new sequence folder"))
-            }
+          )
+        })
+      })
     })
+  })
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  
+  
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # MULTIPLE ANALYSES --------------------------------------------------------------------------------------
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Files input --------------------------------------------------------------------------------------------
+  
+  # Add input to enter new folder name
+  observeEvent(input$foldermainexisting, {
+    
+    if(input$foldermainexisting=="Create new folder") {
+      output$foldermainnew <- renderUI({
+        # input$foldermainnew
+        textInput("foldermainnew", label = "Enter new folder name","folder name") })
+    } else {
+      output$foldermainnew <- NULL
+    }
+  })
+  
+  # State values
+  values <- reactiveValues(
+    exptable_state = NULL,
+    groupedparams_state = NULL
+  )
+  
+  # If file uploaded
+  observeEvent(input$exptable, {
+    values$exptable_state <- 'uploaded'
+  })
+  observeEvent(input$groupedparams, {
+    values$groupedparams_state <- 'uploaded'
+  })
+  
+  # If file is reset
+  observeEvent(input$reset_exptable, {
+    values$exptable_state <- 'reset'
+  })
+  observeEvent(input$reset_groupedparams, {
+    values$groupedparams_state <- 'reset'
+  })
+  
+  # Sample table for individual analyses
+  exptable_input <- reactive({
+    if (is.null(values$exptable_state)) {
+      return(NULL)
+    } else if (values$exptable_state == 'uploaded') {
+      return(input$exptable)
+    } else if (values$exptable_state == 'reset') {
+      return(NULL)
+    }
+  })
+  exptable_file <- reactive({
+    inFile <- exptable_input()
+    return(inFile$datapath)
+  })
+  
+  # Grouped parameters for grouped analyses
+  groupedparams_input <- reactive({
+    if (is.null(values$groupedparams_state)) {
+      return(NULL)
+    } else if (values$groupedparams_state == 'uploaded') {
+      return(input$groupedparams)
+    } else if (values$groupedparams_state == 'reset') {
+      return(NULL)
+    }
+  })
+  groupedparams_file <- reactive({
+    inFile <- groupedparams_input()
+    return(inFile$datapath)
+  })
+  
+  # Display the uploaded file names
+  output$summary_exptable <- renderText({
+    return(paste("Uploaded file:", exptable_input()$name))
+  })
+  output$summary_groupedparams <- renderText({
+    return(paste("Uploaded file:", groupedparams_input()$name))
+  })
+  
+  
+  
+  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Action button obs event --------------------------------------------------------------------------------
+  
+  observeEvent(input$multiple, {
+    
+    # Get folder name
+    if(input$foldermainexisting == "Create new folder") { foldermain <- input$foldermainnew } else { foldermain <- input$foldermainexisting }
     
     
-    # Add input to enter new folder name
-    observeEvent(input$seqexisting, {
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+    # Create directories
+    
+    output_res <- file.path(getwd(),"results")
+    if (!dir.exists(output_res)) {suppressWarnings(dir.create(output_res))}
+    
+    output_rep <- file.path(getwd(),"reports")
+    if (!dir.exists(output_rep)) {suppressWarnings(dir.create(output_rep))}
+    
+    dir_main <- file.path(getwd(),"results", foldermain)
+    if (!dir.exists(dir_main)) {suppressWarnings(dir.create(dir_main))}
+    
+    
+    
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+    # All individual analysis --------------------------------------------------------------------------------
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+    
+    if (!is.null(exptable_file())) {
+      # Read file
+      if (grepl(".xlsx$", exptable_file())==T) { exp_table <- read.xlsx(exptable_file(), cols= c(1:11), detectDates = T) }
+      if (grepl(".csv$", exptable_file())==T) { exp_table <- read.csv2(exptable_file(), na.strings="") }
+      
+      
+      exp_table <- exp_table[,1:11] # keep only 11 first columns
+      exp_table <- exp_table[which(complete.cases(exp_table[,1])),] # remove rows without sequence name
+      
+      # Remove extra character if needed
+      exp_table[,7] <- file.path(gsub("\"", "",exp_table[,7]))
+      exp_table[,9] <- file.path(gsub("\"", "",exp_table[,9]))
+      exp_table[,11] <- file.path(gsub("\"", "",exp_table[,11]))
+      
+      # Remove additionnal rows
+      exp_table <- exp_table[!exp_table[,1]=="",]
+      
+      # Date format
+      if (class(exp_table[,8])!="Date") {exp_table[,8] <- as.Date(exp_table[,8], tryFormats = c("%Y-%m-%d","%m/%d/%y"))}
+      if (class(exp_table[,10])!="Date") {exp_table[,10] <- as.Date(exp_table[,10], tryFormats = c("%Y-%m-%d","%m/%d/%y"))}
+      exp_table[,8] <- as.character(exp_table[,8])
+      exp_table[,10] <- as.character(exp_table[,10])
+      
+      
+      #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+      # Pre-install genomes
+      
+      for (i in unique(exp_table[,6])) {
+        if (!(i %in% installed.packages()[,"Package"])) {
+          BiocManager::install(i, ask = FALSE)
+        } 
+        suppressMessages(lapply(i, library, character.only = TRUE, quietly = TRUE))
+      }
+      
+      
+      #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+      # Run all individual analysis from the sample data table -------------------------------------------------
+      
+      list_Ireports <- c()
+      
+      for (i in 1:nrow(exp_table)) {
         
-        if(input$seqexisting=="Create new sequence folder") {
-            output$seqnew <- renderUI({
-                # input$seqnew
-                textInput("seqnew", label = "Enter new sequence folder name","sequence name") })
-        } else {
-            output$seqnew <- NULL
-        }
-    })
-    
-    
-    
-    
-    # Pre-install genome ------------------------------------------------------
-    
-    observeEvent(input$install_genomeI, {
         
-        if (!(input$genomeI %in% installed.packages()[,"Package"])) {
-            
-            withProgress(message = "Genome pre-installation in progress, please wait !", value=0, {
-                shiny::setProgress(0.1)
-                BiocManager::install(input$genomeI, ask = FALSE)
-                shiny::setProgress(0.8)
-                suppressMessages(lapply(input$genomeI, library, character.only = TRUE, quietly = TRUE))  
-                on.exit(
-                    output$installed_genomeI <- renderUI({
-                        fluidRow(p("Genome successfully pre-installed !", style="font-size:15px ;")) 
-                    }) 
-                )
-            })
-            
-            
-            
-            
-        } else {
-            output$installed_genomeI <- renderUI({
-                fluidRow(p("Genome already pre-installed !", style="font-size:15px ;")) 
-            })
-        }
-    })
-    
-    
-    
-    # Render Rmarkdown report of analysis --------------------------------------------------
-    
-    observeEvent(input$indiv, {
-        
-        output$indivReport <- renderUI(NULL)
-        
-        # Get folder name
-        if(input$folderexisting == "Create new folder") { foldername <- input$foldernew } else { foldername <- input$folderexisting }
-        
-        # Get sequence folder name
-        if(input$seqexisting == "Create new sequence folder") { seqname <- input$seqnew } else { seqname <- input$seqexisting }
-        
-        
-        # Sample name based on input
-        indiv_name <- paste(substr(foldername, 1, 6), # folder name 6 first characters
-                           seqname,
-                           ifelse(input$collection=="0" | input$collection=="", "", input$collection), # collection name if exists
-                           input$group,
-                           ifelse(input$replicate=="0" | input$replicate=="", "", input$replicate),
-                           ifelse(input$clone=="0" | input$clone=="", "", input$clone),sep="-")
+        # Sample name based on idata table
+        indiv_name <- paste(substr(foldermain, 1, 6), # folder name 6 first characters
+                            exp_table[i,1],
+                            ifelse(exp_table[i,2]=="0" | is.na(exp_table[i,2]), "", exp_table[i,2]), # collection name if exists
+                            exp_table[i,3],
+                            ifelse(exp_table[i,4]=="0" | is.na(exp_table[i,4]), "", exp_table[i,4]),
+                            ifelse(exp_table[i,5]=="0" | is.na(exp_table[i,5]), "", exp_table[i,5]), sep="-")
         indiv_name <- gsub("--","-",indiv_name)
         indiv_name <- gsub("-$","",indiv_name)
         
         # Name of report file [ABSP-Indiv]_[folder-seqname-collection-group-replicate-clone]_[YYYYMMDD-HHMM].html
         indiv_file <- paste0(paste("ABSP-Indiv", indiv_name, format(Sys.time(), "%Y%m%d-%H%M"), sep = "_"),".html")
         
-        # Path of report file 
-        if (!dir.exists(file.path(getwd(),"reports"))) {suppressWarnings(dir.create(file.path(getwd(),"reports")))}
-        indiv_path <- file.path(getwd(),"reports",indiv_file)
+        # Path of report file
+        indiv_path <- file.path(output_rep,indiv_file)
         
         # Set up parameters to pass to Rmd document
-        indiv_params <- list(foldername = foldername,
-                             seqname = seqname,
-                             collection = input$collection,
-                             group = input$group,
-                             replicate = input$replicate,
-                             clone = input$clone,
-                             date_s1 = input$date_s1,
-                             date_s2 = input$date_s2,
-                             genome = input$genomeI,
-                             DNA_seq = upload_DNA_seq(),
-                             ab1_s1 = ab1_s1_file(),
-                             ab1_s2 = ab1_s2_file())
+        indiv_params <- list(foldername = foldermain,
+                             seqname = exp_table[i,1],
+                             collection = ifelse(!is.na(exp_table[i,2]),exp_table[i,2],""),
+                             group = exp_table[i,3],
+                             replicate = as.integer(ifelse(!is.na(exp_table[i,4]),exp_table[i,4],"")),
+                             clone = as.integer(ifelse(!is.na(exp_table[i,5]),exp_table[i,5],"")),
+                             genome = exp_table[i,6],
+                             DNA_seq = exp_table[i,7],
+                             date_s1 =  exp_table[i,8],
+                             ab1_s1 = exp_table[i,9],
+                             date_s2 = exp_table[i,10],
+                             ab1_s2 = exp_table[i,11])
         
         indiv_RMD <- list.files(path=file.path(getwd(),"scripts"), pattern ="ABSP_individual_analysis.Rmd$", full.names = T)
         
         withProgress(message = "Analysis in progress, please wait!", {
-            rmarkdown::render(indiv_RMD, encoding = 'UTF-8', output_file = indiv_path, params = indiv_params, envir = new.env(parent = globalenv()))
-            on.exit( {
-                output$indivReport <- renderUI({
-                    fluidRow(
-                        align="center",
-                        br(),
-                        p("Analysis done !", style="font-size:17px ;"),
-                        p("The report file ",em(basename(indiv_path)), " has been generated in the ",em("reports")," directory", style="font-size:15px ;")
-                        
-                    )
-                })
+          rmarkdown::render(indiv_RMD, encoding = 'UTF-8', output_file = indiv_path, params = indiv_params)
+          on.exit( {
+            output$multipleIReport <- renderUI({
+              fluidRow(
+                align="center",
+                br(),
+                p(basename(indiv_path)," has been generated in the ", em("reports")," directory", style="font-size:15px ;")
+              )
             })
+          })
         })
-        
-        
-        
-    })
+      }
+    }
     
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+    # All grouped analysis -----------------------------------------------------------------------------------
+    #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     
-    #************************************************************************************
-    
-    
-    
-    
-    
-    #************************************************************************************
-    # GROUPED ANALYSIS --------------------------------------------------------
-    
-    
-    
-    # Update seqname folder 'input$folderselect' depending on input$folderselect
-    observeEvent(input$folderselect, {
-        updateSelectInput(session = getDefaultReactiveDomain(), "seqselect",
-                          choices = basename(list.dirs(file.path(getwd(), "results", input$folderselect), recursive = F)),
-                          selected = basename(list.dirs(file.path(getwd(), "results", input$folderselect), recursive = F))[1])
-                          
-    })
-    
-
-    # Update group order selection with groups
-    observeEvent( c(input$seqselect,input$exptype), {
-        
-        output$groupedReport <- renderUI(NULL) # Clear the displayed text of the previous report
-        
-        data_files <- reactive( {
-            if(input$exptype =="Cloning-BSP") {
-                data_path <- file.path(getwd(),"results",input$folderselect,input$seqselect,"individual_results_cloning","data")
-            }
-            if(input$exptype =="Direct-BSP") {
-                data_path <- file.path(getwd(),"results",input$folderselect,input$seqselect,"individual_results_direct","data")
-            }
-            
-            data_files <- as.list(list.files(path = data_path, pattern = "*_methdata.csv$",
-                                             all.files = T, full.names = T, recursive = T, ignore.case = F, include.dirs = T))
-            return(data_files)
-        })
-
-        
-        if(length(data_files())!=0) {
-            data_all <- lapply(data_files(), read.table, header=TRUE, check.names = FALSE)
-            all <- purrr::reduce(data_all, rbind)
-            listgroup <- unique(all$group)  
-            updateSelectInput(session = getDefaultReactiveDomain(), "group_order",choices = listgroup)
-        } else {
-            updateSelectInput(session = getDefaultReactiveDomain(), "group_order",choices = "No files found for the provided sequence and experiment type")
-        }
-        
-    })
-    
-    
-    # Render Rmarkdown report of analysis --------------------------------------------------
-
-    observeEvent(input$grouped, {
+    if (!is.null(groupedparams_file())) {
+      
+      # Read file
+      if (grepl(".xlsx$", groupedparams_file())==T) { grouped_table <- read.xlsx(groupedparams_file()) }
+      if (grepl(".csv$", groupedparams_file())==T) { grouped_table <- read.csv2(groupedparams_file(), na.strings="") }
+      grouped_table <- grouped_table[,1:7] # 7 first columns, remove options table
+      grouped_table <- grouped_table[which(complete.cases(grouped_table)),] # remove NA rows
+      grouped_table <- grouped_table[which(complete.cases(grouped_table[,1])),] # remove rows without sequence name
+      
+      
+      
+      #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+      # Pre-install genomes
+      
+      for (i in unique(grouped_table[,2])) {
+        if (!(i %in% installed.packages()[,"Package"])) {
+          BiocManager::install(i, ask = FALSE)
+        } 
+        suppressMessages(lapply(i, library, character.only = TRUE, quietly = TRUE))
+      }
+      
+      
+      
+      #─────────────────────────────────────────────────────────────────────────────────────────────────────────
+      # Run all grouped analysis of previously analysed experiments --------------------------------------------
+      
+      list_Greports <- c()
+      
+      for (i in 1:nrow(grouped_table)) {
         
         # Experiment name based on input
-        grouped_name <- paste(substr(input$folderselect, 1, 6), # folder name 6 first characters
-                            input$seqselect,
-                            ifelse(input$exptype=="Direct-BSP", "directBSP", "cloningBSP"),sep="-")
+        grouped_name <- paste(substr(foldermain, 1, 6), # folder name 6 first characters
+                              grouped_table[i,1],
+                              ifelse(grouped_table[i,3]=="Direct-BSP", "directBSP", "cloningBSP"),sep="-")
         
         # Name of report file [ABSP-Indiv]_[folder-seqname-collection-group-replicate-clone]_[YYYYMMDD-HHMM].html
         grouped_file <- paste0(paste("ABSP-Grouped", grouped_name, format(Sys.time(), "%Y%m%d-%H%M"), sep = "_"),".html")
         
-        # Path of report file 
-        
-        if (!dir.exists(file.path(getwd(),"reports"))) {suppressWarnings(dir.create(file.path(getwd(),"reports")))}
+        # Path of report file
         grouped_path <- file.path(getwd(),"reports",grouped_file)
         
+        # Split string by commas to get list of sample orders
+        sample_order <- strsplit(grouped_table[i,7],",")[[1]] 
+        sample_order <- gsub("^ ","", sample_order) # remove first spaces
+        sample_order <- gsub(" $","", sample_order) # remove last spaces
+        
         # Set up parameters to pass to Rmd document
-        grouped_params <- list(foldername = input$folderselect,
-                             seqname = input$seqselect,
-                             genome = input$genomeG,
-                             cloning = input$exptype,
-                             coll_sep = input$coll_sep,
-                             pos_labels = input$pos_labels,
-                             group_order = paste(input$group_order,collapse = ","),
-                             sample_order = input$sample_order)
+        grouped_params <- list(foldername = foldermain,
+                               seqname = grouped_table[i,1],
+                               genome = grouped_table[i,2],
+                               cloning = grouped_table[i,3],
+                               pos_labels = grouped_table[i,4],
+                               coll_sep = grouped_table[i,5],
+                               group_order = grouped_table[i,6],
+                               sample_order = sample_order)
         
         grouped_RMD <- list.files(path=file.path(getwd(),"scripts"), pattern ="ABSP_grouped_analysis.Rmd$", full.names = T)
         
-        
         withProgress(message = "Analysis in progress, please wait!", {
-            rmarkdown::render(grouped_RMD, encoding = 'UTF-8', output_file = grouped_path, params = grouped_params, envir = new.env(parent = globalenv()))
-            on.exit( {
-                output$groupedReport <- renderUI({
-                    fluidRow(
-                        align="center",
-                        br(),
-                        p("Analysis done !", style="font-size:17px ;"),
-                        p("The report file ",em(basename(grouped_path)), " has been generated in the ",em("reports")," directory", style="font-size:15px ;")
-                        
-                    )
-                })
+          rmarkdown::render(grouped_RMD, encoding = 'UTF-8', output_file = grouped_path, params = grouped_params, envir = new.env(parent = globalenv()))
+          on.exit( {
+            output$multipleIReport <- renderUI(NULL)
+            output$multipleGReport <- renderUI({
+              fluidRow(
+                align="center",
+                br(),
+                p(basename(grouped_path)," has been generated in the ", em("reports")," directory", style="font-size:15px ;")
+              )
             })
+          })
         })
         
+      }
     }
-    )
     
-    
-    #************************************************************************************
-    
-    
-    
-    
-    
-    #************************************************************************************
-    # MULTIPLE ANALYSES -------------------------------------------------
-    
-    
-    # Add input to enter new folder name
-    observeEvent(input$foldermainexisting, {
-        
-        if(input$foldermainexisting=="Create new folder") {
-            output$foldermainnew <- renderUI({
-                # input$foldermainnew
-                textInput("foldermainnew", label = "Enter new folder name","folder name") })
-        } else {
-            output$foldermainnew <- NULL
-        }
-    })
-    
-
-
-    
-    
-    # State values
-    values <- reactiveValues(
-        exptable_state = NULL,
-        groupedparams_state = NULL
-    )
-    
-    # If file uploaded
-    observeEvent(input$exptable, {
-        values$exptable_state <- 'uploaded'
-    })
-    observeEvent(input$groupedparams, {
-        values$groupedparams_state <- 'uploaded'
-    })
-    
-    # If file is reset
-    observeEvent(input$reset_exptable, {
-        values$exptable_state <- 'reset'
-    })
-    observeEvent(input$reset_groupedparams, {
-        values$groupedparams_state <- 'reset'
-    })
-    
-    # Sample table for individual analyses
-    exptable_input <- reactive({
-        if (is.null(values$exptable_state)) {
-            return(NULL)
-        } else if (values$exptable_state == 'uploaded') {
-            return(input$exptable)
-        } else if (values$exptable_state == 'reset') {
-            return(NULL)
-        }
-    })
-    exptable_file <- reactive({
-        inFile <- exptable_input()
-        return(inFile$datapath)
-    })
-    
-    # Grouped parameters for grouped analyses
-    groupedparams_input <- reactive({
-        if (is.null(values$groupedparams_state)) {
-            return(NULL)
-        } else if (values$groupedparams_state == 'uploaded') {
-            return(input$groupedparams)
-        } else if (values$groupedparams_state == 'reset') {
-            return(NULL)
-        }
-    })
-    groupedparams_file <- reactive({
-        inFile <- groupedparams_input()
-        return(inFile$datapath)
-    })
-    
-    # Display the uploaded file names
-    output$summary_exptable <- renderText({
-        return(paste("Uploaded file:", exptable_input()$name))
-    })
-    output$summary_groupedparams <- renderText({
-        return(paste("Uploaded file:", groupedparams_input()$name))
-    })
-    
-    
-    
-    
-
-    
-    # Action button obs event --------------------------------------------------
-    
-    observeEvent(input$multiple, {
-
-        # Get folder name
-        if(input$foldermainexisting == "Create new folder") { foldermain <- input$foldermainnew } else { foldermain <- input$foldermainexisting }
-
-
-        #************************************
-        # Create directories
-        
-        output_res <- file.path(getwd(),"results")
-        if (!dir.exists(output_res)) {suppressWarnings(dir.create(output_res))}
-        
-        output_rep <- file.path(getwd(),"reports")
-        if (!dir.exists(output_rep)) {suppressWarnings(dir.create(output_rep))}
-        
-        dir_main <- file.path(getwd(),"results", foldermain)
-        if (!dir.exists(dir_main)) {suppressWarnings(dir.create(dir_main))}
-        
-        
-        
-        #************************************************************************
-        # All individual analysis
-        #************************************************************************
-        
-        if (!is.null(exptable_file())) {
-            # Read file
-            if (grepl(".xlsx$", exptable_file())==T) { exp_table <- read.xlsx(exptable_file(), cols= c(1:11), detectDates = T) }
-            if (grepl(".csv$", exptable_file())==T) { exp_table <- read.csv2(exptable_file(), na.strings="") }
-            
-            
-            exp_table <- exp_table[,1:11] # keep only 11 first columns
-            exp_table <- exp_table[which(complete.cases(exp_table[,1])),] # remove rows without sequence name
-            
-            # Remove extra character if needed
-            exp_table[,7] <- file.path(gsub("\"", "",exp_table[,7]))
-            exp_table[,9] <- file.path(gsub("\"", "",exp_table[,9]))
-            exp_table[,11] <- file.path(gsub("\"", "",exp_table[,11]))
-            
-            # Remove additionnal rows
-            exp_table <- exp_table[!exp_table[,1]=="",]
-            
-            # Date format
-            if (class(exp_table[,8])!="Date") {exp_table[,8] <- as.Date(exp_table[,8], tryFormats = c("%Y-%m-%d","%m/%d/%y"))}
-            if (class(exp_table[,10])!="Date") {exp_table[,10] <- as.Date(exp_table[,10], tryFormats = c("%Y-%m-%d","%m/%d/%y"))}
-            exp_table[,8] <- as.character(exp_table[,8])
-            exp_table[,10] <- as.character(exp_table[,10])
-            
-            
-            #************************************
-            # Pre-install genomes
-            
-            for (i in unique(exp_table[,6])) {
-                if (!(i %in% installed.packages()[,"Package"])) {
-                    BiocManager::install(i, ask = FALSE)
-                } 
-                suppressMessages(lapply(i, library, character.only = TRUE, quietly = TRUE))
-            }
-            
-
-            #************************************
-            # Run all individual analysis from the sample data table ----------------------------
-            
-            list_Ireports <- c()
-            
-            for (i in 1:nrow(exp_table)) {
-                
-                # Output directories
-                dir_seq <- file.path(output_res,exp_table[i,1])
-                if (!dir.exists(dir_seq)) {suppressWarnings(dir.create(dir_seq))}
-                
-                # Sample name based on idata table
-                indiv_name <- paste(substr(foldermain, 1, 6), # folder name 6 first characters
-                                    exp_table[i,1],
-                                    ifelse(exp_table[i,2]=="0" | is.na(exp_table[i,2]), "", exp_table[i,2]), # collection name if exists
-                                    exp_table[i,3],
-                                    ifelse(exp_table[i,4]=="0" | is.na(exp_table[i,4]), "", exp_table[i,4]),
-                                    ifelse(exp_table[i,5]=="0" | is.na(exp_table[i,5]), "", exp_table[i,5]), sep="-")
-                indiv_name <- gsub("--","-",indiv_name)
-                indiv_name <- gsub("-$","",indiv_name)
-                
-                # Name of report file [ABSP-Indiv]_[folder-seqname-collection-group-replicate-clone]_[YYYYMMDD-HHMM].html
-                indiv_file <- paste0(paste("ABSP-Indiv", indiv_name, format(Sys.time(), "%Y%m%d-%H%M"), sep = "_"),".html")
-                
-                # Path of report file
-                indiv_path <- file.path(output_rep,indiv_file)
-                
-                # Set up parameters to pass to Rmd document
-                indiv_params <- list(foldername = foldermain,
-                                     seqname = exp_table[i,1],
-                                     collection = ifelse(!is.na(exp_table[i,2]),exp_table[i,2],""),
-                                     group = exp_table[i,3],
-                                     replicate = as.integer(ifelse(!is.na(exp_table[i,4]),exp_table[i,4],"")),
-                                     clone = as.integer(ifelse(!is.na(exp_table[i,5]),exp_table[i,5],"")),
-                                     genome = exp_table[i,6],
-                                     DNA_seq = exp_table[i,7],
-                                     date_s1 =  exp_table[i,8],
-                                     ab1_s1 = exp_table[i,9],
-                                     date_s2 = exp_table[i,10],
-                                     ab1_s2 = exp_table[i,11])
-                
-                indiv_RMD <- list.files(path=file.path(getwd(),"scripts"), pattern ="ABSP_individual_analysis.Rmd$", full.names = T)
-                
-                withProgress(message = "Analysis in progress, please wait!", {
-                    rmarkdown::render(indiv_RMD, encoding = 'UTF-8', output_file = indiv_path, params = indiv_params)
-                    on.exit( {
-                        output$multipleIReport <- renderUI({
-                            fluidRow(
-                                align="center",
-                                br(),
-                                p(basename(indiv_path)," has been generated in the ", em("reports")," directory", style="font-size:15px ;")
-                            )
-                        })
-                    })
-                })
-            }
-        }
-
-        #************************************************************************
-        # All grouped analysis
-        #************************************************************************
-        
-        if (!is.null(groupedparams_file())) {
-            
-            # Read file
-            if (grepl(".xlsx$", groupedparams_file())==T) { grouped_table <- read.xlsx(groupedparams_file()) }
-            if (grepl(".csv$", groupedparams_file())==T) { grouped_table <- read.csv2(groupedparams_file(), na.strings="") }
-            grouped_table <- grouped_table[,1:7] # 7 first columns, remove options table
-            grouped_table <- grouped_table[which(complete.cases(grouped_table)),] # remove NA rows
-            grouped_table <- grouped_table[which(complete.cases(grouped_table[,1])),] # remove rows without sequence name
-            
-            
-            
-            #************************************
-            # Pre-install genomes
-            
-            for (i in unique(grouped_table[,2])) {
-                if (!(i %in% installed.packages()[,"Package"])) {
-                    BiocManager::install(i, ask = FALSE)
-                } 
-                suppressMessages(lapply(i, library, character.only = TRUE, quietly = TRUE))
-            }
-            
-            
-            
-            #************************************
-            # Run all grouped analysis of previously analysed experiments ----------------------------
-            
-            list_Greports <- c()
-            
-            for (i in 1:nrow(grouped_table)) {
-                
-                # Experiment name based on input
-                grouped_name <- paste(substr(foldermain, 1, 6), # folder name 6 first characters
-                                      grouped_table[i,1],
-                                      ifelse(grouped_table[i,3]=="Direct-BSP", "directBSP", "cloningBSP"),sep="-")
-                
-                # Name of report file [ABSP-Indiv]_[folder-seqname-collection-group-replicate-clone]_[YYYYMMDD-HHMM].html
-                grouped_file <- paste0(paste("ABSP-Grouped", grouped_name, format(Sys.time(), "%Y%m%d-%H%M"), sep = "_"),".html")
-                
-                # Path of report file
-                grouped_path <- file.path(getwd(),"reports",grouped_file)
-                
-                # Split string by commas to get list of sample orders
-                sample_order <- strsplit(grouped_table[i,7],",")[[1]] 
-                sample_order <- gsub("^ ","", sample_order) # remove first spaces
-                sample_order <- gsub(" $","", sample_order) # remove last spaces
-                
-                # Set up parameters to pass to Rmd document
-                grouped_params <- list(foldername = foldermain,
-                                       seqname = grouped_table[i,1],
-                                       genome = grouped_table[i,2],
-                                       cloning = grouped_table[i,3],
-                                       pos_labels = grouped_table[i,4],
-                                       coll_sep = grouped_table[i,5],
-                                       group_order = grouped_table[i,6],
-                                       sample_order = sample_order)
-                
-                grouped_RMD <- list.files(path=file.path(getwd(),"scripts"), pattern ="ABSP_grouped_analysis.Rmd$", full.names = T)
-                
-                withProgress(message = "Analysis in progress, please wait!", {
-                    rmarkdown::render(grouped_RMD, encoding = 'UTF-8', output_file = grouped_path, params = grouped_params, envir = new.env(parent = globalenv()))
-                    on.exit( {
-                        output$multipleIReport <- renderUI(NULL)
-                        output$multipleGReport <- renderUI({
-                            fluidRow(
-                                align="center",
-                                br(),
-                                p(basename(grouped_path)," has been generated in the ", em("reports")," directory", style="font-size:15px ;")
-                            )
-                        })
-                    })
-                })
-                
-            }
-        }
-        
-    })
-    
-    
+  })
+  
+  
 }
 
 
