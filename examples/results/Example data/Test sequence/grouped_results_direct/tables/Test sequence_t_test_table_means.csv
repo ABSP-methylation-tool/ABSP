@@ -1,0 +1,3 @@
+"collection" "group1" "group2" "n1" "n2" "p" "p.signif"
+"collection1" "group1" "group2" 3 3 0.00374 "**"
+"collection2" "group1" "group2" 3 3 1.61e-05 "****"
