@@ -15,7 +15,7 @@ For more detailed information, please read the [**ABSP User Guide**](https://git
 
 ## Citation
 
-f you use ABSP in your published work, please cite
+If you use ABSP in your published work, please cite
 > **Denoulet et al. (2022). "ABSP: ..." . DOI: [doi.org](https://doi.org)**
 
 <br>
