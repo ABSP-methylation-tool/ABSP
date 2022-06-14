@@ -22,7 +22,7 @@ If you use ABSP in your published work, please cite
 
 ## Availability
 
-Currently, ABSP is not functional onmacOS devices due to compatibility issues of the *renv* package with the R version 4.2.0 on MacOS.
+Currently, ABSP is not functional on macOS devices due to compatibility issues of the *renv* package with the R version 4.2.0 on MacOS.
 
 <br>
 
