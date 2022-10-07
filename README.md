@@ -1,5 +1,6 @@
-![Active version - 1.0.0](https://img.shields.io/badge/Active_version-1.0.0-1bc421)
-![OS - Windows](https://img.shields.io/badge/OS-Windows-0d7ebf)
+![Active version - 1.1.0](https://img.shields.io/badge/Active_version-1.1.0-1bc421)
+![Platform - Windows/MacOS/Linux](https://img.shields.io/badge/Platform-Windows/MacOS/Linux-0d7ebf)
+[![License - GPL-3](https://img.shields.io/badge/License-GPL--3-d8b125)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 # ABSP - Analysis of Bisulfite Sequencing PCR
 
@@ -22,7 +23,7 @@ If you use ABSP in your published work, please cite
 
 ## Availability
 
-Currently, ABSP is not functional on MacOS devices due to compatibility issues of the *renv* package with the R version 4.2.0 on MacOS.
+ABSP was developed on a Windows machine but is functional on MacOS and Linux devices. Please note that on Linux machine, the installation of packages at the first opening of ABSP can take a long time.
 
 <br>
 
@@ -30,14 +31,14 @@ Currently, ABSP is not functional on MacOS devices due to compatibility issues o
 
 ### Installation
 
-* Download all the ABSP files from github ("Code", "Download Zip")
-* Install R and RStudio
+* Download the ABSP files from github ("Code", "Download Zip") and unzip the folder
+* Install the software: R at [https://www.r-project.org/](https://www.r-project.org/) and RStudio at [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/)
 
 ### Open the ABSP app
 
-* Open the "ABSP Rproject.Rproject" file with Rstudio (it might take a few minutes to open)
+* Open the "ABSP Rproject.Rproject" file with Rstudio
 * Open the "app.R" file with Rstudio
-* Click on the "Run App" button on the top right corner (select "Run external" to open it in web browser)
+* Click on the "Run App" button on the top right corner (you can select "Run external" to open it in web browser)
 
 ### Analysis with ABSP
 
@@ -69,3 +70,10 @@ The "Multiple analysis" tab is useful to analyze multiple samples and/or for mul
 
 ## License
 
+ABSP, Analysis of Bisulfite Sequencing PCR
+Copyright © 2022 by the CANTHER laboratory, France (absp@univ-lille.fr)
+Released under the GPL-3 license.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. 
+You should have received a copy of the GNU General Public License along with this program. If not, see [https://www.gnu.org/licenses/](https://www.gnu.org/licenses/).
