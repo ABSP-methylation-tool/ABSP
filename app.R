@@ -22,6 +22,34 @@ list_genomes <- c(
 #────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
+#────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+# Install packages 
+packages <- c("arrangements","BiocManager","compareGroups","DiagrammeR","dplyr","formattable","GenomeInfoDb",
+              "ggdendro","ggplot2","ggpubr","htmltools","htmlwidgets","knitr","openxlsx","pdftools","plotly",
+              "png","purrr","RColorBrewer","readr","rlist","rmarkdown","Rmisc","rstatix","seqinr","shiny",
+              "shinythemes","webshot")
+new.packages <- packages[!(packages %in% installed.packages()[,"Package"])]
+if (length(new.packages)>0) {
+  install.packages(new.packages)
+}
+# Install packages from Bioconductor
+Biocpackages <-c("BiocGenerics","Biostrings","BSgenome","GenomicRanges","Gviz","sangeranalyseR","sangerseqR")
+new.Biocpackages <- Biocpackages[!(Biocpackages %in% installed.packages()[,"Package"])]
+if (length(new.Biocpackages)>0) {
+  BiocManager::install(new.Biocpackages)
+}
+
+# Add packages to library
+suppressWarnings(lapply(packages, library, character.only = TRUE)) #, quietly = TRUE
+suppressWarnings(lapply(Biocpackages, library, character.only = TRUE))
+
+#────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
+
+
 ui <- fluidPage(
     
     # Theme
@@ -119,7 +147,7 @@ ui <- fluidPage(
                                  
                                  br(),
                                  
-                                 p(icon(name="download", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"The ABSP tool is available for download on github at", tags$a(href="https://github.com/ABSP-methylation-tool/ABSP", "https://github.com/ABSP-methylation-tool/ABSP",target="_blank"),"."),
+                                 p(icon(name="download", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"The ABSP tool is available for download on github at", htmltools::tags$a(href="https://github.com/ABSP-methylation-tool/ABSP", "https://github.com/ABSP-methylation-tool/ABSP",target="_blank"),"."),
                                  p(icon(name="file", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"For detailed instructions, please find the user guide in your ABSP folder."),
                                  
                                  br(),
@@ -133,7 +161,7 @@ ui <- fluidPage(
                                  
                                  br(),
                                  
-                                 p(icon(name="envelope", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"), tags$a(href="mailto:absp@univ-lille.fr","absp@univ-lille.fr"))
+                                 p(icon(name="envelope", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"), htmltools::tags$a(href="mailto:absp@univ-lille.fr","absp@univ-lille.fr"))
                                )
                         ),
                         
@@ -327,11 +355,11 @@ ui <- fluidPage(
                                     # WARNINGS
                                     
                                     h5("Be aware that these entries must not contain any special characters :", 
-                                       tags$code("/ \\ : * ? ! \" ' ` < > | & % @ # + = { }", style="color:grey ; background-color:transparent"),
+                                       htmltools::tags$code("/ \\ : * ? ! \" ' ` < > | & % @ # + = { }", style="color:grey ; background-color:transparent"),
                                        style="color:#bf3232"),
                                     
                                     h5("Allowed characters (that must be avoided if not necessary) :", 
-                                       tags$code(" space - _ ", style="color:grey ; background-color:transparent"), 
+                                       htmltools::tags$code(" space - _ ", style="color:grey ; background-color:transparent"), 
                                        style="color:#bf3232"),
                                     
                                     h5("All entries must be named consistently between the different analysis 
@@ -425,11 +453,11 @@ ui <- fluidPage(
                                         h4("Select .fasta file of reference DNA sequence", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("Select the file '.fasta' in your folders to provide the reference DNA sequence from the plus strand of genome.
                                                        The fasta file must contain in the header two elements :"),
-                                        tags$ul(
-                                            tags$li("The precise genomic coordinates of the sequence contained in the file,in the strict format : ", br(),
+                                        htmltools::tags$ul(
+                                          htmltools::tags$li("The precise genomic coordinates of the sequence contained in the file,in the strict format : ", br(),
                                                     span("chr#:######-###### (e.g. chr16:68771087-68771462)", style="color:#40b7a0")),
                                             
-                                            tags$li("The strand chosen for primer design : the strand complementary to primers after bisulfite 
+                                          htmltools::tags$li("The strand chosen for primer design : the strand complementary to primers after bisulfite 
                                                                  conversion, in the strict format : ", br(),
                                                     span("primers=plus or primers=minus", style="color:#40b7a0"))
                                         ),
@@ -624,12 +652,12 @@ ui <- fluidPage(
                                     div( # SAMPLE ORDER
                                         h4("Select the types of sample ordering for plots", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("Choose from one to four of the sample ordering available for plots :"),
-                                        tags$ul(
-                                            tags$li("'As it is' arranges samples by alphabetic order of collections. 
+                                        htmltools::tags$ul(
+                                          htmltools::tags$li("'As it is' arranges samples by alphabetic order of collections. 
                                                     If none or one collection are present, this order is equivalent as the 'By groups' one."),
-                                            tags$li("'By groups' arranges samples by the provided group order above."),
-                                            tags$li("'By methylation levels' arranges samples depending on their methylation mean."),
-                                            tags$li("'By clusters' arranges samples depending on the hierarchical clustering calculated and represented by an associated dendrogram.")
+                                          htmltools::tags$li("'By groups' arranges samples by the provided group order above."),
+                                          htmltools::tags$li("'By methylation levels' arranges samples depending on their methylation mean."),
+                                          htmltools::tags$li("'By clusters' arranges samples depending on the hierarchical clustering calculated and represented by an associated dendrogram.")
                                         )
                                     )
                                 )
@@ -809,7 +837,7 @@ ui <- fluidPage(
                        p("ABSP v1.0.0 - Copyright © 2022 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
                 
                 column(width=6,
-                       tags$button(
+                       htmltools::tags$button(
                            id = 'close',
                            type = "button",
                            class = "btn btn-default action-button btn-primary navbar-btn pull-right shiny-bound-input",
