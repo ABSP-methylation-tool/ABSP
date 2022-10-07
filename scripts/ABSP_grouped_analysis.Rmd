@@ -58,11 +58,6 @@ options(knitr.table.format = "html")
 options(ucscChromosomeNames=FALSE)
 ```
 
-```{r Library sync, include=F}
-# Restore package versions from the renv.lock file : synchronize library with lockfile
-renv::restore(prompt=F)
-```
-
 <!-- PARAMETERS -->
 
 ```{r Manual parameters 1 for TESTS, eval=F}

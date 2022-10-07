@@ -68,11 +68,6 @@ options(ucscChromosomeNames=FALSE)
 Sys.setlocale(category = "LC_ALL", locale = "en_SE.utf8")
 ```
 
-```{r Library sync, include=F}
-# Restore package versions from the renv.lock file : synchronize library with lockfile
-renv::restore(prompt=F)
-```
-
 ```{r Manual parameters and files for TESTS, eval=F}
 ## TO TEST THE SCRIPT WITHOUT KNITTING
 
