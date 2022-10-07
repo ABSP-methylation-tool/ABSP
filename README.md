@@ -39,7 +39,7 @@ ABSP was developed on a Windows machine but is functional on MacOS and Linux dev
 * Open the "**ABSP Rproject.Rproject**" file with Rstudio
 * Open the "**app.R**" file with Rstudio
 * Click on the "**Run App**" button on the top right corner (you can select "Run external" to open it in web browser)
-<img src="./documents/Screenshot-RStudio.png" width="1000"/>
+<img src="./documents/Screenshots/RStudio.png" width="1000"/>
 
 ### Analysis with ABSP
 
@@ -47,6 +47,7 @@ Find example data of inputs and outputs in the "examples" folder.
 
 #### Individual sample analysis: 
 * In the "Individual analysis" tab, fill the entries and add input files (reference sequence .fasta file and sequencing .ab1 files)
+<img src="./documents/Screenshots/App Indiv.png" width="600"/>
 * Run the analysis to compute the CpG methylation levels of your sample 
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
@@ -55,6 +56,7 @@ Find example data of inputs and outputs in the "examples" folder.
 
 #### Grouped samples analysis:
 * Once all of your samples have been individually analyzed, in the "Grouped analysis" tab, fill the entries and choose your parameters for plotting
+<img src="./documents/Screenshots/App Grouped.png" width="600"/>
 * Run the analysis to gather samples, generate visualization plots (lollipop plots) and compare methylation data between groups by comparative statistics
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
@@ -66,6 +68,7 @@ Find example data of inputs and outputs in the "examples" folder.
 
 #### Launch multiple analysis:  
 The "Multiple analysis" tab is useful to analyze multiple samples and/or for multiple grouping analysis, launched in one click, using as input tables filled with the required input entries.
+<img src="./documents/Screenshots/App Multiple.png" width="600"/>
 
 <br>
 
