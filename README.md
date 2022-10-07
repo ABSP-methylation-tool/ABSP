@@ -17,7 +17,7 @@ For more detailed information, please read the [**ABSP User Guide**](https://git
 ## Citation
 
 If you use ABSP in your published work, please cite
-> **Denoulet et al. (2022). "ABSP: ..." . DOI: [doi.org](https://doi.org)**
+> **Denoulet et al. (2022). "ABSP: an automated R tool to efficiently analyze region-specific CpG methylation from bisulfite sequencing PCR" . DOI: [doi.org](https://doi.org)**
 
 <br>
 
