@@ -38,7 +38,7 @@ ABSP was developed on a Windows machine but is functional on MacOS and Linux dev
 
 * Open the "**ABSP Rproject.Rproject**" file with Rstudio
 * Open the "**app.R**" file with Rstudio
-* Click on the "**Run App**" button on the top right corner (you can select "Run external" to open it in web browser)
+* Click on the "**Run App**" button at the top right corner (you can select "Run external" to open it in web browser)
 <img src="./documents/Screenshots/RStudio.png" width="1000"/>
 
 ### Analysis with ABSP
