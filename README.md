@@ -1,5 +1,7 @@
-![Active version - 1.0.0](https://img.shields.io/badge/Active_version-1.0.0-1bc421)
+![Active version - 1.1.0](https://img.shields.io/badge/Active_version-1.1.0-1bc421)
 ![OS - Windows](https://img.shields.io/badge/OS-Windows-0d7ebf)
+![OS - MacOS](https://img.shields.io/badge/OS-MacOS-1b80bb)
+![OS - Linux](https://img.shields.io/badge/OS-Linux-1b80bb)
 
 # ABSP - Analysis of Bisulfite Sequencing PCR
 
