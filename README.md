@@ -1,7 +1,6 @@
 ![Active version - 1.1.0](https://img.shields.io/badge/Active_version-1.1.0-1bc421)
-![OS - Windows](https://img.shields.io/badge/OS-Windows-0d7ebf)
-![OS - MacOS](https://img.shields.io/badge/OS-MacOS-1b80bb)
-![OS - Linux](https://img.shields.io/badge/OS-Linux-1b80bb)
+![Platform - Windows/MacOS/Linux](https://img.shields.io/badge/Platform-Windows/MacOS/Linux-0d7ebf)
+[![License - GPL-3](https://img.shields.io/badge/License-GPL--3-d8b125)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 # ABSP - Analysis of Bisulfite Sequencing PCR
 
