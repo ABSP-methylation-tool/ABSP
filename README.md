@@ -23,7 +23,7 @@ If you use ABSP in your published work, please cite
 
 ## Availability
 
-ABSP was developed on a Windows machine but is functional on MacOS and Linux devices. Please note that on Linux machine, the installation of packages at the first opening of ABSP can take a long time.
+ABSP was developed on a Windows machine but is functional on MacOS and Linux devices. Please note that on Linux machine, the packages installation at the first opening of ABSP can take a long time.
 
 <br>
 
