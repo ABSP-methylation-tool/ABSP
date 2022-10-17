@@ -24,21 +24,21 @@ list_genomes <- c(
 
 #────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-# Install packages 
+# Install packages
+options(timeout = 1800)
 packages <- c("arrangements","BiocManager","compareGroups","DiagrammeR","dplyr","formattable","GenomeInfoDb",
               "ggdendro","ggplot2","ggpubr","htmltools","htmlwidgets","knitr","openxlsx","pdftools","plotly",
               "png","purrr","RColorBrewer","readr","rlist","rmarkdown","Rmisc","rstatix","seqinr","shiny",
               "shinythemes","webshot")
 new.packages <- packages[!(packages %in% installed.packages()[,"Package"])]
 if (length(new.packages)>0) {
-  install.packages(new.packages)
-}
+  install.packages(new.packages)}
+
 # Install packages from Bioconductor
 Biocpackages <-c("BiocGenerics","Biostrings","BSgenome","GenomicRanges","Gviz","sangeranalyseR","sangerseqR")
 new.Biocpackages <- Biocpackages[!(Biocpackages %in% installed.packages()[,"Package"])]
 if (length(new.Biocpackages)>0) {
-  BiocManager::install(new.Biocpackages)
-}
+  BiocManager::install(new.Biocpackages)}
 
 # Add packages to library
 suppressWarnings(lapply(packages, library, character.only = TRUE)) #, quietly = TRUE
