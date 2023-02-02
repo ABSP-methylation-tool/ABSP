@@ -134,7 +134,9 @@ ui <- fluidPage(
                                
                                div(
                                  
-                                 p(icon(name="newspaper", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"Denoulet ", em("et al."),", 2022"),
+                                 p(icon(name="newspaper", lib = "font-awesome", style="padding-right:8px; font-size:1.2em;"),"Marie Denoulet, Mathilde Brulé, François Anquez, Audrey Vincent, Julie Schnipper, Eric Adriaenssens, Robert-Alain Toillon, Xuefen Le Bourhis, Chann Lagadec, ",
+                                   span("ABSP: an automated R tool to efficiently analyze region-specific CpG methylation from bisulfite sequencing PCR", style= "font-weight: bold"),", ",
+                                   em("Bioinformatics"),", Volume 39, Issue 1, January 2023, btad008, ", htmltools::tags$a(href="https://doi.org/10.1093/bioinformatics/btad008", "https://doi.org/10.1093/bioinformatics/btad008",target="_blank")),
                                  
                                  br(),
                                  br()
@@ -834,7 +836,7 @@ ui <- fluidPage(
             div(style="padding-right: 15px; padding-left: 15px;", 
                 
                 column(width=6,
-                       p("ABSP v1.1.0 - Copyright © 2022 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
+                       p("ABSP v1.1.0 - Copyright © 2023 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
                 
                 column(width=6,
                        htmltools::tags$button(
