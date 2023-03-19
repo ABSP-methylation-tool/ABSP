@@ -663,9 +663,6 @@ if(useSeqs2==T) {
   if (sangerRead_s2@objectResults@creationResult==F) {useSeqs2 <- F}
 }
 
-if(useSeqs1==F){TrimOKs1 <- F}
-if(useSeqs2==F){TrimOKs2 <- F}
-
 shiny::setProgress(0.2) 
 ```
 
@@ -822,17 +819,6 @@ Trim_final_FT
 export_formattable(Trim_final_FT,file=file.path(indivDir$tab,paste0(fileprefix,"_trimmedseq.png")))
 ```
 
-```{r Trim text no sequencing}
-if (useSeqs1==F) {
-  p("No sequencing file provided for sequencing result #1.",
-  style="color:#bf3232 ; font-weight: bold ;")
-}
-if (useSeqs2==F) {
-  p("No sequencing file provided for sequencing result #2.",
-  style="color:#bf3232 ; font-weight: bold ;")
-}
-
-```
 
 ### Sequencing result #1 {.tabset .tabset-pills}
 
@@ -1380,11 +1366,6 @@ knit_exit()
 
 ### Sequencing result #1 {.tabset .tabset-pills}
 
-```{r text no s1, eval=!useSeqs1}
-p("No sequencing file provided for sequencing result #1.",
-  style="color:#bf3232 ; font-weight: bold ;")
-```
-
 Sequencing result #1 is aligned on both sense and antisense bisulfite converted DNA sequences to determine the sequencing direction as forward or reverse.
 
 ```{r text warning no trim s1, eval=useSeqs1 & !TrimOKs1}
@@ -1424,10 +1405,8 @@ if(TrimOKs1==T) {
       # Result 1 is in forward direction
       useSeqF <- useSeqs1
       TrimOKF <- TrimOKs1
-      TrimOKR <- TrimOKs2
       seqnumber_F <- 1
       seqdirection_s1 <- "Forward"
-      seqdirection_s2 <- "Reverse"
     }
     
     # RESULT 1 ALIGNED WITH ANTISENSE SEQUENCE : REVERSE
@@ -1435,10 +1414,8 @@ if(TrimOKs1==T) {
       # Result 1 is in reverse direction
       useSeqR <- useSeqs1
       TrimOKR <- TrimOKs1
-      TrimOKF <- TrimOKs2
       seqnumber_R <- 1
       seqdirection_s1 <- "Reverse"
-      seqdirection_s2 <- "Forward"
     }
     DIRincorrect <- F # Direction determination is sucessfull
     Dirdeterms2 <- F # not use s2 for direction determination
@@ -1463,20 +1440,16 @@ if(Dirdeterms2==T) {
       # Result 1 is in reverse direction
       useSeqR <- useSeqs1
       TrimOKR <- TrimOKs1
-      TrimOKF <- TrimOKs2
       seqnumber_R <- 2
       seqdirection_s1 <- "Reverse"
-      seqdirection_s2 <- "Forward"
     }
     if (pa_s2_S@subject@range@width < pa_s2_RC@subject@range@width) {
       # Result 2 is in reverse direction
       # Result 1 is in forward direction
       useSeqF <- useSeqs1
       TrimOKF <- TrimOKs1
-      TrimOKR <- TrimOKs2
       seqnumber_F <- 2
       seqdirection_s1 <- "Forward"
-      seqdirection_s2 <- "Reverse"
     }
     DIRincorrect <- F # Direction determination is sucessfull
     # RESULT 2 UNDETERMINED ALIGNMENT : WARNING
@@ -1485,7 +1458,6 @@ if(Dirdeterms2==T) {
       style="color:#d37217 ; font-weight: bold ;")
     DIRincorrect <- T # Direction determination is not sucessfull
     seqdirection_s1 <- "undetermined"
-    seqdirection_s2 <- "undetermined"
   }
 }
 ```
@@ -1520,11 +1492,6 @@ if(seqdirection_s1=="Reverse") {
 
 
 ### Sequencing result #2 {.tabset .tabset-pills}
-
-```{r text no s2, eval=!useSeqs2}
-p("No sequencing file provided for sequencing result #2.",
-  style="color:#bf3232 ; font-weight: bold ;")
-```
 
 Sequencing result #2 is aligned on both sense and antisense bisulfite converted DNA sequences to determine the sequencing direction as forward or reverse.
 
@@ -1564,10 +1531,8 @@ if(TrimOKs2==T) {
       # Result 2 is in forward direction
       useSeqF <- useSeqs2
       TrimOKF <- TrimOKs2
-      TrimOKR <- TrimOKs1
       seqnumber_F <- 2
       seqdirection_s2 <- "Forward"
-      seqdirection_s1 <- "Reverse"
     }
     
     # RESULT 2 ALIGNED WITH ANTISENSE SEQUENCE : REVERSE
@@ -1575,10 +1540,8 @@ if(TrimOKs2==T) {
       # Result 2 is in reverse direction
       useSeqR <- useSeqs2
       TrimOKR <- TrimOKs2
-      TrimOKF <- TrimOKs1
       seqnumber_R <- 2
       seqdirection_s2 <- "Reverse"
-      seqdirection_s1 <- "Forward"
     }
     DIRincorrect <- F # Direction determination is sucessfull
     Dirdeterms1 <- F # not use s1 for direction determination
@@ -1602,20 +1565,16 @@ if(Dirdeterms1==T) {
       # Result 2 is in reverse direction
       useSeqR <- useSeqs2
       TrimOKR <- TrimOKs2
-      TrimOKF <- TrimOKs1
       seqnumber_R <- 2
       seqdirection_s2 <- "Reverse"
-      seqdirection_s1 <- "Forward"
     }
     if (pa_s1_S@subject@range@width < pa_s1_RC@subject@range@width) {
       # Result 1 is in reverse direction
       # Result 2 is in forward direction
       useSeqF <- useSeqs2
       TrimOKF <- TrimOKs2
-      TrimOKR <- TrimOKs1
       seqnumber_F <- 2
       seqdirection_s2 <- "Forward"
-      seqdirection_s1 <- "Reverse"
     }
     DIRincorrect <- F # Direction determination is sucessfull
     # RESULT 2 UNDETERMINED ALIGNMENT : WARNING
@@ -1624,7 +1583,6 @@ if(Dirdeterms1==T) {
       style="color:#d37217 ; font-weight: bold ;")
     DIRincorrect <- T # Direction determination is not sucessfull
     seqdirection_s2 <- "undetermined"
-    seqdirection_s1 <- "undetermined"
   }
 }
 ```
@@ -1817,18 +1775,13 @@ if (useSeqF==F & useSeqR==T) {alg_coord <- alg_coordR}
 
 ### Forward {.tabset .tabset-pills}
 
-```{r text no sF, eval=!useSeqF}
-p("No sequencing file provided for forward sequencing result.",
-  style="color:#bf3232 ; font-weight: bold ;")
-```
-
 To find nucleotides of reference DNA sequence positions on sequencing result, the trimmed sequence of primary peaks from **forward** sequencing results is aligned with bisulfite converted reference DNA **sense** sequence.
 
 
 #### Alignment
 
 ```{r warning if no aligment F,results='asis'}
-if (TrimOKF==F & useSeqF==T) {
+if (TrimOKF==F) {
   p("Warning: Insufficient length or quality of trimmed forward sequencing.",
     style="color:#d37217 ; font-weight: bold ;")
 }
@@ -1850,7 +1803,7 @@ writePairwiseAlignments(pa_F,block.width=20)
 #### Aligned sequences
 
 ```{r warning if no aligned seq F,results='asis'}
-if (TrimOKF==F & useSeqF==T) {
+if (TrimOKF==F) {
   p("Warning: Insufficient length or quality of trimmed forward sequencing.",
     style="color:#d37217 ; font-weight: bold ;")
 }
@@ -1898,17 +1851,12 @@ rm(fasta_name)
 
 ### Reverse {.tabset .tabset-pills}
 
-```{r text no sR, eval=!useSeqR}
-p("No sequencing file provided for reverse sequencing result.",
-  style="color:#bf3232 ; font-weight: bold ;")
-```
-
 To find nucleotides of reference DNA sequence positions on sequencing result, the trimmed sequence of primary peaks from **reverse** sequencing results is aligned with bisulfite converted reference DNA **antisense** sequence. 
 
 #### Alignment
 
 ```{r warning if no aligment R,results='asis'}
-if (TrimOKR==F & useSeqR==T) {
+if (TrimOKR==F) {
   p("Warning: Insufficient length or quality of trimmed reverse sequencing.",
     style="color:#d37217 ; font-weight: bold ;")
 }
@@ -1927,7 +1875,7 @@ writePairwiseAlignments(pa_R,block.width=20)
 #### Aligned sequences
 
 ```{r warning if no aligned seq R,results='asis'}
-if (TrimOKR==F & useSeqR==T) {
+if (TrimOKR==F) {
   p("Warning: Insufficient length or quality of trimmed reverse sequencing.",
     style="color:#d37217 ; font-weight: bold ;")
 }
@@ -2122,21 +2070,13 @@ QC_table_FT <- formattable(
 
 QC_table_FT
 
-if(TrimOKF==F & useSeqF==T) { 
+if(TrimOKF==F) { 
   p("Forward sequencing result could have not been trimmed due to poor quality.",
   style="color:#bf3232 ; font-weight: bold ;")
 }
-if(useSeqF==F) { 
-  p("No sequencing file provided for forward sequencing result.",
-  style="color:#bf3232 ; font-weight: bold ;")
-}
-if(TrimOKR==F & useSeqR==T) { 
+if(TrimOKR==F) { 
   p("Reverse sequencing result could have not been trimmed due to poor quality.",
     style="color:#bf3232 ; font-weight: bold ;")
-}
-if(useSeqR==F) { 
-  p("No sequencing file provided for reverse sequencing result.",
-  style="color:#bf3232 ; font-weight: bold ;")
 }
 
 if("Incorrect" %in% QC_table[,"Quality Result"]) {
@@ -2556,10 +2496,10 @@ export_formattable(CG_meth_FT,file=file.path(indivDir$tab,paste0(fileprefix,"_me
 # Forward sequening methylation result
 
 # No forward sequencing provided :
-if (useSeqF==F) { p("No sequencing file provided for forward sequencing result.", style="color:#bf3232 ; font-weight: bold ;")}
+if (useSeqF==F) { p("Warning: No sequencing data from foward direction sequencing.", style="color:#d37217 ; font-weight: bold ;")}
 
 
-# Forward Sequencing provided :
+# Forward Sequening provided :
 if (useSeqF==T) {
   
   # Incorrect Forward Sequencing
@@ -2598,10 +2538,10 @@ if (useSeqF==T) {
 # Reverse sequening methylation result
 
 # No reverse sequencing provided :
-if (useSeqR==F) { p("No sequencing file provided for reverse sequencing result.", style="color:#bf3232 ; font-weight: bold ;")}
+if (useSeqR==F) { p("Warning: No sequencing data from reverse direction sequencing.", style="color:#d37217 ; font-weight: bold ;")}
 
 
-# Reverse sequencing provided :
+# Reverse sequening provided :
 if (useSeqR==T) {
   
   # Incorrect Reverse Sequencing
