@@ -1,4 +1,4 @@
-![Active version - v1.1.0](https://img.shields.io/badge/Active_version-v1.1.0-1bc421)
+![Active version - v1.1.1](https://img.shields.io/badge/Active_version-v1.1.1-1bc421)
 ![Platform - Windows/MacOS/Linux](https://img.shields.io/badge/Platform-Windows/MacOS/Linux-0d7ebf)
 [![License - GPL-3](https://img.shields.io/badge/License-GPL--3-d8b125)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -31,7 +31,7 @@ ABSP was developed on a Windows machine but is functional on MacOS and Linux dev
 
 ### Installation
 
-* Download the ABSP files from github ("Code", "Download Zip") and unzip the folder
+* Download the ABSP files from GitHub (Go to "Releases" in the right panel, select the latest release and download the "Source code" file) and unzip the folder
 * Install software: **R** at [https://www.r-project.org/](https://www.r-project.org/) and **RStudio** at [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/)
 
 ### Open the ABSP app
