@@ -31,7 +31,7 @@ ABSP was developed on a Windows machine but is functional on MacOS and Linux dev
 
 ### Installation
 
-* Download the ABSP files from GitHub (Go to "Releases" in the right panel, select the latest release and download the "Source code" file) and unzip the folder
+* Download the ABSP files from GitHub (Go to "Releases" in the right panel and in the "Assets" section of the latest release, download the "Source code" file) and unzip the folder
 * Install software: **R** at [https://www.r-project.org/](https://www.r-project.org/) and **RStudio** at [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/)
 
 ### Open the ABSP app
