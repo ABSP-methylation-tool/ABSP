@@ -836,7 +836,7 @@ ui <- fluidPage(
             div(style="padding-right: 15px; padding-left: 15px;", 
                 
                 column(width=6,
-                       p("ABSP v1.1.0 - Copyright © 2023 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
+                       p("ABSP v1.1.1 - Copyright © 2023 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
                 
                 column(width=6,
                        htmltools::tags$button(
