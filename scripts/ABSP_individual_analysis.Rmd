@@ -1745,10 +1745,10 @@ knit_exit()
 alg_posF <- list(
   # F Subject : ref DNA BS
   subject_F_start = pa_F@subject@range@start,
-  subject_F_end = pa_F@subject@range@start+pa_F@subject@range@width,
+  subject_F_end = pa_F@subject@range@start+pa_F@subject@range@width-1,
   # F Pattern : Sequencing results forward
   pattern_F_start = pa_F@pattern@range@start,
-  pattern_F_end = pa_F@pattern@range@start+pa_F@pattern@range@width
+  pattern_F_end = pa_F@pattern@range@start+pa_F@pattern@range@width-1
 )
 ```
 
@@ -1757,10 +1757,10 @@ alg_posF <- list(
 alg_posR <- list(
   # R Subject : ref DNA BS RC
   subject_R_start = pa_R@subject@range@start,
-  subject_R_end = pa_R@subject@range@start+pa_R@subject@range@width, 
+  subject_R_end = pa_R@subject@range@start+pa_R@subject@range@width-1, 
   # R Pattern : Sequencing results reverse
   pattern_R_start = pa_R@pattern@range@start,
-  pattern_R_end = pa_R@pattern@range@start+pa_R@pattern@range@width 
+  pattern_R_end = pa_R@pattern@range@start+pa_R@pattern@range@width-1 
 )
 ```
 
@@ -1997,7 +1997,7 @@ shiny::setProgress(0.6)
 ## On ref DNA sequence (Subject):
 indel$dna_ref_F <- alg_pos$subject_F_start + pa_F@subject@indel@unlistData@start -1
 ## On sequencing (Pattern) :
-indel$sequencing_F = alg_pos$pattern_F_start + pa_F@pattern@indel@unlistData@start -1
+indel$sequencing_F <- alg_pos$pattern_F_start + pa_F@pattern@indel@unlistData@start -1
 ```
 
 ```{r QC positions of gaps R, eval=useSeqR}
@@ -2006,7 +2006,7 @@ indel$sequencing_F = alg_pos$pattern_F_start + pa_F@pattern@indel@unlistData@sta
 ## On ref DNA sequence (Subject):
 indel$dna_ref_R <- alg_pos$subject_R_start + pa_R@subject@indel@unlistData@start -1
 ## On sequencing (Pattern) :
-indel$sequencing_R = alg_pos$pattern_R_start + pa_R@pattern@indel@unlistData@start -1
+indel$sequencing_R <- alg_pos$pattern_R_start + pa_R@pattern@indel@unlistData@start -1
 ```
 
 ```{r QC bisulfite conv rate}
@@ -2376,7 +2376,7 @@ if (useSeqF==T & useSeqR==F) {
                  min_start = alg_coord$F_start,
                  max_end = alg_coord$F_end) 
 }
-
+# Reverse
 if (useSeqF==F & useSeqR==T) {
   alg_coord <- c(alg_coord,
                  min_start = alg_coord$R_start,
@@ -2456,7 +2456,7 @@ knit_exit()
 ## Methylation {.tabset .tabset-pills}
 
 
-```{r}
+```{r get peaks}
 if (useSeqF==T) { CG_peaks_F <- getPeaks(CG_pos$CG_pos, alg_pos = alg_pos, seqtable_trim = seqtable_trim_F, indel = indel, sequencing = "forward") }
 if (useSeqR==T) { CG_peaks_R <- getPeaks(CG_pos$CG_pos_RC, alg_pos = alg_pos, seqtable_trim = seqtable_trim_R, indel = indel, sequencing = "reverse") }
 ```
