@@ -770,7 +770,7 @@ preprocess_data <- function(data_files, GroupOrder, cloning_exp, clone_threshold
     if(length(unique(x$collection))!=1) {x$collection <- rep(unique(x$collection)[which(!is.na(unique(x$collection)))],length(x$collection))}
     x$group <- rep(unique(x$group)[which(!is.na(unique(x$group)))],length(x$group))
     if(length(unique(x$rep))!=1) {x$rep <- rep(unique(x$rep)[which(!is.na(unique(x$rep)))],length(x$rep))}
-    if(length(unique(x$rep))!=1) {x$clone <- rep(unique(x$clone)[which(!is.na(unique(x$clone)))],length(x$clone))}
+    if(length(unique(x$clone))!=1) {x$clone <- rep(unique(x$clone)[which(!is.na(unique(x$clone)))],length(x$clone))}
     x$alg_coord_start <- rep(unique(x$alg_coord_start)[which(!is.na(unique(x$alg_coord_start)))],length(x$alg_coord_start))
     x$alg_coord_end<- rep(unique(x$alg_coord_end)[which(!is.na(unique(x$alg_coord_end)))],length(x$alg_coord_end))
     
@@ -817,13 +817,9 @@ preprocess_data <- function(data_files, GroupOrder, cloning_exp, clone_threshold
   
   
   
-  # Set group as ordered variable using GroupOrder levels
-  if (length(setdiff(unique(all$group), GroupOrder))!=0 ) { # if a group is missing in GroupOrder, it goes at the end but it is not missing
-    levels_group <- c(GroupOrder,setdiff(unique(all$group), GroupOrder))
-    all$group <- ordered(all$group, levels=levels_group)
-  } else {
-    all$group <- ordered(all$group, levels=GroupOrder)
-  }
+  # Set group as ordered variable using GroupOrder levels, and remove groups not in GroupOrder
+  all$group <- ordered(all$group, levels=GroupOrder)
+  all <- all[!is.na(all$group),]
   all <- all[order(all$group),]
   
   # Set collection as ordered by alphabetic order 
@@ -859,7 +855,7 @@ preprocess_data <- function(data_files, GroupOrder, cloning_exp, clone_threshold
       dplyr::mutate(meth_sd = round(sd(meth,na.rm=T),2)) %>%
       dplyr::mutate(n_clones = sum(!is.na(meth))) %>% 
       dplyr::mutate(meth = round(mean(meth,na.rm=T),2)) %>% 
-      select(-c("clone_ID","clone")) %>% 
+      dplyr::select(-c("clone_ID","clone")) %>% 
       unique()
     table_group[,"samples"] <- table_group$group_ID
     data[["table_group"]] <- table_group
@@ -881,7 +877,7 @@ preprocess_data <- function(data_files, GroupOrder, cloning_exp, clone_threshold
       dplyr::mutate(meth_sd = round(sd(meth,na.rm=T),2)) %>%
       dplyr::mutate(n_rep = sum(!is.na(meth))) %>% 
       dplyr::mutate(meth = round(mean(meth,na.rm=T),2)) %>% 
-      select(-c("rep_ID","rep")) %>% 
+      dplyr::select(-c("rep_ID","rep")) %>% 
       unique()
     table_group[,"samples"] <- table_group$group_ID
     data[["table_group"]] <- table_group
@@ -1301,7 +1297,7 @@ genomic_plot <- function(table, filename, coord, plot_title, SampleOrder, GroupO
 
 # BOXPLOTS FOR EACH POSITION ----------------------------------------------
 
-boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pval","psign"), plot_colors) {
+boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("no_p","pval","psign"), plot_colors) {
   
   if (cloning_exp==T) { table[,"samples"] <- table$clone }
   if (cloning_exp==F) { table[,"samples"] <- table$rep }
@@ -1354,7 +1350,7 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pva
     boxplot <- ggplot(table, aes(x = group, y = meth)) + 
       facet_grid(collection ~ CG_coord) + # grid
       geom_dotplot(aes(col=group),fill="white", stroke = 2, binaxis = 'y', stackdir='center', binwidth = 1, dotsize = 5, na.rm = T) +
-      scale_y_continuous(limits = c(0, 100), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10))
+      scale_y_continuous(limits = c(0, 110), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10))
   }
   
   # Boxplot 
@@ -1396,11 +1392,18 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pva
       stat_compare_means(method = "t.test", paired = FALSE, 
                          label.y = label_y, aes(label = "..p.signif.."), 
                          comparisons = list_comb, na.rm = TRUE, size = 4, bracket.size=0.8) 
-    }
+  }
+  
+  # p value format : no p value displayed
+  if (p_label=="no_p") {
+    boxplot <- suppressMessages(boxplot + 
+                                  scale_y_continuous(limits = c(0, 110), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10)))
+  }
  
   # save ggplot
   width_plot <- max(((450*nb$group)*nb$CG)+400, nchar(plot_title)*35)
   height_plot <- (1400*nb$collection)+400
+  if(width_plot >= 50000) {return(cat("Warning: The boxplot width exceeded the max limit of 50000 px, it was not generated."))} 
   ggsave(filename = filename, width = width_plot, height = height_plot, dpi=300, units = c("px"),limitsize = FALSE)
 }
 
@@ -1409,7 +1412,7 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("pva
 
 # BOXPLOT FOR MEANS OF ALL POSITIONS --------------------------------------
 
-boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"), plot_colors) {
+boxplot_mean <- function(table, filename, plot_title, p_label=c("no_p","pval","psign"), list_comb, plot_colors) {
   
   # Parameters
   nb <- list(
@@ -1427,7 +1430,7 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"),
     hjust <- 1
     size <- 12 }
   
-  list_comb <- as.list(data.frame(t(combinations(as.character(unique(table$group)), k=2))))
+  #note: all combinations : as.list(data.frame(t(combinations(as.character(unique(table$group)), k=2))))
   label_y <- seq(length.out = length(list_comb), from=100, by=12)
   group_colors <- as.vector(plot_colors[1:nb$group])
   
@@ -1469,7 +1472,7 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"),
   # p value format : p value
   if (p_label=="pval") { 
     boxplot <- boxplot + 
-      stat_compare_means(method = "t.test", paired = FALSE, 
+      stat_compare_means(method = "t.test", paired = FALSE,
                          label.y = label_y, aes(label = "..p.format.."), 
                          comparisons = list_comb, na.rm = TRUE, size = 4, bracket.size=0.8) 
     }
@@ -1477,14 +1480,21 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"),
   # p value format : significativity symbol
   if (p_label=="psign") {
       boxplot <- boxplot + 
-        stat_compare_means(method = "t.test", paired = FALSE, 
+        stat_compare_means(method = "t.test", paired = FALSE,
                            label.y = label_y, aes(label = "..p.signif.."), 
                            comparisons = list_comb, na.rm = TRUE, size = 4, bracket.size=0.8) 
-      }
+  }
+  
+  # p value format : no p value displayed
+  if (p_label=="no_p") {
+    boxplot <- suppressMessages(boxplot + 
+                                  scale_y_continuous(limits = c(0, 110), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10)))
+  }
   
   # save ggplot
   width_plot <- max(((450*nb$group)*nb$collection)+800, nchar(plot_title)*40)
   height_plot <- 1800
+  if(width_plot >= 50000) {return(cat("Warning: The boxplot width exceeded the max limit of 50000 px, it was not generated."))}
   ggsave(filename = filename, width = width_plot, height = height_plot, dpi=300, units = c("px"),limitsize = FALSE)
 }
 
@@ -1494,7 +1504,7 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("pval","psign"),
 
 # METHYLATION PROFILE PLOT FUNCTION ---------------------------------------
 
-profile_plot <- function(table, filename, plot_title, plotType=c("proportional","condensed"), p_label=c("pval","psign"), pos_labels, plot_colors, plot_shapes){
+profile_plot <- function(table, filename, plot_title, plotType=c("proportional","condensed"), p_label=c("no_p","pval","psign"), pos_labels, plot_colors, plot_shapes){
   
   #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Parameters
@@ -1526,7 +1536,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   
   KW_no_data <- KW_df[which(is.na(KW_df$meth_mean)),] # mean of meth NA reveal that no data is available for one entire group for one position
   KW_no_data <- KW_no_data %>% 
-    select(CG,group) %>% 
+    dplyr::select(CG,group) %>% 
     unique()
   KW_no_data <- KW_no_data %>% 
     group_by(CG) %>% 
@@ -1540,13 +1550,13 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
     group_by(CG) %>% 
     dplyr::mutate(p=kruskal.test(meth ~ group)$p.value) %>% # KW test on all values
     add_significance("p") %>% 
-    select(CG,group,meth_mean,p,p.signif) %>% 
+    dplyr::select(CG,group,meth_mean,p,p.signif) %>% 
     unique()
   
   KW_df <- KW_df %>% 
     group_by(CG) %>% 
     dplyr::mutate(meth_max = max(meth_mean)) %>%  # Get max of mean values, for y position of label
-    select(CG,meth_max,p,p.signif) %>% 
+    dplyr::select(CG,meth_max,p,p.signif) %>% 
     unique()
   KW_df$p <- p_format(KW_df$p)
   KW_df$p.signif[which(KW_df$p.signif=="ns")] <- ""
@@ -1556,7 +1566,7 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   table <- table %>% 
     group_by(CG,group_ID) %>%
     dplyr::mutate(meth = round(mean(meth,na.rm=T),2)) %>% 
-    select(c(CG_nb,CG_coord,position,CG,meth,group,group_ID)) %>% 
+    dplyr::select(c(CG_nb,CG_coord,position,CG,meth,group,group_ID)) %>% 
     unique()
   
   

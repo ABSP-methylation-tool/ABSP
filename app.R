@@ -541,12 +541,8 @@ ui <- fluidPage(
                             # input$coll_sep
                             checkboxInput("coll_sep",label="Separate plots by collection", value=F),
                             
-                            # # input$group_order
-                            # textInput("group_order",label ="Indicate groups to compare in the correct order for display (comma separated)",
-                            #           "group1, group2, group3"),
-                            
                             # input$group_order
-                            selectInput("group_order",label ="Indicate the order of groups for display (all must be selected)",
+                            selectInput("group_order",label ="Select groups in the desired order for display",
                                       choices="Select folder and sequence first to display groups (or modify experiment type)", multiple=T),
                             
                             # input$sample_order
@@ -644,9 +640,9 @@ ui <- fluidPage(
                                     hr(),
                                     
                                     div( # GROUP ORDER
-                                        h4("Indicate order of groups for display", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
+                                        h4("Select groups in the desired order for display", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("The names of groups are retrieved from files in the selected folder above. 
-                                          Select them all in the correct order, chosen to display samples in plots.")
+                                          Select the desired group for the analysis, in the correct order to display samples in plots.")
                                     ),
                                     
                                     hr(),
@@ -836,7 +832,7 @@ ui <- fluidPage(
             div(style="padding-right: 15px; padding-left: 15px;", 
                 
                 column(width=6,
-                       p("ABSP v1.1.2 - Copyright © 2023 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
+                       p("ABSP v1.2.0 - Copyright © 2023 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
                 
                 column(width=6,
                        htmltools::tags$button(

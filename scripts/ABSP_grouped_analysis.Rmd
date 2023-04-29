@@ -176,7 +176,7 @@ source(file = "./scripts/ABSP_functions.R")
 
 ```{r Output folders, include=F, warning=F}
 ir_type_name <- paste0("individual_results_", ifelse(cloning_exp==T,"cloning","direct"))
-gr_type_name <- paste0("grouped_results_", ifelse(cloning_exp==T,"cloning","direct"))
+gr_type_name <- paste("grouped_results", ifelse(cloning_exp==T,"cloning","direct"), format(Sys.time(), "%Y%m%d-%H%M"), sep = "_")
 
 # Path to main folder to seperate different experiment or user
 
@@ -542,6 +542,8 @@ clone_thresholds <- c(th_unmethylated_max, th_methylated_min, th_partialpos_rati
 # Preprocess methylation data to combine all experiments
 data <- preprocess_data(data_files, GroupOrder = GroupOrder, cloning_exp = cloning_exp, clone_thresholds = clone_thresholds)
 
+data_all <- data$all
+
 shiny::setProgress(0.1)
 ```
 
@@ -561,9 +563,9 @@ parameters <- c(
   ifelse(cloning_exp==F,"Replicates :","Clones :"))
 values <- c(
   seq_name,
-  paste(levels(data$all$collection), collapse = ", "),
-  paste(levels(data$all$group), collapse = ", "),
-  ifelse(cloning_exp==F, paste(unique(data$all$rep), collapse = ", "), paste(unique(data$all$clone), collapse = ", "))
+  paste(levels(data_all$collection), collapse = ", "),
+  paste(levels(data_all$group), collapse = ", "),
+  ifelse(cloning_exp==F, paste(sort(as.integer(unique(data_all$rep))), collapse = ", "), paste(sort(as.integer(unique(data_all$clone))), collapse = ", "))
 )
 
 formattable(data.frame("Parameters" = parameters, "Data files content" = values, check.names = F),
@@ -1155,8 +1157,9 @@ shiny::setProgress(0.7)
 #### Methylation by CpG positions
 
 ```{r STATS descriptive positions, warning=F}
+
 # Get summary data
-stats_sum_pos <- summarySE(data$all, measurevar="meth", groupvars=c("CG_nb","CG_coord","collection","group"),na.rm=T)
+stats_sum_pos <- summarySE(data_all, measurevar="meth", groupvars=c("CG_nb","CG_coord","collection","group"),na.rm=T)
 colnames(stats_sum_pos)[6:9] <- c("meth_mean","SD","SEM","conf_int_95")
 stats_sum_pos[,6:9] <- round(stats_sum_pos[,6:9],2)
 
@@ -1176,14 +1179,14 @@ formattable(
 ```{r STATS compute data means, include=F}
 # Compute means of all CpG methylation on the sequence of each clone/replicate
 if(cloning_exp==T) {
-  data_mean <- data$all %>% 
+  data_mean <- data_all %>% 
     group_by(clone_ID) %>%
     dplyr::mutate(meth = round(mean(meth,na.rm=T),2)) %>% 
     select(c("collection","group","clone","group_ID","clone_ID","meth")) %>% 
     unique()
 }
 if(cloning_exp==F) {
-  data_mean <- data$all %>% 
+  data_mean <- data_all %>% 
     group_by(rep_ID) %>%
     dplyr::mutate(meth = round(mean(meth,na.rm=T),2)) %>% 
     select(c("collection","group","rep","group_ID","rep_ID","meth")) %>% 
@@ -1209,6 +1212,20 @@ formattable(
   align = c(rep("c",ncol(stats_sum_mean))))
 ```
 
+```{r EXPORT DATA, include=F}
+# Raw data export as csv, xlsx, RData
+write.table(data_all, file = file.path(groupDir$tables,paste0(seq_name,"_ALL_DATA.csv")), row.names = F, col.names = T)
+write.xlsx(data_all, file = file.path(groupDir$tables,paste0(seq_name,"_ALL_DATA.xslx")), rowNames = F, colNames = T, overwrite = T)
+save(data_all, file = file.path(groupDir$tables,paste0(seq_name,"_ALL_DATA.RData")))
+
+# Mean data export as csv, xlsx, RData
+write.table(data_mean, file = file.path(groupDir$tables,paste0(seq_name,"_MEAN_DATA.csv")), row.names = F, col.names = T)
+write.xlsx(data_mean, file = file.path(groupDir$tables,paste0(seq_name,"_MEAN_DATA.xlsx")), rowNames = F, colNames = T, overwrite = T)
+save(data_mean, file = file.path(groupDir$tables,paste0(seq_name,"_MEAN_DATA.RData")))
+
+```
+
+
 
 ### Student's T test {.tabset .tabset-pills}
 
@@ -1217,10 +1234,10 @@ formattable(
 ```{r STATS T test positions, results='asis'}
 # CHECK FOR CG POSITIONS 
 CG_ok <- c()
-for (i in unique(data$all$CG_nb)) {
+for (i in unique(data_all$CG_nb)) {
   
   Test_Error <- tryCatch( {
-  data$all[which(data$all$CG_nb==i),] %>%
+  data_all[which(data_all$CG_nb==i),] %>%
     group_by(collection) %>%
     t_test(meth ~ group, paired = FALSE, p.adjust.method = "none") %>%
     add_significance("p") }, 
@@ -1230,10 +1247,10 @@ for (i in unique(data$all$CG_nb)) {
     CG_ok <- append(CG_ok, i)} # vector of positions for which the t tests can be done between every group
 } 
 
-data_Ttest <- data$all[which(data$all$CG_nb%in%CG_ok),]
+data_Ttest <- data_all[which(data_all$CG_nb%in%CG_ok),]
 
-if(!identical(as.vector(unique(data$all$CG_nb)),CG_ok)) {
-  p( paste0("Warning: CpG sites ", toString(setdiff(as.vector(unique(data$all$CG_nb)),CG_ok))," are removed as T test can not be performed due to N<3 for at least one group or essentially constant data between two groups."), style="color:#d37217; font-weight: bold;")
+if(!identical(as.vector(unique(data_all$CG_nb)),CG_ok)) {
+  p( paste0("Warning: CpG sites ", toString(setdiff(as.vector(unique(data_all$CG_nb)),CG_ok))," are removed as T test can not be performed due to N<3 for at least one group or essentially constant data between two groups."), style="color:#d37217; font-weight: bold;")
 }
 
 # ERROR HANDLING 
@@ -1263,21 +1280,23 @@ if("data.frame" %in% class(stat_test_pos)) {
   write.table(stat_test_pos, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_positions.csv")), row.names = F, col.names = T)
   write.xlsx(stat_test_pos, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_positions.xlsx")), rowNames = F, colNames = T, overwrite = T)
   
+  stat_test_pos_display <- stat_test_pos
+  
   # Change * for display (transformed in a dot by R markdown) and regex (gsub function) can not be used for * special character
-  for (i in 1:length(stat_test_pos$p.signif)) {
-    if (stat_test_pos$p.signif[i]=="*") stat_test_pos$p.signif[i] <- "&ast;" # html character
-    if (stat_test_pos$p.signif[i]=="**") stat_test_pos$p.signif[i] <- "&ast;&ast;"
-    if (stat_test_pos$p.signif[i]=="***") stat_test_pos$p.signif[i] <- "&ast;&ast;&ast;"
-    if (stat_test_pos$p.signif[i]=="****") stat_test_pos$p.signif[i] <- "&ast;&ast;&ast;&ast;"
+  for (i in 1:length(stat_test_pos_display$p.signif)) {
+    if (stat_test_pos_display$p.signif[i]=="*") stat_test_pos_display$p.signif[i] <- "&ast;" # html character
+    if (stat_test_pos_display$p.signif[i]=="**") stat_test_pos_display$p.signif[i] <- "&ast;&ast;"
+    if (stat_test_pos_display$p.signif[i]=="***") stat_test_pos_display$p.signif[i] <- "&ast;&ast;&ast;"
+    if (stat_test_pos_display$p.signif[i]=="****") stat_test_pos_display$p.signif[i] <- "&ast;&ast;&ast;&ast;"
     }
   
   # Rename columns for display
-  colnames(stat_test_pos) <- c("CpG number","CpG coordinate","Collection","Compared group 1","Compared group 2",
+  colnames(stat_test_pos_display) <- c("CpG number","CpG coordinate","Collection","Compared group 1","Compared group 2",
                                "N group 1","N group 2","p-value","p-value significance level")
   
   cat("\n\n Student's T test (two-samples, unpaired).\n\n")
   
-  formattable(stat_test_pos, align=rep("c",ncol(stat_test_pos)))
+  formattable(stat_test_pos_display, align=rep("c",ncol(stat_test_pos_display)))
 }
 
 ```
@@ -1312,20 +1331,22 @@ if("data.frame" %in% class(stat_test_mean)) {
   write.table(stat_test_mean, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_means.csv")), row.names = F, col.names = T)
   write.xlsx(stat_test_mean, file = file.path(groupDir$tables,paste0(seq_name,"_t_test_table_means.xlsx")), rowNames = F, colNames = T, overwrite = T)
   
+  stat_test_mean_display <- stat_test_mean
+  
   # Change * for display (transformed in a dot by R markdown) and regex (gsub function) can not be used for * special character
-  for (i in 1:length(stat_test_mean$p.signif)) {
-    if (stat_test_mean$p.signif[i]=="*") stat_test_mean$p.signif[i] <- "&ast;" # html character
-    if (stat_test_mean$p.signif[i]=="**") stat_test_mean$p.signif[i] <- "&ast;&ast;"
-    if (stat_test_mean$p.signif[i]=="***") stat_test_mean$p.signif[i] <- "&ast;&ast;&ast;"
-    if (stat_test_mean$p.signif[i]=="****") stat_test_mean$p.signif[i] <- "&ast;&ast;&ast;&ast;"
+  for (i in 1:length(stat_test_mean_display$p.signif)) {
+    if (stat_test_mean_display$p.signif[i]=="*") stat_test_mean_display$p.signif[i] <- "&ast;" # html character
+    if (stat_test_mean_display$p.signif[i]=="**") stat_test_mean_display$p.signif[i] <- "&ast;&ast;"
+    if (stat_test_mean_display$p.signif[i]=="***") stat_test_mean_display$p.signif[i] <- "&ast;&ast;&ast;"
+    if (stat_test_mean_display$p.signif[i]=="****") stat_test_mean_display$p.signif[i] <- "&ast;&ast;&ast;&ast;"
   }
   
   # Rename columns for display
-  colnames(stat_test_mean) <- c("Collection","Compared group 1","Compared group 2","N group 1","N group 2","p-value","p-value significance level")
+  colnames(stat_test_mean_display) <- c("Collection","Compared group 1","Compared group 2","N group 1","N group 2","p-value","p-value significance level")
   
   cat("\n\n Student's T test (two-samples, unpaired).\n\n")
   
-  formattable(stat_test_mean, align=rep("c",ncol(stat_test_mean)))
+  formattable(stat_test_mean_display, align=rep("c",ncol(stat_test_mean_display)))
 }
 
 shiny::setProgress(0.8)
@@ -1351,14 +1372,15 @@ p("The p-values and p-value significance levels are determined by Student's T te
 ```{r STATS boxplots positions, results = 'asis', fig.align = "center", warning=F, message=F}
 #─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # PARAMETERS
-list_coll <- levels(data$all$collection)
+list_coll <- levels(data_all$collection)
 
 #─────────────────────────────────────────────────────────────────────────────────────────────────────────
 # BOXPLOTS, collections on same plot
 if (coll_sep==FALSE | length(list_coll)<=1) {
   
-  for(p in c("pval","psign")) {
+  for(p in c("no_p","pval","psign")) {
     
+    if(p=="no_p") cat("\n\n##### without p-values \n\n")
     if(p=="pval") cat("\n\n##### p-values\n\n")
     if(p=="psign") cat("\n\n##### p-values significance levels\n\n")
     
@@ -1366,14 +1388,15 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     path_pos <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_positions_",p,".png"))
     
     ## Plot of each position
-    suppressWarnings(boxplot_pos(data$all, filename=path_pos, plot_title = paste("Methylation of each CpG positions for",seq_name), 
-                                 cloning_exp = cloning_exp, p_label=p, plot_colors = plot_colors))
+    suppressWarnings(boxplot_pos(data_all, filename=path_pos, plot_title=paste("Methylation of each CpG positions for",seq_name), 
+                                 cloning_exp=cloning_exp, p_label=p, plot_colors=plot_colors))
     
     #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # Display boxplots : 
     
-    cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab.")))
-    cat("\n\n![](",path_pos,")\n\n")
+    if(file.exists(path_pos)){
+      cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab.")))
+      cat("\n\n![](",path_pos,")\n\n")}
   }
   
 }
@@ -1387,10 +1410,11 @@ if (coll_sep==TRUE & length(list_coll)>1) {
     # header
     cat("\n\n##### ",h,"{.tabset .tabset-pills}\n\n")
     
-    data_coll <- data$all[which(data$all$collection==h),]
+    data_coll <- data_all[which(data_all$collection==h),]
     
-    for(p in c("pval","psign")) {
+    for(p in c("no_p","pval","psign")) {
       
+      if(p=="no_p") cat("\n\n##### without p-values \n\n")
       if(p=="pval") cat("\n\n###### p-values\n\n")
       if(p=="psign") cat("\n\n###### p-values significance levels\n\n")
       
@@ -1398,14 +1422,15 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       path_pos <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_",h,"_positions_",p,".png"))
       
       ## Plot of each position
-      suppressWarnings(boxplot_pos(data_coll, filename=path_pos, plot_title = paste("Methylation of each CpG positions for",seq_name,"in",h), 
-                                   cloning_exp = cloning_exp, p_label=p, plot_colors = plot_colors))
+      suppressWarnings(boxplot_pos(data_coll, filename=path_pos, plot_title=paste("Methylation of each CpG positions for",seq_name,"in",h), 
+                                   cloning_exp=cloning_exp, p_label=p, plot_colors=plot_colors))
       
       #─────────────────────────────────────────────────────────────────────────────────────────────────────────
       # Display boxplots
-
-      cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab.")))
-      cat("\n\n![](",path_pos,")\n\n")
+      
+      if(file.exists(path_pos)){
+        cat(as.character(htmltools::p("Open ",htmltools::a(href = file.path(path_pos),"boxplot image",target="_blank")," in a new tab.")))
+        cat("\n\n![](",path_pos,")\n\n")}
       
     }
   }
@@ -1432,9 +1457,17 @@ list_coll <- levels(data_mean$collection)
 # BOXPLOTS, collections on same plot
 if (coll_sep==FALSE | length(list_coll)<=1) {
   
+  # get only significative comparisons
+  stat_test_mean_si <- as.data.frame(stat_test_mean[which(stat_test_mean$p.signif!="ns"),c("group1","group2")])
+  list_comb <- list()
+  for(s in 1:nrow(stat_test_mean_si)){
+    comb <- c(stat_test_mean_si[s,"group1"],stat_test_mean_si[s,"group2"])
+    list_comb <- list.append(list_comb,comb)
+  }
+
+  for(p in c("no_p","pval","psign")) {
     
-  for(p in c("pval","psign")) {
-    
+    if(p=="no_p") cat("\n\n##### without p-values \n\n")
     if(p=="pval") cat("\n\n##### p-values\n\n")
     if(p=="psign") cat("\n\n##### p-values significance levels\n\n")
     
@@ -1442,8 +1475,8 @@ if (coll_sep==FALSE | length(list_coll)<=1) {
     path_mean <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_means_",p,".png"))
     
     ## Plot of each position
-    suppressWarnings(boxplot_mean(data_mean, filename=path_mean, plot_title = paste("Methylation of all CpG positions for",seq_name),
-                                  p_label=p, plot_colors = plot_colors))
+    suppressWarnings(boxplot_mean(data_mean, filename=path_mean, plot_title=paste("Methylation of all CpG positions for",seq_name),
+                                  p_label=p, list_comb=list_comb, plot_colors=plot_colors))
     
     #─────────────────────────────────────────────────────────────────────────────────────────────────────────
     # Display boxplots 
@@ -1466,8 +1499,17 @@ if (coll_sep==TRUE & length(list_coll)>1) {
     
     data_coll <- data_mean[which(data_mean$collection==h),]
     
-    for(p in c("pval","psign")) {
+    # get only significative comparisons
+    stat_test_mean_si <- as.data.frame(stat_test_mean[which(stat_test_mean$p.signif!="ns" & stat_test_mean$collection==h),c("group1","group2")])
+    list_comb <- list()
+    for(s in 1:nrow(stat_test_mean_si)){
+      comb <- c(stat_test_mean_si[s,"group1"],stat_test_mean_si[s,"group2"])
+      list_comb <- list.append(list_comb,comb)
+    }
+    
+    for(p in c("no_p","pval","psign")) {
       
+      if(p=="no_p") cat("\n\n##### without p-values \n\n")
       if(p=="pval") cat("\n\n###### p-values\n\n")
       if(p=="psign") cat("\n\n###### p-values significance levels\n\n")
       
@@ -1475,8 +1517,8 @@ if (coll_sep==TRUE & length(list_coll)>1) {
       path_mean <- file.path(groupDir$boxplot,paste0(seq_name,"_boxplot_",h,"_means_",p,".png"))
       
       ## Plot of each position 
-      suppressWarnings(boxplot_mean(data_coll, filename=path_mean, plot_title = paste("Methylation of all CpG positions for",seq_name,"in",h),
-                                    p_label=p, plot_colors = plot_colors))
+      suppressWarnings(boxplot_mean(data_coll, filename=path_mean, plot_title=paste("Methylation of all CpG positions for",seq_name,"in",h),
+                                    p_label=p, list_comb=list_comb, plot_colors=plot_colors))
       
       #─────────────────────────────────────────────────────────────────────────────────────────────────────────
       # Display boxplots : p values numeric
@@ -1505,7 +1547,7 @@ The p-values and p-value significance levels are determined by Kruskal-Wallis te
 
 ```{r STATS profile plots, results='asis', warning=F, message=F}
 
-list_coll <- levels(data$all$collection)
+list_coll <- levels(data_all$collection)
 
 if(length(list_coll)<=1) {
   
@@ -1517,15 +1559,16 @@ if(length(list_coll)<=1) {
     # header
     cat("\n\n#### Type : ",j,"{.tabset .tabset-pills}\n\n")
     
-    for(p in c("pval","psign")) {
+    for(p in c("no_p","pval","psign")) {
       
+      if(p=="no_p") cat("\n\n##### without p-values \n\n")
       if(p=="pval") cat("\n\n##### p-values\n\n")
       if(p=="psign") cat("\n\n##### p-values significance levels\n\n")
       
       # path to save png
       meth_profile_path <- file.path(groupDir$profile,paste0(seq_name,"_meth_profile_",j,"_",p,".png"))
       # plot generation
-      suppressWarnings(profile_plot(data$all, filename = meth_profile_path, 
+      suppressWarnings(profile_plot(data_all, filename = meth_profile_path, 
                                     plot_title = paste("Methylation profile of",seq_name), 
                                     plotType = j, p_label = p, pos_labels = pos_labels, 
                                     plot_colors = plot_colors, plot_shapes = plot_shapes))
@@ -1541,7 +1584,7 @@ if(length(list_coll)>1) {
   for (h in list_coll) {  
     
     # separate values for collections
-    data_coll <- data$all[which(data$all$collection==h),]
+    data_coll <- data_all[which(data_all$collection==h),]
     
     # header
     cat("\n\n#### ",h,"{.tabset .tabset-pills}\n\n")
