@@ -68,9 +68,9 @@ Find example data of inputs and outputs in the "examples" folder.
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-<img src="./examples/results/Example data/Test sequence/grouped_results_direct/lollipop_plots/plots_replicates/Test sequence_lollipop_replicates_as-is_proportional.png" width="600" />
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct_20230429-1821/lollipop_plots/plots_replicates/Test sequence_lollipop_replicates_as-is_proportional.png" width="600" />
 
-<img src="./examples/results/Example data/Test sequence/grouped_results_direct/meth_profile_plots/Test sequence_meth_profile_collection1_proportional_psign.png" width="600" />
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct_20230429-1821/meth_profile_plots/Test sequence_meth_profile_collection1_proportional_psign.png" width="600" />
 
 
 #### Launch multiple analysis:  
