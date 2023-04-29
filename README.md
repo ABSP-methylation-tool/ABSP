@@ -1,4 +1,4 @@
-![Active version - v1.1.2](https://img.shields.io/badge/Active_version-v1.1.2-1bc421)
+![Active version - v1.2.0](https://img.shields.io/badge/Active_version-v1.2.0-1bc421)
 ![Platform - Windows/MacOS/Linux](https://img.shields.io/badge/Platform-Windows/MacOS/Linux-0d7ebf)
 [![License - GPL-3](https://img.shields.io/badge/License-GPL--3-d8b125)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
