@@ -1,4 +1,4 @@
-![Active version - v1.2.0](https://img.shields.io/badge/Active_version-v1.2.0-1bc421)
+![Active version - v1.2.1](https://img.shields.io/badge/Active_version-v1.2.1-1bc421)
 ![Platform - Windows/MacOS/Linux](https://img.shields.io/badge/Platform-Windows/MacOS/Linux-0d7ebf)
 [![License - GPL-3](https://img.shields.io/badge/License-GPL--3-d8b125)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -68,9 +68,9 @@ Find example data of inputs and outputs in the "examples" folder.
 * View the results in the .html report generated in your "reports" folder
 * Look for output files in your "results" folder
 
-<img src="./examples/results/Example data/Test sequence/grouped_results_direct_20230429-1821/lollipop_plots/plots_replicates/Test sequence_lollipop_replicates_as-is_proportional.png" width="600" />
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct_20230609-1727/lollipop_plots/plots_replicates/Test sequence_lollipop_replicates_as-is_proportional.png" width="600" />
 
-<img src="./examples/results/Example data/Test sequence/grouped_results_direct_20230429-1821/meth_profile_plots/Test sequence_meth_profile_collection1_proportional_psign.png" width="600" />
+<img src="./examples/results/Example data/Test sequence/grouped_results_direct_20230609-1727/meth_profile_plots/Test sequence_meth_profile_collection1_proportional_psign.png" width="600" />
 
 
 #### Launch multiple analysis:  

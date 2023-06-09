@@ -2024,6 +2024,8 @@ if (useSeqF==T & useSeqR==F) {
 if (useSeqF==F & useSeqR==T) {
   BisConRate_all <- BisConRate$R[,c(1,9)]
 }
+BisConRate_all <- BisConRate_all[order(BisConRate_all[,1]),]
+rownames(BisConRate_all) <- NULL
 ```
 
 ```{r QC table row F, include=F, eval=useSeqF}
@@ -2195,32 +2197,36 @@ formattable(QC_mismatch_R, align=rep("c",ncol(QC_mismatch_R)))} else {
 
 #### Forward
 ```{r QC indel F 2, results='asis', eval=useSeqF}
-if (pa_F@pattern@indel@partitioning@end!=0 | pa_F@subject@indel@partitioning@end!=0) {
-  data_length <- max(length(indel$sequencing_F),length(indel$dna_ref_F))
-  QC_indel_F <- data.frame(matrix(nrow=data_length,ncol=2))
-  colnames(QC_indel_F) <- c("Indel positions in \n trimmed sequencing result","Indel positions in \n reference DNA sequence")
-  QC_indel_F[,1] <- indel$sequencing_F
-  QC_indel_F[,2] <- indel$dna_ref_F
-  QC_indel_F[which(is.na(QC_indel_F)==T)] <- ""
-  formattable(QC_indel_F, align=c("c","c"))} else {
-  cat("No insertions/deletions in forward alignment.")
+
+if (pa_F@pattern@indel@partitioning@end!=0) {
+  QC_indel_seq_F <- data.frame("indel_seq"=indel$sequencing_F)
+  colnames(QC_indel_seq_F) <- c("Indel positions in trimmed sequencing result")
+  formattable(QC_indel_seq_F, align=c("c","c"))
 }
+if (pa_F@subject@indel@partitioning@end!=0) {
+  QC_indel_ref_F <- data.frame("indel_ref"=indel$dna_ref_F)
+  colnames(QC_indel_ref_F) <- c("Indel positions in reference DNA sequence")
+  formattable(QC_indel_ref_F, align=c("c","c"))
+}
+if (pa_F@pattern@indel@partitioning@end==0 & pa_F@subject@indel@partitioning@end==0) {cat("No insertion/deletion in forward alignment.")}
 ```
 
 
 
 #### Reverse
 ```{r QC indel R 2, results='asis', eval=useSeqR}
-if (pa_R@pattern@indel@partitioning@end!=0 | pa_R@subject@indel@partitioning@end!=0) {
-  data_length <- max(length(indel$sequencing_R),length(indel$dna_ref_R))
-  QC_indel_R <- data.frame(matrix(nrow=data_length,ncol=2))
-  colnames(QC_indel_R) <- c("Indel positions in \n sequence from sequencing result","Indel positions in \n reference DNA sequence")
-  QC_indel_R[,1] <- indel$sequencing_R
-  QC_indel_R[,2] <- indel$dna_ref_R
-  QC_indel_R[which(is.na(QC_indel_R)==T)] <- ""
-  formattable(QC_indel_R, align=c("c","c"))} else {
-  cat("No insertions/deletions in reverse alignment.")
+
+if (pa_R@pattern@indel@partitioning@end!=0) {
+  QC_indel_seq_R <- data.frame("indel_seq"=indel$sequencing_R)
+  colnames(QC_indel_seq_R) <- c("Indel positions in trimmed sequencing result")
+  formattable(QC_indel_seq_R, align=c("c","c"))
 }
+if (pa_R@subject@indel@partitioning@end!=0) {
+  QC_indel_ref_R <- data.frame("indel_ref"=indel$dna_ref_R)
+  colnames(QC_indel_ref_R) <- c("Indel positions in reference DNA sequence")
+  formattable(QC_indel_ref_R, align=c("c","c"))
+}
+if (pa_R@pattern@indel@partitioning@end==0 & pa_R@subject@indel@partitioning@end==0) {cat("No insertion/deletion in reverse alignment.")}
 ```
 
 
@@ -2690,12 +2696,16 @@ if (!file.exists(legend_bases_path)) {
 
 ```{r plot generation, include=F}
 # Plot generation
-
-plot_path <- file.path(indivDir$plot,paste0(fileprefix,"_plot.png"))
-png(filename=plot_path, width = alg_coord$max_length*10, height = 600)
-individual_meth_plot(meth=CG_meth_plot, start=alg_coord$min_start, end=alg_coord$max_end, genome = genome,
-                     plot_title = paste("Methylation plot of",exp_name), bases_colors=bases_colors)
-dev.off()
+tryCatch({
+  plot_path <- file.path(indivDir$plot,paste0(fileprefix,"_plot.png"))
+  png(filename=plot_path, width = alg_coord$max_length*10, height = 600)
+  individual_meth_plot(meth=CG_meth_plot, start=alg_coord$min_start, end=alg_coord$max_end, genome = genome,
+                       plot_title = paste("Methylation plot of",exp_name), bases_colors=bases_colors)
+  dev.off()
+},
+error=function(e){
+  cat("ERROR:",conditionMessage(e), "\n")
+})
 ```
 
 

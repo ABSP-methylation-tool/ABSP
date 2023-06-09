@@ -1305,7 +1305,6 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("no_
   # Parameters
   nb <- list(
     CG = length(unique(table$CG_coord)),
-    collection = length(levels(table$collection)),
     group = length(as.character(unique(table$group))))
   
   if (nchar(max(as.character(unique(table$group))))<=12) {
@@ -1329,7 +1328,7 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("no_
     label_y <- seq(length.out = length(list_comb), from=110, by=12)
     
     boxplot <- ggplot(table, aes(x = group, y = meth)) + 
-      facet_grid(collection ~ CG_coord) + # grid
+      facet_grid(cols = vars(CG_coord)) + # grid
       geom_dotplot(aes(col=group),fill="white", stroke = 2, binaxis = 'y', stackdir='center', binwidth = 1, dotsize = 5, na.rm = T) +
       stat_summary(aes(col=group),fun = "mean", size = 1.5, shape = 18) +
       scale_y_continuous(limits = c(-10, max(label_y)+10), breaks = seq(0,100,50),  minor_breaks = seq(0, 100, 10))
@@ -1397,12 +1396,12 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("no_
   # p value format : no p value displayed
   if (p_label=="no_p") {
     boxplot <- suppressMessages(boxplot + 
-                                  scale_y_continuous(limits = c(0, 110), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10)))
+                                  scale_y_continuous(limits = c(0, 100), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10)))
   }
  
   # save ggplot
   width_plot <- max(((450*nb$group)*nb$CG)+400, nchar(plot_title)*35)
-  height_plot <- (1400*nb$collection)+400
+  height_plot <- 1800
   if(width_plot >= 50000) {return(cat("Warning: The boxplot width exceeded the max limit of 50000 px, it was not generated."))} 
   ggsave(filename = filename, width = width_plot, height = height_plot, dpi=300, units = c("px"),limitsize = FALSE)
 }
@@ -1415,9 +1414,7 @@ boxplot_pos <- function(table, filename, plot_title, cloning_exp, p_label=c("no_
 boxplot_mean <- function(table, filename, plot_title, p_label=c("no_p","pval","psign"), list_comb, plot_colors) {
   
   # Parameters
-  nb <- list(
-    collection = length(unique(table$collection)),
-    group = length(as.character(unique(table$group))))
+  nb <- list(group = length(as.character(unique(table$group))))
   
   if (nchar(max(as.character(unique(table$group))))<=12) {
     angle <- 0 
@@ -1450,13 +1447,12 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("no_p","pval","p
     theme(
       line=element_line(size=1),
       plot.title.position = "plot",
-      plot.title = element_text(hjust=0.5,size = 19, face = "bold", color = "black"), # center title
-      axis.title.x.bottom = element_text(size = 16, face = "bold", vjust = -2),
-      axis.title.y.left = element_text(size = 16, face = "bold", vjust = 2),
+      plot.title = element_text(hjust=0.5,size = 16, face = "bold", color = "black"), # center title
+      axis.title.x.bottom = element_text(size = 14, face = "bold", vjust = -2),
+      axis.title.y.left = element_text(size = 14, face = "bold", vjust = 2),
       axis.text.x = element_text(angle = angle, vjust = vjust, hjust = hjust, size = size),
-      axis.text.x.bottom = element_text(size = 15, color = "black"),
-      axis.text.y.left = element_text(size = 14, color = "black"),
-      strip.text.x = element_text(size = 16, color = "black"),
+      axis.text.x.bottom = element_text(size = 12, color = "black"),
+      axis.text.y.left = element_text(size = 12, color = "black"),
       panel.grid.major.x = element_blank(),
       legend.position = "none",
       panel.spacing = unit(1, "line"),
@@ -1464,10 +1460,6 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("no_p","pval","p
       aspect.ratio = 3/nb$group) # ratio height/width of plots
   
   
-  # one panel per collection if more than one
-  if (nb$collection>1) { 
-    boxplot <- boxplot + facet_wrap(~collection) 
-    } 
   
   # p value format : p value
   if (p_label=="pval") { 
@@ -1488,11 +1480,11 @@ boxplot_mean <- function(table, filename, plot_title, p_label=c("no_p","pval","p
   # p value format : no p value displayed
   if (p_label=="no_p") {
     boxplot <- suppressMessages(boxplot + 
-                                  scale_y_continuous(limits = c(0, 110), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10)))
+                                  scale_y_continuous(limits = c(0, 100), breaks = seq(0,100,20), minor_breaks = seq(0, 100, 10)))
   }
   
   # save ggplot
-  width_plot <- max(((450*nb$group)*nb$collection)+800, nchar(plot_title)*40)
+  width_plot <- max(((450*nb$group))+800, nchar(plot_title)*40)
   height_plot <- 1800
   if(width_plot >= 50000) {return(cat("Warning: The boxplot width exceeded the max limit of 50000 px, it was not generated."))}
   ggsave(filename = filename, width = width_plot, height = height_plot, dpi=300, units = c("px"),limitsize = FALSE)
@@ -1546,20 +1538,29 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   KW_df <- KW_df[which(KW_df$CG %in% setdiff(KW_df$CG,cg_no_data)),] # Remove CG positions for which 1 grop only have data
   
   
-  KW_df <- KW_df %>% 
-    group_by(CG) %>% 
-    dplyr::mutate(p=kruskal.test(meth ~ group)$p.value) %>% # KW test on all values
-    add_significance("p") %>% 
-    dplyr::select(CG,group,meth_mean,p,p.signif) %>% 
-    unique()
+  KW_df <- tryCatch( {
+    KW_df %>% 
+      group_by(CG) %>% 
+      dplyr::mutate(p=kruskal.test(meth ~ group)$p.value) %>% # KW test on all values
+      add_significance("p") %>% 
+      dplyr::select(CG,group,meth_mean,p,p.signif) %>% 
+      unique() 
+  }, 
+  error=function(e){
+    cat("ERROR:",conditionMessage(e), "\n")
+  })
+    
+  if(!is.null(nrow(KW_df))) {
+    KW_df <- KW_df %>% 
+      group_by(CG) %>% 
+      dplyr::mutate(meth_max = max(meth_mean)) %>%  # Get max of mean values, for y position of label
+      dplyr::select(CG,meth_max,p,p.signif) %>% 
+      unique()
+    KW_df$p <- p_format(KW_df$p)
+    KW_df$p.signif[which(KW_df$p.signif=="ns")] <- ""
+  }
+
   
-  KW_df <- KW_df %>% 
-    group_by(CG) %>% 
-    dplyr::mutate(meth_max = max(meth_mean)) %>%  # Get max of mean values, for y position of label
-    dplyr::select(CG,meth_max,p,p.signif) %>% 
-    unique()
-  KW_df$p <- p_format(KW_df$p)
-  KW_df$p.signif[which(KW_df$p.signif=="ns")] <- ""
   
   #─────────────────────────────────────────────────────────────────────────────────────────────────────────
   # Get means of groups
@@ -1624,14 +1625,16 @@ profile_plot <- function(table, filename, plot_title, plotType=c("proportional",
   
   #───────────────────────────────────────────────────────────────────────────────────────────────────────── 
   # Kruskal Wallis significance
-  if (p_label=="pval") {
-    plot <- plot +
-      geom_text(data = KW_df, aes(x = CG, y = meth_max, label = p), size = 3.5, vjust=-2)
-  }
-  
-  if (p_label=="psign") {
-    plot <- plot +
-      geom_text(data = KW_df, aes(x = CG, y = meth_max, label = p.signif), size = 3.5, vjust=-2)
+  if(!is.null(nrow(KW_df))) {
+    if (p_label=="pval") {
+      plot <- plot +
+        geom_text(data = KW_df, aes(x = CG, y = meth_max, label = p), size = 3.5, vjust=-2)
+    }
+    
+    if (p_label=="psign") {
+      plot <- plot +
+        geom_text(data = KW_df, aes(x = CG, y = meth_max, label = p.signif), size = 3.5, vjust=-2)
+    }
   }
   
   #─────────────────────────────────────────────────────────────────────────────────────────────────────────
