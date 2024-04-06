@@ -10,6 +10,14 @@ ABSP,  which stands for *"Analysis of Bisulfite Sequencing PCR"*, is an R-based 
 It was developed to assist researchers in estimating and comparing methylation percentages of a DNA regions studied through BSP experiments.
 ABSP offers a comprehensive automated workflow, spanning from trace file sequencing results to data visualization and statistical analysis.
 
+Contents:
+
+* [Citation](#citation)
+* [Availability](#availability)
+* [Quick start guide](#quick-start-guide)
+* [FAQ](#faq)
+* [Licence](#license)
+
 For further detailed information, please read the [**ABSP User Guide**](https://github.com/ABSP-methylation-tool/ABSP/blob/813568d14944b20488cc01582a61dfbd602f744c/ABSP%20User%20Guide.pdf) document.
 
 <br>
@@ -79,7 +87,7 @@ You can locate example data for both inputs and outputs in the "examples" folder
 
 The "Multiple analyses" tab is useful to analyze multiple samples and/or for multiple grouping analysis, launched in one click, using as input tables filled with the required input entries.
 
-
+<br>
 
 ## FAQ
 
