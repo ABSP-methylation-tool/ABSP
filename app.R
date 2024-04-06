@@ -81,9 +81,9 @@ ui <- fluidPage(
                                    
                                    br(),
                                    
-                                   p("ABSP is a R based tool to analyze Bisulfite Sequencing PCR (BSP) experiment results, which is why it is the acronym for 'Analysis of Bisulfite Sequencing PCR'."), 
-                                   p("It was developed to help researchers estimate and compare CpG methylation percentages of a DNA region studied using BSP experiments."),
-                                   p("It provides a complete automated workflow, from trace file sequencing results to data visualization and statistics."),
+                                   p("ABSP is a R-based tool designed to analyze results from Bisulfite Sequencing PCR (BSP) experiments, hence its acronym 'Analysis of Bisulfite Sequencing PCR'."), 
+                                   p("It was developed to assist researchers in estimating and comparing CpG methylation percentages of DNA regions studied using BSP experiments."),
+                                   p("It offers a comprehensive automated workflow, spanning from trace file sequencing results to data visualization and statistical analysis."),
                                    
                                    br()
                                    
@@ -359,7 +359,7 @@ ui <- fluidPage(
                                     
                                     # WARNINGS
                                     
-                                    h5("Be aware that these entries must not contain any special characters :", 
+                                    h5("Be aware that these entries must not contain any special characters such as :", 
                                        htmltools::tags$code("/ \\ : * ? ! \" ' ` < > | & % @ # + = { }", style="color:grey ; background-color:transparent"),
                                        style="color:#bf3232"),
                                     
@@ -367,8 +367,8 @@ ui <- fluidPage(
                                        htmltools::tags$code(" space - _ ", style="color:grey ; background-color:transparent"), 
                                        style="color:#bf3232"),
                                     
-                                    h5("All entries must be named consistently between the different analysis 
-                                                    (e.g. the group names must strickly be identical between samples of the same group).", 
+                                    h5("All entries must be named consistently across the different analyses 
+                                                    (e.g. the group names must strickly be identical between samples belonging to the same group).", 
                                        style="color:#bf3232"),
                                     
                                     hr(),
@@ -376,10 +376,10 @@ ui <- fluidPage(
                                     div( # FOLDER
                                         h4("Select existing folder", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("Select an existing folder within the ABSP results folder to locate all of the analysis results.
-                                                       Having different folders of results can be use to separate the different analysis by projects, 
+                                                       Organizing results into separate folders can help differentiate analyses by projects, 
                                                        experiments or users."),
-                                        p("To create a new folder, select the 'Create new folder' entry and enter the name 
-                                                       of the new folder in the text input. Note that the six first letters will appear in the report file name.")
+                                        p("To create a new folder, select the 'Create new folder' option and enter the desired 
+                                                        name in the text input. Please note that the six first letters of the folder name will appear in the report file name.")
                                     ),
                                     
                                     hr(),
@@ -397,11 +397,11 @@ ui <- fluidPage(
                                     
                                     div( # COLLECTION
                                         h4("Enter collection name", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("The collection corresponds to a separation of samples above groups. 
-                                          Samples from different collections can not be compared, even if they belong to the same group. 
-                                          For example, collections can be different cell lines, organs, or patients, in which the same 
-                                          groups are compared but not between the different collections. 
-                                          To compare these types of samples, consider them as groups."),
+                                        p("The term 'collection' refers to a segragation of samples above the level of 'groups'. 
+                                          Samples from different collections cannot be compared, even if they belong to the same group. 
+                                          For instance, collections might represent different cell lines, organs, or patients, where comparisons 
+                                          between groups are made within each collection but not between different collections.  
+                                          To actually compare these types of samples, consider them as groups instead collections."),
                                         em("If you do not want to specify any collection, leave empty or enter '0'. 
                                            Make sure the collection name is strictly identical for all samples of the same collection.")
                                     ),
@@ -410,9 +410,9 @@ ui <- fluidPage(
                                     
                                     div( # GROUP
                                         h4("Enter group name", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("The group corresponds to the condition you want to compare in the grouped analysis. 
+                                        p("The term 'group' represents the condition you intend to compare in the grouped analysis. 
                                           For example, groups can be the 'control' and 'treated' conditions."),
-                                        em("The group field entry is required. Make sure the group name is strictly identical for all samples of the same group.")
+                                        em("The group field entry is required. Ensure that the group name is consistent across all samples belonging to the same group.")
                                     ),
                                     
                                     hr(),
@@ -420,8 +420,8 @@ ui <- fluidPage(
                                     div( # REPLICATE
                                         h4("Direct-BSP - Enter replicate number", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("In the case of direct sequencing of PCR products only (direct-BSP). 
-                                          The replicate number corresponds to the number of repetition for one group, for experiment reproducibility 
-                                          and statistic significance determination. A minimum of 3 replicates is generally recommended.")
+                                          The 'replicate number' refers to the number of repetitions within a single group, for experiment reproducibility 
+                                          and statistic significance determination. It is generally recommended to have a minimum of 3 replicates for statistical analysis.")
                                     ),
                                     
                                     hr(),
@@ -429,8 +429,8 @@ ui <- fluidPage(
                                     div( # CLONE
                                         h4("Cloning-BSP - Enter clone number", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("In the case of clone sequencing only (cloning-BSP). 
-                                          The clone number corresponds to the identification number of each clone for one group. 
-                                          In general, the sequencing of 10 clones is recommended for results reliability.")
+                                          The 'clone number' represents the identification number assigned to each clone within a group. 
+                                          Typically, sequencing around 10 clones is advised to ensure the reliability of results.")
                                     )
                                 ),
                                 
@@ -445,29 +445,29 @@ ui <- fluidPage(
                                     
                                     div( # GENOME
                                         h4("Select genome", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select the reference genome. Only used to display the genomic sequence in the genomic plot."),
-                                        p("Make sure to click on 'Pre-install genome' button if the selected genome is used for the first time.", 
+                                        p("Select the reference genome. This is solely used for displaying the genomic sequence in the genomic plot."),
+                                        p("Ensure to click on the 'Pre-install genome' button if the selected genome is being used for the first time.", 
                                           style="color:#bf3232"),
-                                        em("Only a few of the available genomes are listed in the selection tab, but more genomes can be used. 
-                                           If your studied genome does not appear please refer to the user guide.")
+                                        em("Note that only a limited number of genomes are listed in the selection tab, but more genomes can be used. 
+                                           If your studied genome is not listed please refer to the user guide for further instructions.")
                                     ),
                                     
                                     hr(),
                                     
                                     div( # FASTA
                                         h4("Select .fasta file of reference DNA sequence", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select the file '.fasta' in your folders to provide the reference DNA sequence from the plus strand of genome.
-                                                       The fasta file must contain in the header two elements :"),
+                                        p("Select the '.fasta' file from your folders to provide the reference DNA sequence from the plus strand of genome.
+                                                       The fasta file header must contain two elements :"),
                                         htmltools::tags$ul(
-                                          htmltools::tags$li("The precise genomic coordinates of the sequence contained in the file,in the strict format : ", br(),
+                                          htmltools::tags$li("The precise genomic coordinates of the sequence contained in the file, following this strict format : ", br(),
                                                     span("chr#:######-###### (e.g. chr16:68771087-68771462)", style="color:#40b7a0")),
                                             
                                           htmltools::tags$li("The strand chosen for primer design : the strand complementary to primers after bisulfite 
-                                                                 conversion, in the strict format : ", br(),
+                                                                 conversion, following this strict format : ", br(),
                                                     span("primers=plus or primers=minus", style="color:#40b7a0"))
                                         ),
-                                        em("Note that any other information in the header, as the sequence name for example, can be added 
-                                                        without consequences if they do not interfere with the previously described formats."),
+                                        em("Note that any additional information in the header, such as the sequence name for example,
+                                                        can be included without consequences as long as it does not interfere with the formats described above."),
                                         
                                         br(),
                                         
@@ -486,9 +486,9 @@ ui <- fluidPage(
                                     br(),
                                     
                                     div( # DATE
-                                        h4("Select dates of sequencing", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("In a matter of traceability, you can select the dates when the sequencing runs were performed."),
-                                        em("If one of the sequencing files is not provided, the date entry must be empty.")
+                                        h4("Select sequencing dates", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
+                                        p("For traceability purposes, you can select the dates when the sequencing runs were performed."),
+                                        em("If one of the sequencing files is not provided, leave the date entry empty.")
                                     ),
                                     
                                     hr(),
@@ -496,7 +496,7 @@ ui <- fluidPage(
                                     div( # SEQ 
                                         h4("Select .ab1 sequencing files", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("Select the files in your folders corresponding to the .ab1 sequencing files. 
-                                          The sequencing reads from one direction (#1) and the other direction (#2) should both be provided, although the analysis can be runned with only one sequencing read provided."),
+                                          Both the sequencing reads from one direction (#1) and the other direction (#2) should be provided, although the analysis can be run with only one sequencing read provided."),
                                         p("The directions (forward or reverse) will be determined during the analysis.")
                                     )
                                 )
@@ -586,16 +586,16 @@ ui <- fluidPage(
                                     
                                     div( # FOLDER
                                         h4("Select folder", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select an existing folder within the ABSP results folder to retrieve the previously 
+                                        p("Select an existing folder within the ABSP results folder to retrieve previously 
                                                        generated methylation data files after individual analyses, and to locate the newly 
-                                                       generated results of the grouped analysis.")
+                                                       generated results from the grouped analysis.")
                                     ),
                                     
                                     hr(),
                                     
                                     div( # SEQUENCE
                                         h4("Select sequence", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select an existing folder corresponding to the name of your sequence, to retrieve the previously 
+                                        p("Select an existing folder corresponding to the name of your sequence, to retrieve previously 
                                                        generated methylation data files after individual analyses, and to locate the newly 
                                                        generated results of the grouped analysis.")
                                     ),
@@ -604,15 +604,15 @@ ui <- fluidPage(
                                     
                                     div( # GENOME
                                         h4("Select genome", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select the reference genome. Only used to display the genomic sequence in the genomic plots.")
+                                        p("Select the reference genome. This is solely used to display the genomic sequence in the genomic plots.")
                                     ),
                                     
                                     hr(),
                                     
                                     div( # EXP
                                         h4("Select experiment type", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select the experiment type, either 'Direct-BSP' or 'Cloning-BSP', for proper 
-                                                       retrieval of methylation data and analysis specification.") 
+                                        p("Select the experiment type as either 'Direct-BSP' or 'Cloning-BSP', to ensure proper 
+                                                       retrieval of methylation data and specification of analysis.") 
                                     )
                                     
                                 ),
@@ -628,16 +628,16 @@ ui <- fluidPage(
                                     
                                     div( # POS LABS
                                         h4("Select position labels for plots", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Select which label type you want to display as the CpG positions in plots, among 'CpG coordinates', 'CpG numbers' and 'None'.
-                                               Note that in case of extremely close CpG positions, labels may overlap, therefore the 'None' label type can provide a good alternative.")
+                                        p("Select the label type to display as CpG positions in plots, options include 'CpG coordinates', 'CpG numbers' and 'None'.
+                                               Note that in cases of extremely close CpG positions, labels may overlap, so selecting 'None' can be a suitable alternative.")
                                     ),
                                     
                                     hr(),
                                     
                                     div( # COLL SEP
                                         h4("Collection separation", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Parameter to completely separate collections for display in plots or not, in both cases the groups of different collection are not compared.
-                                          If unchecked, plots will represents all samples of all collections, and if checked each collection will be represented in a separated plot.")
+                                        p("This parameter determines whether collections are completely separated for display in plots or not. In both cases, groups of different collection are not compared.
+                                          If unchecked, plots will represents all samples of all collections together. If checked each collection will be represented in a separated plot.")
                                     ),
                                     
                                     hr(),
@@ -645,20 +645,20 @@ ui <- fluidPage(
                                     div( # GROUP ORDER
                                         h4("Select groups in the desired order for display", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
                                         p("The names of groups are retrieved from files in the selected folder above. 
-                                          Select the desired group for the analysis, in the correct order to display samples in plots.")
+                                          Select the desired groups for analysis in the correct order to display samples in plots.")
                                     ),
                                     
                                     hr(),
                                     
                                     div( # SAMPLE ORDER
                                         h4("Select the types of sample ordering for plots", style="color:#374e64 ; font-weight: bold ; font-size:17px"),
-                                        p("Choose from one to four of the sample ordering available for plots :"),
+                                        p("Choose from one to four available options for sample ordering in plots :"),
                                         htmltools::tags$ul(
                                           htmltools::tags$li("'As it is' arranges samples by alphabetic order of collections. 
-                                                    If none or one collection are present, this order is equivalent as the 'By groups' one."),
+                                                    If none or only one collection is present, this order is equivalent to 'By groups'."),
                                           htmltools::tags$li("'By groups' arranges samples by the provided group order above."),
-                                          htmltools::tags$li("'By methylation levels' arranges samples depending on their methylation mean."),
-                                          htmltools::tags$li("'By clusters' arranges samples depending on the hierarchical clustering calculated and represented by an associated dendrogram.")
+                                          htmltools::tags$li("'By methylation levels' arranges samples based on their mean methylation levels."),
+                                          htmltools::tags$li("'By clusters' arranges samples based on hierarchical clustering, which is depicted in an associated dendrogram.")
                                         )
                                     )
                                 )
@@ -767,31 +767,31 @@ ui <- fluidPage(
                                           br(),
                                           
                                           h4("Automated launch of multiple analyses"),
-                                          p("Several analyses can be launched from this tab, in only one click, using pre-filled tables containing the input entries."),
+                                          p("Several analyses can be launched from this tab with just one click, using pre-filled tables containing the input entries."),
                                           
                                           br(),
                                           
                                           h4("How to proceed ?"),
-                                          p("1. Fill one or the two input tables below with the sample information and the choice of parameters 
-                                            (you can open the tables files with the buttons below)."),
+                                          p("1. Fill out one or the input tables below with the sample information and the chosen parameters 
+                                            (you can open the tables files with the buttons provided below)."),
                                           
-                                          p("2. In the left panel, select an existing folder within the ABSP results folder to locate all of the analyses results."),
-                                          p("To create a new folder, select the 'Create new folder' entry and enter the name of the new folder in the text input. Note that the six first letters will appear in the report file name."),
+                                          p("2. In the left panel, select an existing folder within the ABSP results folder to store all of the analyses results."),
+                                          p("To create a new folder, select the 'Create new folder' option and enter desired name in the text input. Please note that the six first letters of the folder name will appear in the report file name."),
                                           
                                           
                                           p("3. In the left panel, select your filled table as input."), 
-                                          p("Both the sample data table for multiple individual analyses and the parameters table for multiple grouped analyses can be provided at the same time to launch the individual analyses followed by the grouped analyses,
-                                            or only one of the two tables can be provided and will launch the corresponding analyses, either individual analyses or grouped analyses."),
+                                          p("Both the sample data table for multiple individual analyses and the parameter table for multiple grouped analyses can be provided concomitantly to launch individual analyses followed by grouped analyses.
+                                             Alternatively, you can provide only one of the two tables, which will launch the corresponding analyses, either individual or grouped."),
                                           
-                                          p("4. Launch the analyses by clicking on the bottom button 'Run analyses'. "),
-                                          p("All the input analyses will be launch one after the other, do not close the app until the end."),
+                                          p("4. Launch the analyses by clicking on the 'Run analyses' button. "),
+                                          p("All the input analyses will be launch one after the other, do not close the app until all analyses have completed."),
                                         
                                           em("Note: The tables files are located in the 'documents' folder. The input file format must be either '.xlsx' or '.csv'."),
                                           
                                           hr(),
                                           
                                           h4("Sample data for individual analyses"),
-                                          p("The table regroups the individual analyses inputs."),
+                                          p("The table compiles the inputs for individual analyses."),
                                           
                                           actionButton("exp_tab_open"," Open multiple individual analysis table file", 
                                                        icon=shiny::icon("folder-open", lib = "font-awesome", style="padding-right:8px ;"),
@@ -800,7 +800,7 @@ ui <- fluidPage(
                                           hr(),
                                           
                                           h4("Parameters for the grouped analyses"),
-                                          p("The table regroups the grouped analyses inputs."),
+                                          p("The table compiles the inputs for grouped analyses."),
                                           
                                           actionButton("group_tab_open"," Open multiple grouped analyses table file", 
                                                        icon=shiny::icon("folder-open", lib = "font-awesome", style="padding-right:8px ;"),
@@ -827,7 +827,6 @@ ui <- fluidPage(
     br(),
     
     #─────────────────────────────────────────────────────────────────────────────────────────────────────────
-    # Close button -------------------------------------------------------------------------------------------
     
     div(class="navbar navbar-default navbar-fixed-bottom",
         style="min-height: 40px;",
@@ -835,17 +834,8 @@ ui <- fluidPage(
             div(style="padding-right: 15px; padding-left: 15px;", 
                 
                 column(width=6,
-                       p("ABSP v1.2.1 - Copyright © 2023 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px")),
+                       p("ABSP v1.2.2 - Copyright © 2023 CANTHER laboratory, released under the GPL-3 license", style="font-size:14px ; color:#ffffff ; padding-top:15px"))
                 
-                column(width=6,
-                       htmltools::tags$button(
-                           id = 'close',
-                           type = "button",
-                           class = "btn btn-default action-button btn-primary navbar-btn pull-right shiny-bound-input",
-                           style = "background-color: #40b7a0; border-color: #40b7a0 ; float: right!important; margin-right:10px; border-width: 0px; padding: 6px 15px;",
-                           onclick = "setTimeout(function(){window.close();},500);",  # close browser
-                           "Close"
-                       ))
             )
             
         )
@@ -866,11 +856,6 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   
   
-  #─────────────────────────────────────────────────────────────────────────────────────────────────────────
-  # Close button -------------------------------------------------------------------------------------------
-  observe({
-    if (input$close > 0) stopApp() # stop shiny
-  })
   # Close app when browser page is closed
   session$onSessionEnded(stopApp)
   
@@ -1478,17 +1463,10 @@ server <- function(input, output, session) {
             })
           })
         })
-        
       }
     }
-    
   })
-  
-  
 }
-
-
-
 
 
 # Run the application 
@@ -1496,50 +1474,74 @@ shinyApp(ui = ui, server = server)
 
 
 # > sessionInfo()
-# R version 4.2.1 (2022-06-23 ucrt)
+# R version 4.3.3 (2024-02-29 ucrt)
 # Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 10 x64 (build 22621)
+# Running under: Windows 11 x64 (build 22631)
 # 
 # Matrix products: default
 # 
+# 
 # locale:
-#   [1] LC_COLLATE=en_SE.utf8  LC_CTYPE=en_SE.utf8    LC_MONETARY=en_SE.utf8 LC_NUMERIC=C           LC_TIME=en_SE.utf8    
+#   [1] LC_COLLATE=French_France.utf8  LC_CTYPE=French_France.utf8    LC_MONETARY=French_France.utf8 LC_NUMERIC=C                  
+# [5] LC_TIME=French_France.utf8    
+# 
+# time zone: Europe/Paris
+# tzcode source: internal
 # 
 # attached base packages:
 #   [1] tools     parallel  grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-#   [1] shinybusy_0.3.1                   BSgenome.Hsapiens.UCSC.hg19_1.4.3 sangeranalyseR_1.6.1              logger_0.2.2                      BiocStyle_2.24.0                  shinyWidgets_0.7.6               
-# [7] shinycssloaders_1.0.0             excelR_0.4.0                      zeallot_0.1.0                     DT_0.27                           data.table_1.14.8                 shinyjs_2.1.0                    
-# [13] shinydashboard_0.7.2              gridExtra_2.3                     sangerseqR_1.32.0                 phangorn_2.11.1                   reshape2_1.4.4                    DECIPHER_2.24.0                  
-# [19] RSQLite_2.3.0                     ape_5.7-1                         stringr_1.5.0                     Gviz_1.40.1                       BSgenome_1.64.0                   rtracklayer_1.56.1               
-# [25] GenomicRanges_1.48.0              Biostrings_2.64.1                 XVector_0.36.0                    webshot_0.5.4                     shinythemes_1.2.0                 seqinr_4.2-23                    
-# [31] rstatix_0.7.2                     Rmisc_1.5.1                       plyr_1.8.8                        lattice_0.20-45                   rmarkdown_2.21                    rlist_0.4.6.2                    
-# [37] readr_2.1.4                       RColorBrewer_1.1-3                purrr_1.0.1                       png_0.1-8                         plotly_4.10.1                     pdftools_3.3.3                   
-# [43] openxlsx_4.2.5.2                  knitr_1.42                        htmlwidgets_1.6.2                 htmltools_0.5.5                   ggpubr_0.6.0                      ggplot2_3.4.1                    
-# [49] ggdendro_0.1.23                   GenomeInfoDb_1.32.4               IRanges_2.30.1                    S4Vectors_0.34.0                  BiocGenerics_0.42.0               formattable_0.2.1                
-# [55] dplyr_1.1.1                       DiagrammeR_1.0.9                  compareGroups_4.6.0               BiocManager_1.30.20               arrangements_1.1.9                shiny_1.7.4                      
+#   [1] sangeranalyseR_1.12.0 logger_0.3.0          BiocStyle_2.30.0      shinyWidgets_0.8.3    shinycssloaders_1.0.0
+# [6] excelR_0.4.0          zeallot_0.1.0         DT_0.32               data.table_1.15.4     shinyjs_2.1.0        
+# [11] shinydashboard_0.7.2  gridExtra_2.3         sangerseqR_1.38.0     phangorn_2.11.1       reshape2_1.4.4       
+# [16] DECIPHER_2.30.0       RSQLite_2.3.6         ape_5.7-1             stringr_1.5.1         Gviz_1.46.1          
+# [21] BSgenome_1.70.2       rtracklayer_1.62.0    BiocIO_1.12.0         GenomicRanges_1.54.1  Biostrings_2.70.3    
+# [26] XVector_0.42.0        webshot_0.5.5         shinythemes_1.2.0     shinybusy_0.3.3       seqinr_4.2-36        
+# [31] rstatix_0.7.2         Rmisc_1.5.1           plyr_1.8.9            lattice_0.22-5        rmarkdown_2.26       
+# [36] rlist_0.4.6.2         readr_2.1.5           RColorBrewer_1.1-3    purrr_1.0.2           png_0.1-8            
+# [41] plotly_4.10.4         pdftools_3.4.0        openxlsx_4.2.5.2      knitr_1.45            htmlwidgets_1.6.4    
+# [46] htmltools_0.5.8       ggpubr_0.6.0          ggplot2_3.5.0         ggdendro_0.2.0        GenomeInfoDb_1.38.8  
+# [51] IRanges_2.36.0        S4Vectors_0.40.2      BiocGenerics_0.48.1   formattable_0.2.1     dplyr_1.1.4          
+# [56] DiagrammeR_1.0.11     compareGroups_4.8.0   BiocManager_1.30.22   arrangements_1.1.9    shiny_1.8.1.1        
 # 
 # loaded via a namespace (and not attached):
-#   [1] rappdirs_0.3.3              ragg_1.2.5                  tidyr_1.3.0                 bit64_4.0.5                 DelayedArray_0.22.0         rpart_4.1.16                KEGGREST_1.36.3            
-# [8] RCurl_1.98-1.10             AnnotationFilter_1.20.0     generics_0.1.3              GenomicFeatures_1.48.4      callr_3.7.3                 mice_3.15.0                 chron_2.3-60               
-# [15] bit_4.0.5                   tzdb_0.3.0                  xml2_1.3.3                  httpuv_1.6.9                SummarizedExperiment_1.26.1 fontawesome_0.5.0           xfun_0.38                  
-# [22] hms_1.1.3                   jquerylib_0.1.4             evaluate_0.20               promises_1.2.0.1            fansi_1.0.4                 restfulr_0.0.15             progress_1.2.2             
-# [29] dbplyr_2.3.2                igraph_1.4.1                DBI_1.1.3                   Rsolnp_1.16                 ellipsis_0.3.2              crosstalk_1.2.0             backports_1.4.1            
-# [36] fontLiberation_0.1.0        fontBitstreamVera_0.1.1     biomaRt_2.52.0              deldir_1.0-6                MatrixGenerics_1.8.1        vctrs_0.6.1                 Biobase_2.56.0             
-# [43] ensembldb_2.20.2            abind_1.4-5                 cachem_1.0.7                withr_2.5.0                 HardyWeinberg_1.7.5         checkmate_2.1.0             GenomicAlignments_1.32.1   
-# [50] prettyunits_1.1.1           svglite_2.1.1               cluster_2.1.4               lazyeval_0.2.2              crayon_1.5.2                crul_1.3                    labeling_0.4.2             
-# [57] pkgconfig_2.0.3             nlme_3.1-162                ProtGenerics_1.28.0         nnet_7.3-17                 rlang_1.1.0                 lifecycle_1.0.3             fontquiver_0.2.1           
-# [64] filelock_1.0.2              httpcode_0.3.0              BiocFileCache_2.4.0         dichromat_2.0-0.1           matrixStats_0.63.0          flextable_0.9.0             Matrix_1.5-3               
-# [71] carData_3.0-5               base64enc_0.1-3             processx_3.8.0              viridisLite_0.4.1           rjson_0.2.21                bitops_1.0-7                visNetwork_2.1.2           
-# [78] blob_1.2.4                  qpdf_1.3.2                  jpeg_0.1-10                 ggsignif_0.6.4              scales_1.2.1                memoise_2.0.1               magrittr_2.0.3             
-# [85] zlibbioc_1.42.0             compiler_4.2.1              kableExtra_1.3.4            BiocIO_1.6.0                Rsamtools_2.12.0            cli_3.6.0                   ade4_1.7-22                
-# [92] ps_1.7.3                    htmlTable_2.4.1             Formula_1.2-5               MASS_7.3-58.2               tidyselect_1.2.0            stringi_1.7.12              textshaping_0.3.6          
-# [99] highr_0.10                  yaml_2.3.7                  askpass_1.1                 latticeExtra_0.6-30         sass_0.4.5                  VariantAnnotation_1.42.1    fastmatch_1.1-3            
-# [106] rstudioapi_0.14             uuid_1.1-0                  foreign_0.8-82              farver_2.1.1                digest_0.6.31               quadprog_1.5-8              gfonts_0.2.0               
-# [113] Rcpp_1.0.10                 car_3.1-1                   broom_1.0.4                 later_1.3.0                 writexl_1.4.2               httr_1.4.5                  gdtools_0.3.2              
-# [120] AnnotationDbi_1.58.0        biovizBase_1.44.0           colorspace_2.1-0            rvest_1.0.3                 XML_3.99-0.14               truncnorm_1.0-9             splines_4.2.1              
-# [127] systemfonts_1.0.4           xtable_1.8-4                gmp_0.7-1                   jsonlite_1.8.4              R6_2.5.1                    Hmisc_5.0-1                 pillar_1.9.0               
-# [134] mime_0.12                   glue_1.6.2                  fastmap_1.1.1               BiocParallel_1.30.4         codetools_0.2-18            utf8_1.2.3                  bslib_0.4.2                
-# [141] tibble_3.2.1                curl_5.0.0                  officer_0.6.1               zip_2.2.2                   openssl_2.0.6               interp_1.1-3                survival_3.5-5             
-# [148] munsell_0.5.0               GenomeInfoDbData_1.2.8      gtable_0.3.3   
+#   [1] ProtGenerics_1.34.0         matrixStats_1.2.0           bitops_1.0-7                fontawesome_0.5.2          
+# [5] httr_1.4.7                  backports_1.4.1             utf8_1.2.4                  R6_2.5.1                   
+# [9] lazyeval_0.2.2              jomo_2.7-6                  withr_3.0.0                 prettyunits_1.2.0          
+# [13] cli_3.6.2                   Biobase_2.62.0              textshaping_0.3.7           officer_0.6.5              
+# [17] sass_0.4.9                  askpass_1.2.0               Rsamtools_2.18.0            systemfonts_1.0.6          
+# [21] foreign_0.8-86              gfonts_0.2.0                svglite_2.1.3               dichromat_2.0-0.1          
+# [25] rstudioapi_0.16.0           httpcode_0.3.0              visNetwork_2.1.2            generics_0.1.3             
+# [29] shape_1.4.6.1               car_3.1-2                   zip_2.3.1                   Matrix_1.6-5               
+# [33] interp_1.1-6                fansi_1.0.6                 abind_1.4-5                 lifecycle_1.0.4            
+# [37] yaml_2.3.8                  carData_3.0-5               SummarizedExperiment_1.32.0 SparseArray_1.2.4          
+# [41] BiocFileCache_2.10.2        blob_1.2.4                  promises_1.2.1              crayon_1.5.2               
+# [45] mitml_0.4-5                 GenomicFeatures_1.54.4      KEGGREST_1.42.0             pillar_1.9.0               
+# [49] rjson_0.2.21                boot_1.3-29                 codetools_0.2-19            fastmatch_1.1-4            
+# [53] pan_1.9                     glue_1.7.0                  fontLiberation_0.1.0        qpdf_1.3.3                 
+# [57] vctrs_0.6.5                 gtable_0.3.4                cachem_1.0.8                xfun_0.43                  
+# [61] S4Arrays_1.2.1              mime_0.12                   survival_3.5-8              iterators_1.0.14           
+# [65] gmp_0.7-4                   nlme_3.1-164                bit64_4.0.5                 fontquiver_0.2.1           
+# [69] progress_1.2.3              filelock_1.0.3              bslib_0.7.0                 rpart_4.1.23               
+# [73] colorspace_2.1-0            DBI_1.2.2                   Hmisc_5.1-2                 nnet_7.3-19                
+# [77] ade4_1.7-22                 tidyselect_1.2.1            bit_4.0.5                   compiler_4.3.3             
+# [81] curl_5.2.1                  chron_2.3-61                glmnet_4.1-8                htmlTable_2.4.2            
+# [85] HardyWeinberg_1.7.7         flextable_0.9.5             mice_3.16.0                 xml2_1.3.6                 
+# [89] fontBitstreamVera_0.1.1     DelayedArray_0.28.0         checkmate_2.3.1             scales_1.3.0               
+# [93] quadprog_1.5-8              rappdirs_0.3.3              digest_0.6.35               minqa_1.2.6                
+# [97] pkgconfig_2.0.3             jpeg_0.1-10                 base64enc_0.1-3             lme4_1.1-35.2              
+# [101] MatrixGenerics_1.14.0       dbplyr_2.5.0                fastmap_1.1.1               ensembldb_2.26.0           
+# [105] rlang_1.1.3                 jquerylib_0.1.4             jsonlite_1.8.8              BiocParallel_1.36.0        
+# [109] VariantAnnotation_1.48.1    RCurl_1.98-1.14             magrittr_2.0.3              kableExtra_1.4.0           
+# [113] Formula_1.2-5               GenomeInfoDbData_1.2.11     munsell_0.5.1               Rcpp_1.0.12                
+# [117] gdtools_0.3.7               stringi_1.8.3               zlibbioc_1.48.2             MASS_7.3-60.0.1            
+# [121] deldir_2.0-4                splines_4.3.3               hms_1.1.3                   igraph_2.0.3               
+# [125] uuid_1.2-0                  ggsignif_0.6.4              biomaRt_2.58.2              crul_1.4.0                 
+# [129] XML_3.99-0.16.1             evaluate_0.23               latticeExtra_0.6-30         biovizBase_1.50.0          
+# [133] nloptr_2.0.3                tzdb_0.4.0                  foreach_1.5.2               httpuv_1.6.15              
+# [137] tidyr_1.3.1                 openssl_2.1.1               broom_1.0.5                 xtable_1.8-4               
+# [141] restfulr_0.0.15             AnnotationFilter_1.26.0     Rsolnp_1.16                 later_1.3.2                
+# [145] viridisLite_0.4.2           ragg_1.3.0                  truncnorm_1.0-9             tibble_3.2.1               
+# [149] memoise_2.0.1               AnnotationDbi_1.64.1        GenomicAlignments_1.38.2    writexl_1.5.0              
+# [153] cluster_2.1.6 
