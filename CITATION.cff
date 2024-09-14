@@ -55,5 +55,5 @@ preferred-citation:
   title: "ABSP: an automated R tool to efficiently analyze region-specific CpG methylation from bisulfite sequencing PCR"
   issue: 1
   volume: 39
-  pages: btad008
+  start: btad008
   year: 2023
