@@ -10,12 +10,18 @@ ABSP,  which stands for *"Analysis of Bisulfite Sequencing PCR"*, is an R-based 
 It was developed to assist researchers in estimating and comparing methylation percentages of a DNA regions studied through BSP experiments.
 ABSP offers a comprehensive automated workflow, spanning from trace file sequencing results to data visualization and statistical analysis.
 
-Contents:
+**Contents:**
 
 * [Citation](#citation)
 * [Availability](#availability)
 * [Quick start guide](#quick-start-guide)
-* [FAQ](#faq)
+  - [Installation](#installation)
+  - [Open the ABSP app](#open-the-absp-app)
+  - [Analysis with ABSP](#analysis-with-absp)
+* [FAQ - Frequently Asked Questions](#faq---frequently-asked-questions)
+  - [1. My reference genome is not available, what can I do ?](#1-my-reference-genome-is-not-available-what-can-i-do-)
+  - [2. My reference sequence doesn't exist in a reference genome (e.g. custom reporter sequence), what can I do ?](#2-my-reference-sequence-doesnt-exist-in-a-reference-genome-eg-custom-reporter-sequence-what-can-i-do-)
+  - [3. Why is my sequence too short after trimming, and how can I fix it ?](#3-why-is-my-sequence-too-short-after-trimming-and-how-can-i-fix-it-)
 * [Licence](#license)
 
 For further detailed information, please read the [**ABSP User Guide**](https://github.com/ABSP-methylation-tool/ABSP/blob/813568d14944b20488cc01582a61dfbd602f744c/ABSP%20User%20Guide.pdf) document.
@@ -89,9 +95,9 @@ The "Multiple analyses" tab is useful to analyze multiple samples and/or for mul
 
 <br>
 
-## FAQ
+## FAQ - Frequently Asked Questions
 
-### My reference genome is not available 
+### 1. My reference genome is not available, what can I do ? 
 First, the reference genome is only necessary for visualization of the reference sequence in genomic plots but it is not needed for computing methylation percentages.
 
 Still, there are several possibilities:  
@@ -139,10 +145,28 @@ seqlevels(cs10)[1:10] <- c("chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr
 
 Then, use ABSP with any genome as the default input, as it will bypass it.
 
-### My reference sequence doesn't exist in a reference genome
+***
+<br>
 
-In scenarios such as creating a custom reporter sequence, you can specify arbitrary coordinates in the header of the reference sequence FASTA file. These coordinates should align with the length of your sequence; for example, 'chr1:1-200' for a 200 bp sequence. After setting the coordinates, please consult the previous section titled '[My reference genome is not available](#my-reference-genome-is-not-available)' for guidance on selecting and adjusting the reference genome to suit your needs.
+### 2. My reference sequence doesn't exist in a reference genome (e.g. custom reporter sequence), what can I do ?
 
+In scenarios such as creating a custom reporter sequence, you can specify arbitrary coordinates in the header of the reference sequence FASTA file. These coordinates should align with the length of your sequence; for example, 'chr1:1-200' for a 200 bp sequence. After setting the coordinates, please consult the previous section titled '[My reference genome is not available, what can I do ?](#my-reference-genome-is-not-available-what-can-i-do-)' for guidance on selecting and adjusting the reference genome to suit your needs.
+
+***
+<br>
+
+### 3. Why is my sequence too short after trimming, and how can I fix it ?
+
+You may either end up with a very short final sequence with only a few CpG sites covered in the “Methylation” tab, or the analysis may be aborted with the error message: “Error: Analysis has been stopped as no CpG sites were found covered by sequencing results.”  
+
+First, check the “Trimming plot” in the “Sequencing trimming” tab, as this will provide insight into the trimming step results. The results from both trimming methods—based on quality scores (orange) and primary ratios (blue)—are combined to produce the final trimmed sequence (green). The purpose of trimming is to remove low-quality ends from the sequence. It should not trim the sequence too short, nor should it allow low-quality ends to be kept for next steps of the analysis.  
+
+*	If the trimming method based on Phred quality scores is too aggressive, consider lowering the minimum base-calling error probability threshold `th_quality_error` in the `ABSP_individual_analysis.Rmd` file (line 607). By default, this is set to 0.001, which corresponds to a base-calling accuracy of 99.9% and a Phred quality score of 30. Lowering it to 0.01, for example, corresponds to a base-calling accuracy of 99% and a Phred quality score of 20.
+*	If the trimming method based on Primary peak ratios is too strict, you can adjust the following thresholds: `th_mixed_position` (default: 0.75, line 612 in the ABSP_individual_analysis.Rmd file), this is the minimum primary peak ratio for a position to be considered non-mixed, and/or `th_mixed_perc` (default: 75%, line 614), this is the minimum percentage of non-mixed positions in the trimmed sequence.
+  
+To assist in setting these thresholds, review the detailed values of Phred quality scores and primary peak ratios for each position in the “Raw Sequence” > “Table” tab. Keep in mind the potential impact that lowering thresholds may have on subsequent steps in the analysis.
+
+***
 
 <br>
 
