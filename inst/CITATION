@@ -1,0 +1,13 @@
+bibentry(
+  bibtype  = "Article",
+  title    = {ABSP: an automated R tool to efficiently analyze region-specific CpG methylation from bisulfite sequencing PCR},
+  author   = {Denoulet, Marie and Brulé, Mathilde and Anquez, François and Vincent, Audrey and Schnipper, Julie and Adriaenssens, Eric and Toillon, Robert-Alain and Le Bourhis, Xuefen and Lagadec, Chann},
+  journal  = {Bioinformatics},
+  year     = {2023},
+  month    = {01},
+  volume   = {39},
+  number   = {1},
+  pages    = {btad008},
+  issn     = {1367-4811},
+  doi      = {10.1093/bioinformatics/btad008},
+)

@@ -1,16 +1,24 @@
 Package: ABSP
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
+Title: Analysis of Bisulfite Sequencing PCR
+Version: 2.0.0
 Authors@R: c(
-    person(
-      "Jane", "Doe",
-      email = "jane@example.com",
-      role = c("aut", "cre")
-    )
+    person("Marie", "Denoulet", , "marie.denoulet@univ-nantes.fr", role = c("cre", "aut"),
+           comment = c(ORCID = "0000-0002-9668-0439")),
+    person("Chann", "Lagadec", , "chann.lagadec@inserm.fr", role = "aut",
+           comment = c(ORCID = "0000-0002-5182-2069"))
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Description: ABSP, which stands for "Analysis of Bisulfite Sequencing PCR", 
+    is an R-based tool designed to analyze CpG methylation profiles using data 
+    from Bisulfite Sequencing PCR (BSP) experiments. It was developed to assist 
+    researchers in estimating and comparing methylation percentages of a DNA 
+    region studied through BSP experiments. 
+    ABSP offers a comprehensive automated workflow, spanning from trace file 
+    sequencing results to data visualization and statistical analysis.
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
+Imports: 
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 3.5)
